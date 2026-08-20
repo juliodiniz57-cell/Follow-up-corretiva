@@ -418,6 +418,29 @@ function syncUrl(codigo) {
   if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return null;
   return `${SYNC_API_BASE}?action=buscar&codigo=${encodeURIComponent(codigo)}`;
 }
+
+// O Google Apps Script (Web App) redireciona a resposta final para
+// script.googleusercontent.com. Em alguns navegadores, o fetch() moderno
+// tem problema para seguir esse redirecionamento em requisições cross-origin,
+// especialmente em POST. O XMLHttpRequest tradicional lida melhor com isso,
+// então usamos ele por baixo dos panos, mas com uma interface parecida com fetch.
+function syncRequest(url, opts) {
+  opts = opts || {};
+  return new Promise(function (resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open(opts.method || "GET", url, true);
+    xhr.onload = function () {
+      resolve({
+        ok: xhr.status >= 200 && xhr.status < 300,
+        status: xhr.status,
+        json: function () { return Promise.resolve().then(function () { return JSON.parse(xhr.responseText); }); },
+        text: function () { return Promise.resolve(xhr.responseText); }
+      });
+    };
+    xhr.onerror = function () { reject(new Error("falha de rede")); };
+    xhr.send(opts.body || null);
+  });
+}
 const SYNC_ID_KEY = "followup_corretiva_sync_id";
 let syncId = safeGetItem(SYNC_ID_KEY) || null;
 let syncPollTimer = null;
@@ -452,7 +475,7 @@ async function syncCriar() {
   if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) { mostrarSyncMsg("Sincronização não configurada. Cole a URL do Web App no início do script.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Criando compartilhamento...");
   try {
-    const resp = await fetch(SYNC_API_BASE + "?action=criar", { method:"POST", body: JSON.stringify(registros) });
+    const resp = await syncRequest(SYNC_API_BASE + "?action=criar", { method:"POST", body: JSON.stringify(registros) });
     if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
     const data = await resp.json();
     if (!data || !data.codigo) throw new Error("o servidor não informou o código do compartilhamento");
@@ -473,7 +496,7 @@ async function syncConectar(codigo) {
   if (!url) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Conectando...");
   try {
-    const resp = await fetch(url);
+    const resp = await syncRequest(url);
     if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
     const dados = await resp.json();
     if (dados && dados.erro) throw new Error("código não encontrado");
@@ -498,7 +521,7 @@ function syncDesconectar() {
 async function syncEnviar() {
   if (!syncId || !SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return;
   try {
-    const resp = await fetch(SYNC_API_BASE + "?action=salvar&codigo=" + encodeURIComponent(syncId), { method:"POST", body: JSON.stringify(registros) });
+    const resp = await syncRequest(SYNC_API_BASE + "?action=salvar&codigo=" + encodeURIComponent(syncId), { method:"POST", body: JSON.stringify(registros) });
     if (!resp.ok) throw new Error("HTTP "+resp.status);
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
@@ -510,7 +533,7 @@ async function syncReceber(mostrarStatus) {
   const url = syncUrl(syncId); if (!url) return;
   if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
   try {
-    const resp = await fetch(url);
+    const resp = await syncRequest(url);
     if (!resp.ok) throw new Error("HTTP "+resp.status);
     const dados = await resp.json();
     if (Array.isArray(dados)) {
