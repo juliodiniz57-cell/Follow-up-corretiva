@@ -345,106 +345,7 @@ tr.row-semdata { background: #fafbfc; }
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script>
 // ===================== DADOS INICIAIS (98 registros da planilha) =====================
-const SEED_DATA = [
-{ordem:"92165254",requisicao:"10518069",pedido:"4500340471 / 4500343693",equipamento:"7086CC",criadoPor:"TCLUNA",textoBreve:"APLICAÇÃO DOS TUBOS E MANGUEIRAS DE IRRIGAÇÃO",statusSap:"AGMA",custoPlan:2418,fornecedor:"TBA",observacao:"NF 121045 - Material chegou dia 10/06/2026 - NF 122477 - prev em ptg dia 15/09",dataPrevista:"2026-08-18",atendida:false},
-{ordem:"92181792",requisicao:"10520136",pedido:"4500341801",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR TUBO DE ABASTECIMENTO DE ÓLEO DO MOTOR",statusSap:"AGPR",custoPlan:3412.98,fornecedor:"SUPERMAC",observacao:"NF 72339 - Material chegou dia 06/08",dataPrevista:null,atendida:true},
-{ordem:"92176867",requisicao:"10519070",pedido:"4500340807",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR PROTETOR TÉRMICO",statusSap:"AGPR",custoPlan:1926.83,fornecedor:"SUPERMAC",observacao:"NF 72045 - Material chegou dia 13/07",dataPrevista:null,atendida:true},
-{ordem:"92167092",requisicao:"10517857",pedido:"4500339902",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR FEIXES DE MOLAS DIANTEIRO",statusSap:"AGPR",custoPlan:16870.26,fornecedor:"SUPERMAC",observacao:"NF 72342 - Material chegou dia 10/08",dataPrevista:null,atendida:true},
-{ordem:"92176552",requisicao:"10519856",pedido:"4500341519",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS CILINDRO DIREÇÃO L",statusSap:"AGMA",custoPlan:1632.94,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 17/08/2026",dataPrevista:"2026-07-20",atendida:false},
-{ordem:"92161231",requisicao:"10515212",pedido:"4500340689",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"CORRETIVA MATERIAL DE COMPRA SOLICITADO",statusSap:"AGPR",custoPlan:59923.23,fornecedor:"Delta Maquinas",observacao:"NF 25578 - material chegou dia 03/08",dataPrevista:null,atendida:true},
-{ordem:"92092785",requisicao:"10509008",pedido:"4500341847 / 4500343508",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"SUBSTITUIR PEÇAS DA TORRE DE ELEVAÇÃO DE 3 ESTAGIO",statusSap:"AGMA",custoPlan:3743.88,fornecedor:"Delta Maquinas",observacao:"PC: 1847 : Vai faturar 17/08 solicitar NF - PC: 3508 : prev de faturamento 03/09",dataPrevista:"2026-08-12",atendida:false},
-{ordem:"92176863",requisicao:"10519069",pedido:"4500340921",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR ISOLADOR DE SOM",statusSap:"AGMA",custoPlan:4129.6,fornecedor:"SUPERMAC",observacao:"Previsão de faturamento dia 28/08",dataPrevista:"2026-08-04",atendida:false},
-{ordem:"92182655",requisicao:"10520060",pedido:"4500341886",equipamento:"7044EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
-{ordem:"92182656",requisicao:"10520061",pedido:"4500341886",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
-{ordem:"92075826",requisicao:"10501048",pedido:"4500334318",equipamento:"7014ES",criadoPor:"CBJUNIOR",textoBreve:"TUBOS E MANGUEIRAS DE LUBRIFICAÇÃO DO BO",statusSap:"AGMA",custoPlan:11445.46,fornecedor:"SOTREQ",observacao:"NF 189474-189472-189473 - material chegou pendente apenas o item mangueira MANGUEIRA CJ CATERPILLAR 2887543 - solicitar previsão de faturamento do rodrigo",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92180010",requisicao:"10520122",pedido:"4500341888",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR CONJUNTO DRENO ÓLEO CARTER MO",statusSap:"AGMA",custoPlan:3126.18,fornecedor:"SOTREQ",observacao:"Previsão de faturamento dia 18/08",dataPrevista:"2026-07-30",atendida:false},
-{ordem:"92041383",requisicao:"10509133",pedido:"4500334657",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"SOLICITA PARA TERMOS PARA CORRETIVA DO E",statusSap:"AGMA",custoPlan:28639.23,fornecedor:"Delta Maquinas",observacao:"NF 25577 - material chegou 03/08 - item ACIONADOR NF 25611 - material chegou dia 03/08",dataPrevista:null,atendida:true},
-{ordem:"92182652",requisicao:"10520059",pedido:"4500341886",equipamento:"7043EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
-{ordem:"92173988",requisicao:"10519100",pedido:"4500341900",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RADIADOR LIQUIDO ARREFECIMENTO",statusSap:"AGMA",custoPlan:1500.01,fornecedor:"Delta Maquinas",observacao:"Previsão de faturamento dia 14/08/2026",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92186581",requisicao:"10520829",pedido:"4500342585",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGAS EIXOS CUBOS DE RODAS TIRANTES DIREÇÃO",statusSap:"AGMA",custoPlan:3928,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento dia 25/08",dataPrevista:"2026-07-26",atendida:false},
-{ordem:"92172595",requisicao:"10517344",pedido:"4500340662",equipamento:"7019EM",criadoPor:"ECARIOCA",textoBreve:"AQUISICAO DE RECURSOS PARA CORRIGIR VAZAMENTO",statusSap:"AGMA",custoPlan:516.58,fornecedor:"Delta Maquinas",observacao:"NF 25716 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
-{ordem:"92182044",requisicao:"10520134",pedido:"4500341760",equipamento:"7034EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGPR",custoPlan:3134.3,fornecedor:"Delta Maquinas",observacao:"NF 25609 - material chegou dia 03/08",dataPrevista:null,atendida:true},
-{ordem:"92184899",requisicao:"10521094",pedido:"4500343132",equipamento:"7006RE",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR MANGUEIRAS DO EQUIPAMENTO 7006RE",statusSap:"AGMA",custoPlan:34578.17,fornecedor:"SOTREQ",observacao:"Solicitar faturamento parcial do material que já esta disponivel",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92184323",requisicao:"10522099",pedido:"4500343679",equipamento:"7086CC",criadoPor:"TCLUNA",textoBreve:"MATERIAIS FEITOS VALES SEM REGISTROS.",statusSap:"AGMA",custoPlan:14766.82,fornecedor:"SUPERMAC",observacao:"NF 72430 - Previsão em ptg dia 18/08/2026",dataPrevista:"2026-07-20",atendida:false},
-{ordem:"92184540",requisicao:"10520446",pedido:"4500342040",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR FLANGE DO CARDAN",statusSap:"AGPR",custoPlan:6588.37,fornecedor:"SUPERMAC",observacao:"NF 71979 - Material chegou dia 13/07/2026",dataPrevista:null,atendida:true},
-{ordem:"92184572",requisicao:"10520447",pedido:"4500342041",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"APLICAR ALAVANCA DE ENCOSTO DO BANCO L/E",statusSap:"AGPR",custoPlan:166.88,fornecedor:"SUPERMAC",observacao:"NF 72343 - Material chegou dia 06/08/2026",dataPrevista:null,atendida:true},
-{ordem:"92171704",requisicao:"10517312",pedido:"4500343130",equipamento:"7012ES",criadoPor:"JDINIZ",textoBreve:"LEVANTAMENTO DE PEÇAS REALIZADO PELOS TE",statusSap:"AGMA",custoPlan:144319.29,fornecedor:"SOTREQ",observacao:"Verificar se pode faturar 17/08",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92156754",requisicao:"10514746",pedido:"4500338653",equipamento:"7013ES",criadoPor:"CBJUNIOR",textoBreve:"DEGRAU LADO D/E.",statusSap:"AGPR",custoPlan:36157.55,fornecedor:"SOTREQ",observacao:"NF 190629 chegou 24/06 - NF 190632 chegou 24/06- NF 189928 chegou 20/07 - NF 190248 chegou 08/06",dataPrevista:null,atendida:true},
-{ordem:"92136474",requisicao:"10512485",pedido:"4500338645",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS LINHAS MOTOR VENTI",statusSap:"AGPR",custoPlan:9159.57,fornecedor:"SOTREQ",observacao:"NF 190329 Material chegou dia 20/07 - NF 190164 material chegou dia 08/06 - NF 190448 material chegou dia 20/06- NF 190611 material chegou dia 24/06 - NF 191121 material chegou 04/07 - NF 191483 material chegou dia 25/07",dataPrevista:null,atendida:true},
-{ordem:"92059069",requisicao:"10499009",pedido:"4500335970",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GUIAS DAS ESTEIRAS",statusSap:"AGMA",custoPlan:286406.36,fornecedor:"SOTREQ",observacao:"Foi solicitado cancelamento via email pelo Paulo Lindoso, verificar se a OM foi encerrada",dataPrevista:"2026-07-17",atendida:false},
-{ordem:"92182074",requisicao:"10521436",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182067",requisicao:"10521445",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:889.2,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182078",requisicao:"10521448",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182466",requisicao:"10520928",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CORREIA COMPRESSOR A/C",statusSap:"AGMA",custoPlan:150,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182071",requisicao:"10521439",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92181866",requisicao:"10520930",pedido:"4500344454",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR TUBO CONEXÃO INFERIORES CILIN",statusSap:"AGMA",custoPlan:205,fornecedor:"Delta Maquinas",observacao:"NF 25711 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
-{ordem:"92184827",requisicao:"10520467",pedido:"4500342688",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"BAIXA EFICIENTE NO GRUPO DE VALVULA",statusSap:"AGMA",custoPlan:111104.76,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 17/08",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92186759",requisicao:"10521133",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CORREIA COMPRESSOR A/C",statusSap:"AGMA",custoPlan:1000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92189028",requisicao:"10521134",pedido:"4500342999",equipamento:"7020TE",criadoPor:"MBRAGANÇA",textoBreve:"SOS - VERIFICAR E TROCAR VEDAÇÕES SISTEMA COMBUSTÍVEL",statusSap:"AGMA",custoPlan:5938.74,fornecedor:"SOTREQ",observacao:"Atualizar dia 17/08 prev faturamento",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92188029",requisicao:"10522592",pedido:"4500344343",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBST TURBINA E JUNTAS COLETORES ESCAPE E ADMISSÃO",statusSap:"AGPR",custoPlan:9777.67,fornecedor:"MARDISA",observacao:"NF 120254 - Material chegou dia 06/08",dataPrevista:null,atendida:true},
-{ordem:"92186757",requisicao:"10521456",pedido:"4500344455",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR CONJUNTO MOLA GÁS CAPÔ MOTOR DIESEL",statusSap:"AGMA",custoPlan:280,fornecedor:"Delta Maquinas",observacao:"prev de faturamento dia 22/10",dataPrevista:"2026-09-25",atendida:false},
-{ordem:"92189792",requisicao:"10522874",pedido:"4500344460",equipamento:"7043EM",criadoPor:"GRIBEIRO",textoBreve:"AQUISIÇÃO DE PEÇAS PARA APLICAÇÃO NA EMPILHADEIRA 7043EM.",statusSap:"AGMA",custoPlan:3958.4,fornecedor:"Delta Maquinas",observacao:"Previsão faturamento dia 24/09/2026",dataPrevista:"2026-08-19",atendida:false},
-{ordem:"92162826",requisicao:"10518071",pedido:"4500344933",equipamento:"7086CC",criadoPor:"PLINDOSO",textoBreve:"MUDAR PARA TANQUE PIPA",statusSap:"AGMA",custoPlan:11516.8,fornecedor:"TBA",observacao:"previsão de faturamento dia 31/08/2026",dataPrevista:"2026-08-18",atendida:false},
-{ordem:"92184558",requisicao:"",pedido:"",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SOLICITAÇÃO DE SERVIÇO PARA SISTEMA SEIVE",statusSap:"AGPL",custoPlan:0,fornecedor:"COTANDO",observacao:"Aguardando Tony adicionar itens na OM para seguir a compra do material solicitado",dataPrevista:"2026-07-30",atendida:false},
-{ordem:"92186284",requisicao:"10522405",pedido:"4500344694",equipamento:"7776PC",criadoPor:"JDINIZ",textoBreve:"REPARAR O COMPRESSOR DO AR CONDICIONADO",statusSap:"AGPL",custoPlan:0,fornecedor:"SOTREQ",observacao:"previsão dia 20/08 faturamento",dataPrevista:"2026-08-03",atendida:false},
-{ordem:"92162690",requisicao:"10515207",pedido:"4500337907",equipamento:"7012ES",criadoPor:"PLINDOSO",textoBreve:"MANGUEIRA DA LINHA DA BOMBA HIDRAULICA.",statusSap:"AGMA",custoPlan:11484.53,fornecedor:"SOTREQ",observacao:"NF 191699 - verificar no IWBK se realmente chegou o material",dataPrevista:"2026-07-17",atendida:false},
-{ordem:"92176771",requisicao:"10519087",pedido:"4500341074",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO ALAVANCA PORTA CABIN",statusSap:"AGPR",custoPlan:3623.97,fornecedor:"SOTREQ",observacao:"NF 191707 - material chegou dia 26/07",dataPrevista:null,atendida:true},
-{ordem:"92159549",requisicao:"10514745",pedido:"4500340197",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR UNIDADES INJETORAS MOTOR DIES",statusSap:"AGPR",custoPlan:89988.84,fornecedor:"SOTREQ",observacao:"NF 191259 - material chegou 14/07",dataPrevista:null,atendida:true},
-{ordem:"92136472",requisicao:"10512483",pedido:"4500338644",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS LINHAS FILTROS COM",statusSap:"AGPR",custoPlan:9987.76,fornecedor:"SOTREQ",observacao:"NF 191353 - material chegou dia 24/07",dataPrevista:null,atendida:true},
-{ordem:"92136523",requisicao:"10512512",pedido:"4500335817",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR LINK CAÇAMBA",statusSap:"AGMA",custoPlan:106706.13,fornecedor:"SOTREQ",observacao:"Atualizar previsão com raquel na segunda feira",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92041342",requisicao:"10496972",pedido:"4500332851",equipamento:"7013ES",criadoPor:"CBJUNIOR",textoBreve:"MANGUEIRA DE COMBUSTIVEIS.",statusSap:"AGPR",custoPlan:20664.67,fornecedor:"SOTREQ",observacao:"NF 191329 material chegou dia 11/07",dataPrevista:null,atendida:true},
-{ordem:"92142598",requisicao:"10514717",pedido:"4500338648",equipamento:"7014ES",criadoPor:"CBJUNIOR",textoBreve:"MAGUEIRAS DO SISTEMA HIDRAULICO.",statusSap:"AGMA",custoPlan:42158.69,fornecedor:"SOTREQ",observacao:"NF 190827 - material chegou dia 08/07 - confirmar no IWBK se chegou tudo.",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182066",requisicao:"10521451",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:2330.96,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182077",requisicao:"10521437",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182551",requisicao:"10520934",pedido:"4500343277",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGAS EIXOS CUBOS DE RODAS T",statusSap:"AGMA",custoPlan:6814.5,fornecedor:"Delta Maquinas",observacao:"prev de faturamento 27/08/2026",dataPrevista:"2026-07-27",atendida:false},
-{ordem:"92182072",requisicao:"10521447",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92181257",requisicao:"10520855",pedido:"4500343637",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR FAROIS FRONTAIS",statusSap:"AGMA",custoPlan:600,fornecedor:"Delta Maquinas",observacao:"previsão faturamento dia 10/08/2026",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182125",requisicao:"10520927",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BANCO OPERADOR",statusSap:"AGMA",custoPlan:2000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182069",requisicao:"10521366",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:889.2,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182080",requisicao:"10521440",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92179807",requisicao:"10519386",pedido:"4500341827",equipamento:"7020TE",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ MOTORES LIMPADORES PARA BRISAS APLICAÇÃO TRATORES D8",statusSap:"AGPR",custoPlan:13013.11,fornecedor:"SOTREQ",observacao:"NF 191579 (material chegou 07/08/2026) - NF 191583 material chegou 20/07 - NF 191584 material chegou 20/07 - NF 191581 material chegou dia 20/07 - NF 191580 (material chegou dia 24/07) - NF 191582 Material chegou dia 24/07/2026",dataPrevista:null,atendida:true},
-{ordem:"92184840",requisicao:"10520475",pedido:"4500342574",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"BAIXA EFICIENCIA NOS SOLENOIDES",statusSap:"AGPR",custoPlan:3243.3,fornecedor:"SOTREQ",observacao:"NF 191089 - material chegou dia 17/07",dataPrevista:null,atendida:true},
-{ordem:"92191079",requisicao:"10522206",pedido:"4500344123",equipamento:"7010ES",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR VEDAÇÃO DO GRUPO DE VALVULAS",statusSap:"AGPR",custoPlan:11470.81,fornecedor:"SOTREQ",observacao:"NF 191748 / 191749 - material chegou dia 07/08",dataPrevista:null,atendida:true},
-{ordem:"92167808",requisicao:"10516698",pedido:"4500338704",equipamento:"7019ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR PARAFUSOS FIXAÇÃO CONJUNTO ROLAMENTO ENGRENAGEM SISTEMA GIRO",statusSap:"AGPR",custoPlan:38475.6,fornecedor:"SOTREQ",observacao:"NF 190830 - material chegou dia 08/07",dataPrevista:null,atendida:true},
-{ordem:"92191056",requisicao:"10522591",pedido:"4500344144",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR CINTO DE SEGURANÇA L/E",statusSap:"AGPR",custoPlan:4537.13,fornecedor:"MARDISA",observacao:"NF 120196 - material chegou dia 01/08",dataPrevista:null,atendida:true},
-{ordem:"92188673",requisicao:"10521452",pedido:"4500343279",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR MANGUEIRAS DA DIREÇÃO",statusSap:"AGMA",custoPlan:691.09,fornecedor:"MARDISA",observacao:"Solicitar previsão de faturamento do fornecedor",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92188012",requisicao:"10521138",pedido:"4500343000",equipamento:"7014ES",criadoPor:"MBRAGANÇA",textoBreve:"REESTABELECER SISTEMA DE PROTEÇÃO DA MÁQUINA",statusSap:"AGPR",custoPlan:12790.89,fornecedor:"SOTREQ",observacao:"NF 191521 - Material chegou dia 24/07",dataPrevista:null,atendida:true},
-{ordem:"92189779",requisicao:"10521441",pedido:"4500343007",equipamento:"7019EM",criadoPor:"GRIBEIRO",textoBreve:"CILINDROS HIDRAULICOS",statusSap:"AGMA",custoPlan:4006.7,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento dia 10/08/2026",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92186857",requisicao:"10521457",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR TAMPA RESERVATÓRIO ÁGUA LIMPADOR PARA BRISAS",statusSap:"AGMA",custoPlan:200,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92189790",requisicao:"10522873",pedido:"4500344855",equipamento:"7043EM",criadoPor:"GRIBEIRO",textoBreve:"AQUISIÇÃO DE PEÇAS PARA APLICAÇÃO NA EMPILHADEIRA 7043EM.",statusSap:"AGMA",custoPlan:9489.03,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182014",requisicao:"10520480",pedido:"4500342588",equipamento:"7034EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR SUPORTE GIROFLEX",statusSap:"AGMA",custoPlan:157.72,fornecedor:"Delta Maquinas",observacao:"NF 25680 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
-{ordem:"92182015",requisicao:"10520481",pedido:"4500342587",equipamento:"7037EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR SUPORTE GIROFLEX",statusSap:"AGMA",custoPlan:157.72,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92182046",requisicao:"10520078",pedido:"4500341663",equipamento:"7034EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RETROVISORES",statusSap:"AGPR",custoPlan:105.48,fornecedor:"Delta Maquinas",observacao:"NF 25628 - material chegou 03/08",dataPrevista:null,atendida:true},
-{ordem:"92182048",requisicao:"10520077",pedido:"4500341662",equipamento:"7037EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RETROVISORES",statusSap:"AGPR",custoPlan:105.48,fornecedor:"Delta Maquinas",observacao:"NF 25627 - material chegou 06/08",dataPrevista:null,atendida:true},
-{ordem:"92180310",requisicao:"10520156",pedido:"4500341886",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CARTER OLEO MOTOR DIESEL",statusSap:"AGMA",custoPlan:5180,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
-{ordem:"92180085",requisicao:"10519547",pedido:"4500341103",equipamento:"7037EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIÇÃO DO ALARME DE RÉ",statusSap:"AGMA",custoPlan:459.18,fornecedor:"Delta Maquinas",observacao:"prev de faturamento 13/08/2026",dataPrevista:"2026-07-23",atendida:false},
-{ordem:"92185110",requisicao:"10520630",pedido:"4500342586",equipamento:"7023EM",criadoPor:"ECARIOCA",textoBreve:"AQUISICAO DE PEÇAS PARA REFORMA DA CAIXA DE TRANSMISSÃO",statusSap:"AGPR",custoPlan:15473.01,fornecedor:"Delta Maquinas",observacao:"NF 25636 - Material chegou 03/08",dataPrevista:null,atendida:true},
-{ordem:"92190062",requisicao:"10521883",pedido:"4500344456",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO FREIO LADO ESQUERDO LADO DIREITO",statusSap:"AGMA",custoPlan:3000,fornecedor:"Delta Maquinas",observacao:"NF 25676 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
-{ordem:"92190064",requisicao:"10522870",pedido:"4500344459",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BUCHAS SUPORTES CENTRAIS BALANÇA TRASEIRA",statusSap:"AGPR",custoPlan:585.32,fornecedor:"Delta Maquinas",observacao:"NF 25677 - material chegou dia 06/08",dataPrevista:null,atendida:true},
-{ordem:"92190085",requisicao:"10523564",pedido:"4500345186",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BUCHAS SUPORTES CENTRAIS BALANÇA TRASEIRA",statusSap:"AGMA",custoPlan:4928.84,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92190059",requisicao:"10522104",pedido:"4500344457",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO FREIO LADO ESQUERDO LADO DIREITO",statusSap:"AGPR",custoPlan:3700,fornecedor:"Delta Maquinas",observacao:"NF 25678 - material chegou dia 06/08",dataPrevista:null,atendida:true},
-{ordem:"92182453",requisicao:"10521462",pedido:"4500343134",equipamento:"7006RE",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GRUPO FREIO ESTACIONAMENTO E CABO ALANCA FREIO ESTACIONAMENTO",statusSap:"AGPR",custoPlan:5183.89,fornecedor:"SOTREQ",observacao:"NF 192025 - 192026 - 192027 - 192028 / material chegou dia 11/08",dataPrevista:null,atendida:true},
-{ordem:"92191932",requisicao:"10521827",pedido:"4500343327",equipamento:"7079CB",criadoPor:"PLINDOSO",textoBreve:"KANBAN DE MATERIAL PARA O ARLA",statusSap:"LIBE",custoPlan:21007.96,fornecedor:"MELO",observacao:"NF 1452639 - Material chegou 10/07 - NF 1457648 Material chegou dia 01/08",dataPrevista:null,atendida:true},
-{ordem:"92190149",requisicao:"10521571",pedido:"4500343376",equipamento:"7777CB",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ DOSADORA ARLA",statusSap:"LIBE",custoPlan:31511.94,fornecedor:"MELO",observacao:"NF 1457649 - Material chegou 01/08",dataPrevista:null,atendida:true},
-{ordem:"92186267",requisicao:"10520777",pedido:"4500343328",equipamento:"7777ES",criadoPor:"ATMARTINS",textoBreve:"ESTEIRA CATERPILLAR 6339336",statusSap:"AGMA",custoPlan:108274.9,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 15/09/2026",dataPrevista:"2026-08-20",atendida:false},
-{ordem:"92184414",requisicao:"10520347",pedido:"4500343136",equipamento:"7777ES",criadoPor:"MBRAGANÇA",textoBreve:"CILINDRO CATERPILLAR 5880714",statusSap:"AGMA",custoPlan:203050.1,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 09/10",dataPrevista:"2026-09-13",atendida:false},
-{ordem:"92186208",requisicao:"10522105",pedido:"",equipamento:"7777ES",criadoPor:"JDINIZ",textoBreve:"MOLA TENSORA MONTADA + MONTAGEM",statusSap:"AGMA",custoPlan:146077.23,fornecedor:"SOTREQ",observacao:"aguardando aprovação pela controladoria do pedido das peças",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92191286",requisicao:"10522718",pedido:"4500344181",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CILINDRO MESTRE",statusSap:"AGPR",custoPlan:8507.26,fornecedor:"Delta Maquinas",observacao:"NF 25674 - material chegou 06/08",dataPrevista:null,atendida:true},
-{ordem:"92198449",requisicao:"10523938",pedido:"4500345190",equipamento:"7026PC",criadoPor:"PLINDOSO",textoBreve:"COMPLEMENTO DE PEÇAS PARA REFORMA PARCIAL DO MOTOR COMBUSTÃO",statusSap:"AGMA",custoPlan:0,fornecedor:"SOTREQ",observacao:"Solicitar faturamento da Raquel dia 17/08/2026",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92191612",requisicao:"10522959",pedido:"4500344524",equipamento:"7030 PC",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR COXINS DA TRANSMISSÃO",statusSap:"AGMA",custoPlan:2524.2,fornecedor:"NISSEY",observacao:"previsão de faturamento dia 18/08",dataPrevista:"2026-07-20",atendida:false},
-{ordem:"92191602",requisicao:"10523535",pedido:"4500345186",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGMA",custoPlan:0,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92194201",requisicao:"10522957",pedido:"4500344366",equipamento:"7030 PC",criadoPor:"JDINIZ",textoBreve:"REPOR VALE SISTEMA ELETRICO ELETRONICO",statusSap:"AGPR",custoPlan:21433.95,fornecedor:"NISSEY",observacao:"NF 1623 - Material chegou dia 11/08",dataPrevista:null,atendida:true},
-{ordem:"92194214",requisicao:"10522958",pedido:"4500344524",equipamento:"7030 PC",criadoPor:"JDINIZ",textoBreve:"REPOR VALE CONJUNTO DE ASSENTO COMPLETO",statusSap:"AGMA",custoPlan:50000,fornecedor:"NISSEY",observacao:"previsão de faturamento dia 18/08",dataPrevista:"2026-07-20",atendida:false},
-{ordem:"92203916",requisicao:"",pedido:"",equipamento:"7086CC",criadoPor:"PLINDOSO",textoBreve:"IMPLEMENTO DO CAMINHAO PIPA;MODELO:SCANIA P250 B6X4 XT ;",statusSap:"AGCO",custoPlan:0,fornecedor:"COTANDO",observacao:"Em processo de cadastro aguardando cod SAP",dataPrevista:"2026-07-22",atendida:false},
-{ordem:"92203543",requisicao:"10524534",pedido:"4500345394",equipamento:"7023EM",criadoPor:"PLINDOSO",textoBreve:"PENDÊNCIA DE PEÇA PARA REFORMA DA CAIXA DE TRANSMISSAO",statusSap:"AGMA",custoPlan:100,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92199416",requisicao:"10524089",pedido:"",equipamento:"7019ES",criadoPor:"PLINDOSO",textoBreve:"CILINDROS DE ELEVAÇÃO E CAÇAMBA ESCAVADEIRA 374 KHH",statusSap:"AGMA",custoPlan:250000,fornecedor:"COTANDO",observacao:"RC Em processo de aprovação na torre de controle",dataPrevista:"2026-07-30",atendida:false},
-{ordem:"92196726",requisicao:"10523205",pedido:"4500345186",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR RETROVISOR LADO DIREITO CABINE OPERADOR",statusSap:"AGMA",custoPlan:50,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92197108",requisicao:"10522940",pedido:"4500344411",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ AROS DIANTERIO E TRASEIRO",statusSap:"AGMA",custoPlan:5229.22,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92191598",requisicao:"10523754",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGMA",custoPlan:12000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92203915",requisicao:"10524635",pedido:"",equipamento:"7040EM",criadoPor:"PLINDOSO",textoBreve:"REPOR VALE FEITO NO EQUIPAMEWNTO PARA LIBERAÇÃO DA 7041EM",statusSap:"AGMA",custoPlan:3445.84,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
-{ordem:"92199404",requisicao:"10524252",pedido:"",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"CONDESADOR DO AR_CONDICIONADO",statusSap:"AGMA",custoPlan:26400,fornecedor:"COTANDO",observacao:"RC em processo de aprovação na controladoria",dataPrevista:"2026-07-30",atendida:false},
-{ordem:"92180101",requisicao:"10520123",pedido:"4500341827",equipamento:"7019ES",criadoPor:"JDINIZ",textoBreve:"VAZAMENTO NA BOMBA HIDRAULICA",statusSap:"AGPR",custoPlan:47935.41,fornecedor:"SOTREQ",observacao:"NF 191579 (material chegou 07/08/2026) - NF 191583 material chegou 20/07- NF 191584 material chegou 20/07 - NF 191581 material chegou dia 20/07- NF 191580 (material chegou dia 24/07) - NF 191582 Material chegou dia 24/07/2026",dataPrevista:null,atendida:true}
-];
+const SEED_DATA = [];
 
 const LISTAS = {
   criadoPor: ["TCLUNA","JBRAMOS","ATMARTINS","CBJUNIOR","JDINIZ","PLINDOSO","ECARIOCA","MBRAGANÇA","GRIBEIRO"],
@@ -511,16 +412,16 @@ function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); 
 // do blob, devolvido pelo servidor no cabeçalho "Location" da resposta de
 // criação. Qualquer dispositivo com o mesmo código lê e grava os mesmos dados.
 // Não há login: quem tiver o código tem acesso total.
-const SYNC_API_BASE = "https://jsonblob.com/api/jsonBlob";
+const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec"; // URL do Google Apps Script (Implantar > Nova implantação > App da Web), termina em /exec
+
+function syncUrl(codigo) {
+  if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return null;
+  return `${SYNC_API_BASE}?action=buscar&codigo=${encodeURIComponent(codigo)}`;
+}
 const SYNC_ID_KEY = "followup_corretiva_sync_id";
 let syncId = safeGetItem(SYNC_ID_KEY) || null;
 let syncPollTimer = null;
 let syncBusy = false;
-
-function syncUrl(id) {
-  if (!id) return null;
-  return `${SYNC_API_BASE}/${encodeURIComponent(id)}`;
-}
 
 function modalAbertoAlgum() {
   return ["modalOverlay","confirmOverlay","passwordOverlay"].some(id=>document.getElementById(id).style.display==="flex");
@@ -548,14 +449,14 @@ function mostrarSyncMsg(texto, tipo) {
 }
 
 async function syncCriar() {
+  if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) { mostrarSyncMsg("Sincronização não configurada. Cole a URL do Web App no início do script.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Criando compartilhamento...");
   try {
-    const resp = await fetch(SYNC_API_BASE, { method:"POST", headers:{"Content-Type":"application/json","Accept":"application/json"}, body: JSON.stringify(registros) });
+    const resp = await fetch(SYNC_API_BASE + "?action=criar", { method:"POST", body: JSON.stringify(registros) });
     if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
-    const loc = resp.headers.get("Location") || resp.headers.get("location");
-    if (!loc) throw new Error("o servidor não informou o código do compartilhamento (cabeçalho indisponível)");
-    const novoId = loc.split("/").filter(Boolean).pop();
-    if (!novoId) throw new Error("não foi possível interpretar o código retornado");
+    const data = await resp.json();
+    if (!data || !data.codigo) throw new Error("o servidor não informou o código do compartilhamento");
+    const novoId = data.codigo;
     syncId = novoId; safeSetItem(SYNC_ID_KEY, novoId);
     atualizarUiSync();
     mostrarSyncMsg("Compartilhamento criado! Use o código no outro dispositivo.", "ok");
@@ -572,9 +473,10 @@ async function syncConectar(codigo) {
   if (!url) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Conectando...");
   try {
-    const resp = await fetch(url, { headers:{"Accept":"application/json"} });
+    const resp = await fetch(url);
     if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
     const dados = await resp.json();
+    if (dados && dados.erro) throw new Error("código não encontrado");
     if (!Array.isArray(dados)) throw new Error("formato de dados inesperado");
     registros = dados;
     syncId = codigo; safeSetItem(SYNC_ID_KEY, codigo);
@@ -594,9 +496,9 @@ function syncDesconectar() {
 }
 
 async function syncEnviar() {
-  const url = syncUrl(syncId); if (!url) return;
+  if (!syncId || !SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return;
   try {
-    const resp = await fetch(url, { method:"PUT", headers:{"Content-Type":"application/json","Accept":"application/json"}, body: JSON.stringify(registros) });
+    const resp = await fetch(SYNC_API_BASE + "?action=salvar&codigo=" + encodeURIComponent(syncId), { method:"POST", body: JSON.stringify(registros) });
     if (!resp.ok) throw new Error("HTTP "+resp.status);
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
@@ -608,7 +510,7 @@ async function syncReceber(mostrarStatus) {
   const url = syncUrl(syncId); if (!url) return;
   if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
   try {
-    const resp = await fetch(url, { headers:{"Accept":"application/json"} });
+    const resp = await fetch(url);
     if (!resp.ok) throw new Error("HTTP "+resp.status);
     const dados = await resp.json();
     if (Array.isArray(dados)) {
@@ -634,7 +536,7 @@ async function syncAgora() {
 function iniciarPollingSync() {
   pararPollingSync();
   if (!syncId) return;
-  // jsonblob.com permite até 60 requisições por minuto no uso anônimo,
+  // Verificação periódica via Google Apps Script (Web App do Google),
   // então dá pra verificar com uma frequência bem mais próxima do tempo real.
   syncPollTimer = setInterval(()=>{ if(!modalAbertoAlgum()) syncReceber(false); }, 45*1000);
 }
