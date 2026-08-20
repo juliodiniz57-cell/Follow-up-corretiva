@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Follow-up Corretiva | Mineração Taboca</title>
+<style>
+:root {
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-border: #e2e6ec;
+  --color-text: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-primary: #1e3a5f;
+  --color-primary-hover: #163049;
+  --color-accent: #2f6fed;
+  --color-atendida-bg: #e8f0fd;
+  --color-atendida-text: #2952a3;
+  --color-noprazo-bg: #e6f7ea;
+  --color-noprazo-text: #1e7d38;
+  --color-proxvenc-bg: #fff2e0;
+  --color-proxvenc-text: #a35a00;
+  --color-vencida-bg: #fde3e3;
+  --color-vencida-text: #b02a2a;
+  --color-semdata-bg: #eceef1;
+  --color-semdata-text: #5a6472;
+  --radius: 10px;
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 4px 12px rgba(16, 24, 40, 0.08);
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background: var(--color-bg); color: var(--color-text); font-size: 14px; }
+.topbar { background: var(--color-primary); color: #fff; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow-md); }
+.topbar-title h1 { margin: 0; font-size: 20px; font-weight: 600; }
+.subtitle { margin: 4px 0 0; font-size: 13px; color: #cbd8ea; }
+.topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.container { max-width: 1440px; margin: 0 auto; padding: 24px 28px 60px; }
+.btn { border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.05s; white-space: nowrap; }
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--color-accent); color: #fff; }
+.btn-primary:hover { background: #2559c4; }
+.btn-secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
+.btn-secondary:hover { background: rgba(255,255,255,0.2); }
+.btn-ghost { background: transparent; color: var(--color-text-muted); border: 1px solid var(--color-border); }
+.btn-ghost:hover { background: #eef1f5; }
+.btn-danger { background: #d33d3d; color: #fff; }
+.btn-danger:hover { background: #b62f2f; }
+.btn-close { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--color-text-muted); }
+.btn-close:hover { color: var(--color-text); }
+.dashboard { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 22px; }
+.card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); }
+.card-value { font-size: 22px; font-weight: 700; color: var(--color-text); }
+.card-label { font-size: 11.5px; color: var(--color-text-muted); margin-top: 4px; }
+.card-total { border-left-color: var(--color-primary); }
+.card-atendida { border-left-color: var(--color-atendida-text); }
+.card-noprazo { border-left-color: var(--color-noprazo-text); }
+.card-proxvenc { border-left-color: var(--color-proxvenc-text); }
+.card-vencida { border-left-color: var(--color-vencida-text); }
+.card-semdata { border-left-color: var(--color-semdata-text); }
+.card-custo { border-left-color: var(--color-accent); }
+.card-pct { border-left-color: #7c3aed; }
+.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; background: var(--color-surface); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+.filters select, .filters .input-search { padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
+.input-search { flex: 1 1 260px; min-width: 200px; }
+.filters select { min-width: 150px; }
+.filter-date-group { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--color-text-muted); }
+.filter-date-group input[type="date"] { padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
+.table-wrap { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+thead th { position: sticky; top: 0; background: #eef1f6; color: var(--color-text); text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--color-border); white-space: nowrap; }
+tbody td { padding: 9px 12px; border-bottom: 1px solid var(--color-border); font-size: 13px; vertical-align: top; max-width: 280px; }
+tbody tr:hover { background: #f8fafc; }
+td.col-obs, td.col-texto { white-space: normal; word-break: break-word; }
+td.col-actions, th.col-actions { white-space: nowrap; text-align: right; }
+.icon-btn { border: none; background: transparent; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; color: var(--color-text-muted); }
+.icon-btn:hover { background: #eef1f5; color: var(--color-text); }
+.icon-btn.delete:hover { color: #d33d3d; background: #fde3e3; }
+.badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.badge-atendida { background: var(--color-atendida-bg); color: var(--color-atendida-text); }
+.badge-noprazo { background: var(--color-noprazo-bg); color: var(--color-noprazo-text); }
+.badge-proxvenc { background: var(--color-proxvenc-bg); color: var(--color-proxvenc-text); }
+.badge-vencida { background: var(--color-vencida-bg); color: var(--color-vencida-text); }
+.badge-semdata { background: var(--color-semdata-bg); color: var(--color-semdata-text); }
+tr.row-atendida { background: #f7faff; }
+tr.row-noprazo { background: #f6fdf8; }
+tr.row-proxvenc { background: #fffaf3; }
+tr.row-vencida { background: #fef6f6; }
+tr.row-semdata { background: #fafbfc; }
+.empty-state { text-align: center; color: var(--color-text-muted); padding: 40px 0; }
+.record-count { margin-top: 10px; font-size: 12.5px; color: var(--color-text-muted); }
+.sync-status { margin-top: 4px; font-size: 12px; color: var(--color-text-muted); }
+.sync-status.ok { color: #1e7d38; }
+.sync-status.err { color: #b02a2a; }
+.sync-status.busy { color: #a35a00; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 100; }
+.modal { background: #fff; border-radius: 12px; width: 100%; max-width: 760px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-md); }
+.modal-small { max-width: 420px; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--color-border); }
+.modal-header h2 { margin: 0; font-size: 17px; }
+.modal-body { padding: 20px 22px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px 16px; }
+.form-field { display: flex; flex-direction: column; gap: 5px; }
+.form-field-wide { grid-column: 1 / -1; }
+.form-field-checkbox { align-self: center; padding-top: 18px; }
+.form-field label { font-size: 12.5px; font-weight: 600; color: var(--color-text-muted); }
+.form-field input.input-error { border-color: #d33d3d; box-shadow: 0 0 0 3px rgba(211,61,61,0.12); }
+.field-error-msg { font-size: 11.5px; color: #b02a2a; margin-top: 2px; display: none; }
+.field-error-msg.show { display: block; }
+.form-field input, .form-field select, .form-field textarea { padding: 9px 11px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13.5px; font-family: inherit; color: var(--color-text); }
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(47,111,237,0.15); }
+.checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--color-text); cursor: pointer; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--color-border); }
+.cards-wrap { display: none; flex-direction: column; gap: 12px; }
+.record-card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px; border-left: 4px solid var(--color-border); }
+.record-card.row-atendida { background: #f7faff; border-left-color: var(--color-atendida-text); }
+.record-card.row-noprazo { background: #f6fdf8; border-left-color: var(--color-noprazo-text); }
+.record-card.row-proxvenc { background: #fffaf3; border-left-color: var(--color-proxvenc-text); }
+.record-card.row-vencida { background: #fef6f6; border-left-color: var(--color-vencida-text); }
+.record-card.row-semdata { background: #fafbfc; border-left-color: var(--color-semdata-text); }
+.record-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+.record-card-ordem { font-size: 15px; font-weight: 700; color: var(--color-text); }
+.record-card-sub { font-size: 12px; color: var(--color-text-muted); margin-top: 2px; }
+.record-card-body { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; font-size: 12.5px; margin-bottom: 10px; }
+.record-card-field-wide { grid-column: 1 / -1; }
+.record-card-field label { display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .03em; color: var(--color-text-muted); margin-bottom: 2px; }
+.record-card-field span { font-size: 13px; color: var(--color-text); word-break: break-word; }
+.record-card-obs { font-size: 12.5px; background: rgba(255,255,255,0.6); border: 1px solid var(--color-border); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; white-space: normal; word-break: break-word; }
+.record-card-actions { display: flex; gap: 8px; }
+.record-card-actions button { flex: 1; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 1px solid var(--color-border); background: #fff; cursor: pointer; }
+.record-card-actions button.delete { color: #d33d3d; border-color: #f3c9c9; }
+.record-card-actions button:active { transform: translateY(1px); }
+@media (max-width: 1200px) { .dashboard { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 720px) {
+  .topbar { padding: 14px 16px; }
+  .container { padding: 16px; }
+  .dashboard { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .filters { flex-direction: column; }
+  .filters select, .input-search { width: 100%; }
+  .filter-date-group { flex-wrap: wrap; width: 100%; }
+  .filter-date-group input[type="date"] { flex: 1; min-width: 130px; }
+  .table-wrap { display: none; }
+  .cards-wrap { display: flex; }
+  .record-card-body { grid-template-columns: 1fr 1fr; }
+  .modal { max-height: 100vh; border-radius: 0; }
+  .modal-overlay { padding: 0; }
+}
+@media (max-width: 480px) {
+  .topbar { flex-direction: column; align-items: stretch; gap: 12px; }
+  .topbar-title img { height: 24px; }
+  .topbar-title h1 { font-size: 16.5px; }
+  .subtitle { font-size: 12px; }
+  .topbar-actions { width: 100%; }
+  .topbar-actions .btn { flex: 1; padding: 12px 10px; }
+  .record-card-body { grid-template-columns: 1fr; }
+  .dashboard { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .card { padding: 12px 10px; }
+  .card-value { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-title" style="display:flex; align-items:center; gap:16px;">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAACFYAAAJACAYAAACthXAdAAAACXBIWXMAAC4jAAAuIwF4pT92AAAgAElEQVR4nOzd3XHcRrqAYazL16AyIE8E4l7jQtwIxI1AdAAo0xGIisB0IQBRESwdgcmLuV4qgqUykJCAT7XVY48ltX5nMP3zPFUsbZ2bgwFkaIh+8fU/fv/99w4AAAAAAAAAgPd955wAAAAAAAAAAHyYsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAAAAAAIEFYAQAAAAAAAACQIKwAAAAAAAAAAEgQVgAAAAAAAAAAJAgrAAAAAAAAAAAShBUAAAAAAAAAAAnCCgAAAAAAAACABGEFAAAAAAAAAECCsAIAAAAA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gCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIAgVgAAAAAAAAAABLECAAAAAAAAACCIFQAAAAAAAAAAQawAAAAAAAAAAAhiBQAAAAAAAABAECsAAAAAAAAAAIJYAQAAAAAAAAAQxAoAAAAAAAAAgCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIAgVgAAAAAAAAAABLECAAAAAAAAACCIFQAAAAAAAAAAQawAAAAAAAAAAAhiBQAAAAAAAABAECsAAAAAAAAAAIJYAQAAAAAAAAAQxAoAAAAAAAAAgCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIAgVgAAAAAAAAAABLECAAAAAAAAACCIFQAAAAAAAAAAQawAAAAAAAAAAAhiBQAAAAAAAABAECsAAAAAAAAAAIJYAQAAAAAAAAAQxAoAAAAAAAAAgCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIAgVgAAAAAAAAAABLECAAAAAAAAACCIFQAAAAAAAAAAQawAAAAAAAAAAAhiBQAAAAAAAABAECsAAAAAAAAAAIJYAQAAAAAAAAAQxAoAAAAAAAAAgCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIAgVgAAAAAAAAAABLECAAAAAAAAACCIFQAAAAAAAAAAQawAAAAAAAAAAAhiBQAAAAAAAABAECsAAAAAAAAAAIJYAQAAAAAAAAAQxAoAAAAAAAAAgCBWAAAAAAAAAAAEsQIAAAAAAAAAIIgVAAAAAAAAAABBrAAAAAAAAAAACGIFAAAAAAAAAEAQKwAAAAAAAAAAglgBAAAAAAAAABDECgAAAAAAAACAIFYAAAAAAAAAAASxAgAAAAAAAAAgiBUAAAAAAAAAAEGsAAAAAAAAAAAIYgUAAAAAAAAAQBArAAAAAAAAAACCWAEAAAAAAAAAEMQKAAAAAAAAAIDPtgPj/eJdYbhQIAAAAABJRU5ErkJggg==" alt="Mineração Taboca" style="height:32px; width:auto; background:#fff; padding:4px 8px; border-radius:6px;">
+    <div>
+      <h1>Follow-up de Manutenção Corretiva</h1>
+      <p id="subtitle" class="subtitle">Acompanhamento de materiais e ordens de manutenção</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button id="btnSync" class="btn btn-secondary">🔗 Sincronizar</button>
+    <button id="btnExport" class="btn btn-secondary">Exportar Excel</button>
+    <button id="btnPainelGerencial" class="btn btn-secondary">📊 Painel Gerencial</button>
+    <button id="btnAdd" class="btn btn-primary">+ Novo Registro</button>
+  </div>
+</header>
+
+<main class="container">
+  <section class="dashboard" id="dashboard">
+    <div class="card card-total"><span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span></div>
+    <div class="card card-atendida"><span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span></div>
+    <div class="card card-noprazo"><span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span></div>
+    <div class="card card-proxvenc"><span class="card-value" id="kpiProxVenc">0</span><span class="card-label">Próx. Venc.</span></div>
+    <div class="card card-vencida"><span class="card-value" id="kpiVencida">0</span><span class="card-label">Vencidas</span></div>
+    <div class="card card-semdata"><span class="card-value" id="kpiSemData">0</span><span class="card-label">Sem Data</span></div>
+    <div class="card card-custo"><span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span></div>
+    <div class="card card-pct"><span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span></div>
+  </section>
+
+  <section class="filters">
+    <input type="search" id="fSearch" class="input-search" placeholder="Buscar por Ordem, Equipamento, Descrição, Observação...">
+    <select id="fSituacao"><option value="">Situação (todas)</option><option value="Atendida">Atendida</option><option value="No Prazo">No Prazo</option><option value="Prox. Venc.">Prox. Venc.</option><option value="VENCIDA">VENCIDA</option><option value="Sem Data">Sem Data</option></select>
+    <select id="fStatusSap"><option value="">Status SAP (todos)</option></select>
+    <select id="fFornecedor"><option value="">Fornecedor (todos)</option></select>
+    <select id="fCriadoPor"><option value="">Criado por (todos)</option></select>
+    <div class="filter-date-group">
+      <label for="fDataDe">Data prevista de</label>
+      <input type="date" id="fDataDe">
+      <label for="fDataAte">até</label>
+      <input type="date" id="fDataAte">
+    </div>
+    <button id="btnClearFilters" class="btn btn-ghost">Limpar filtros</button>
+  </section>
+
+  <section class="table-wrap">
+    <table id="tblFollowUp">
+      <thead>
+        <tr>
+          <th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Criado por</th>
+          <th>Texto Breve</th><th>Status SAP</th><th>Custo Plan. (R$)</th><th>Fornecedor</th>
+          <th>Status / Observação</th><th>Data Prevista</th><th>Dias</th><th>Situação</th>
+          <th class="col-actions">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tblBody"></tbody>
+    </table>
+    <p id="emptyState" class="empty-state" style="display:none;">Nenhum registro encontrado com os filtros atuais.</p>
+  </section>
+  <div id="cardsWrap" class="cards-wrap"></div>
+  <p class="record-count" id="recordCount"></p>
+  <p class="sync-status" id="syncStatusLine"></p>
+</main>
+
+<!-- Modal Add/Editar -->
+<div id="modalOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Novo Registro</h2>
+      <button id="btnCloseModal" class="btn-close">&times;</button>
+    </div>
+    <form id="formRegistro" class="modal-body">
+      <input type="hidden" id="fId">
+      <div class="form-grid">
+        <div class="form-field"><label for="fOrdem">Ordem (OM)</label><input type="text" id="fOrdem" placeholder="Ex: 92165254"><span id="fOrdemError" class="field-error-msg">Este registro já existe.</span></div>
+        <div class="form-field"><label for="fRequisicao">Requisição</label><input type="text" id="fRequisicao" placeholder="Ex: 10518069"></div>
+        <div class="form-field"><label for="fPedido">Pedido</label><input type="text" id="fPedido" placeholder="Ex: 4500340471"></div>
+        <div class="form-field"><label for="fEquipamento">Equipamento</label><input type="text" id="fEquipamento" list="dlEquipamento" placeholder="Ex: 7086CC"><datalist id="dlEquipamento"></datalist></div>
+        <div class="form-field"><label for="mCriadoPor">Criado por</label><input type="text" id="mCriadoPor" list="dlCriadoPor" placeholder="Selecione ou digite"><datalist id="dlCriadoPor"></datalist></div>
+        <div class="form-field"><label for="mStatusSap">Status SAP</label><input type="text" id="mStatusSap" list="dlStatusSap" placeholder="Selecione ou digite" style="text-transform:uppercase;"><datalist id="dlStatusSap"></datalist></div>
+        <div class="form-field"><label for="fCustoPlan">Custo Planejado (R$)</label><input type="number" id="fCustoPlan" step="0.01" min="0" placeholder="0,00"></div>
+        <div class="form-field"><label for="mFornecedor">Fornecedor</label><input type="text" id="mFornecedor" list="dlFornecedor" placeholder="Selecione ou digite"><datalist id="dlFornecedor"></datalist></div>
+        <div class="form-field form-field-wide"><label for="fTextoBreve">Texto Breve</label><input type="text" id="fTextoBreve" placeholder="Descrição resumida do serviço/material"></div>
+        <div class="form-field form-field-wide"><label for="fObservacao">Status / Observação</label><textarea id="fObservacao" rows="3" placeholder="NF, previsão de faturamento, pendências..."></textarea></div>
+        <div class="form-field"><label for="fDataPrevista">Data Prevista</label><input type="date" id="fDataPrevista"></div>
+        <div class="form-field form-field-checkbox"><label class="checkbox-label"><input type="checkbox" id="fAtendida"> Já atendida (item recebido)</label></div>
+        <div class="form-field"><label>Situação (calculada)</label><span id="previewSituacao" class="badge">-</span></div>
+        <div class="form-field"><label>Dias (calculado)</label><span id="previewDias">-</span></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="btnCancel" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Salvar Registro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Confirmação de exclusão -->
+<div id="confirmOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal modal-small">
+    <div class="modal-header"><h2>Confirmar exclusão</h2></div>
+    <div class="modal-body"><p>Tem certeza que deseja excluir o registro <strong id="confirmOrdem"></strong>? Esta ação não pode ser desfeita.</p></div>
+    <div class="modal-footer">
+      <button id="btnCancelDelete" class="btn btn-ghost">Cancelar</button>
+      <button id="btnConfirmDelete" class="btn btn-danger">Excluir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Senha de edição -->
+<div id="passwordOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal modal-small">
+    <div class="modal-header">
+      <h2>Senha necessária</h2>
+      <button id="btnClosePassword" class="btn-close">&times;</button>
+    </div>
+    <form id="formPassword" class="modal-body">
+      <p style="margin-top:0;color:var(--color-text-muted);font-size:13.5px;">Digite a senha para adicionar, editar ou excluir registros.</p>
+      <div class="form-field">
+        <label for="fPassword">Senha</label>
+        <input type="password" id="fPassword" placeholder="••••••••" autocomplete="off">
+      </div>
+      <p id="passwordError" style="display:none;color:#b02a2a;font-size:12.5px;margin:6px 0 0;">Senha incorreta. Tente novamente.</p>
+      <div class="modal-footer" style="padding:16px 0 0;">
+        <button type="button" id="btnCancelPassword" class="btn btn-ghost">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Confirmar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Sincronização -->
+<div id="syncOverlay" class="modal-overlay" style="display:none;">
+  <div class="modal modal-small">
+    <div class="modal-header">
+      <h2>Sincronização entre dispositivos</h2>
+      <button id="btnCloseSync" class="btn-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-top:0;color:var(--color-text-muted);font-size:13px;">Compartilhe os mesmos registros entre o computador e o celular usando um código. Quem tiver o código pode ver e editar os dados — não compartilhe com quem não deveria ter acesso. A verificação automática roda a cada poucos minutos (não é instantânea); use "Sincronizar agora" quando precisar atualizar na hora.</p>
+
+      <div id="syncNotConnected">
+        <div class="form-field" style="margin-bottom:12px;">
+          <label>Já tem um código de outro dispositivo?</label>
+          <input type="text" id="fSyncCodeInput" placeholder="Cole o código aqui">
+        </div>
+        <button type="button" id="btnSyncConnect" class="btn btn-primary" style="width:100%;margin-bottom:10px;">Conectar com código existente</button>
+        <div style="text-align:center;color:var(--color-text-muted);font-size:12px;margin:10px 0;">— ou —</div>
+        <button type="button" id="btnSyncCreate" class="btn btn-ghost" style="width:100%;">Criar novo compartilhamento</button>
+      </div>
+
+      <div id="syncConnected" style="display:none;">
+        <div class="form-field" style="margin-bottom:12px;">
+          <label>Código deste compartilhamento</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="fSyncCodeDisplay" readonly style="flex:1;">
+            <button type="button" id="btnSyncCopy" class="btn btn-ghost">Copiar</button>
+          </div>
+        </div>
+        <p style="font-size:12.5px;color:var(--color-text-muted);">Use este mesmo código no outro dispositivo (em "Conectar com código existente") para ver e editar os mesmos registros.</p>
+        <button type="button" id="btnSyncNow" class="btn btn-primary" style="width:100%;margin-bottom:10px;">Sincronizar agora</button>
+        <button type="button" id="btnSyncDisconnect" class="btn btn-ghost" style="width:100%;">Desconectar deste dispositivo</button>
+      </div>
+
+      <p id="syncMsg" style="display:none;font-size:12.5px;margin:12px 0 0;"></p>
+
+      <hr style="margin:18px 0;border:none;border-top:1px solid var(--color-border);">
+      <h3 style="margin:0 0 6px;font-size:14px;">Transferência manual (sem internet)</h3>
+      <p style="margin:0 0 12px;color:var(--color-text-muted);font-size:12.5px;">Se a sincronização automática não funcionar na sua rede (comum em redes de empresa), copie os dados de um dispositivo e cole no outro. Envie o texto copiado por WhatsApp, e-mail etc.</p>
+      <button type="button" id="btnManualExport" class="btn btn-ghost" style="width:100%;margin-bottom:10px;">Copiar dados deste dispositivo</button>
+      <div class="form-field" style="margin-bottom:10px;">
+        <label>Colar dados recebidos de outro dispositivo</label>
+        <textarea id="fManualImport" rows="3" placeholder="Cole aqui o texto copiado do outro dispositivo" style="width:100%;font-size:12px;"></textarea>
+      </div>
+      <button type="button" id="btnManualImport" class="btn btn-primary" style="width:100%;">Importar e substituir os dados deste dispositivo</button>
+      <p id="manualMsg" style="display:none;font-size:12.5px;margin:12px 0 0;"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" id="btnSyncClose2" class="btn btn-ghost">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script>
+// ===================== DADOS INICIAIS (98 registros da planilha) =====================
+const SEED_DATA = [
+{ordem:"92165254",requisicao:"10518069",pedido:"4500340471 / 4500343693",equipamento:"7086CC",criadoPor:"TCLUNA",textoBreve:"APLICAÇÃO DOS TUBOS E MANGUEIRAS DE IRRIGAÇÃO",statusSap:"AGMA",custoPlan:2418,fornecedor:"TBA",observacao:"NF 121045 - Material chegou dia 10/06/2026 - NF 122477 - prev em ptg dia 15/09",dataPrevista:"2026-08-18",atendida:false},
+{ordem:"92181792",requisicao:"10520136",pedido:"4500341801",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR TUBO DE ABASTECIMENTO DE ÓLEO DO MOTOR",statusSap:"AGPR",custoPlan:3412.98,fornecedor:"SUPERMAC",observacao:"NF 72339 - Material chegou dia 06/08",dataPrevista:null,atendida:true},
+{ordem:"92176867",requisicao:"10519070",pedido:"4500340807",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR PROTETOR TÉRMICO",statusSap:"AGPR",custoPlan:1926.83,fornecedor:"SUPERMAC",observacao:"NF 72045 - Material chegou dia 13/07",dataPrevista:null,atendida:true},
+{ordem:"92167092",requisicao:"10517857",pedido:"4500339902",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR FEIXES DE MOLAS DIANTEIRO",statusSap:"AGPR",custoPlan:16870.26,fornecedor:"SUPERMAC",observacao:"NF 72342 - Material chegou dia 10/08",dataPrevista:null,atendida:true},
+{ordem:"92176552",requisicao:"10519856",pedido:"4500341519",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS CILINDRO DIREÇÃO L",statusSap:"AGMA",custoPlan:1632.94,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 17/08/2026",dataPrevista:"2026-07-20",atendida:false},
+{ordem:"92161231",requisicao:"10515212",pedido:"4500340689",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"CORRETIVA MATERIAL DE COMPRA SOLICITADO",statusSap:"AGPR",custoPlan:59923.23,fornecedor:"Delta Maquinas",observacao:"NF 25578 - material chegou dia 03/08",dataPrevista:null,atendida:true},
+{ordem:"92092785",requisicao:"10509008",pedido:"4500341847 / 4500343508",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"SUBSTITUIR PEÇAS DA TORRE DE ELEVAÇÃO DE 3 ESTAGIO",statusSap:"AGMA",custoPlan:3743.88,fornecedor:"Delta Maquinas",observacao:"PC: 1847 : Vai faturar 17/08 solicitar NF - PC: 3508 : prev de faturamento 03/09",dataPrevista:"2026-08-12",atendida:false},
+{ordem:"92176863",requisicao:"10519069",pedido:"4500340921",equipamento:"7087CC",criadoPor:"JBRAMOS",textoBreve:"SUBSTITUIR ISOLADOR DE SOM",statusSap:"AGMA",custoPlan:4129.6,fornecedor:"SUPERMAC",observacao:"Previsão de faturamento dia 28/08",dataPrevista:"2026-08-04",atendida:false},
+{ordem:"92182655",requisicao:"10520060",pedido:"4500341886",equipamento:"7044EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
+{ordem:"92182656",requisicao:"10520061",pedido:"4500341886",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
+{ordem:"92075826",requisicao:"10501048",pedido:"4500334318",equipamento:"7014ES",criadoPor:"CBJUNIOR",textoBreve:"TUBOS E MANGUEIRAS DE LUBRIFICAÇÃO DO BO",statusSap:"AGMA",custoPlan:11445.46,fornecedor:"SOTREQ",observacao:"NF 189474-189472-189473 - material chegou pendente apenas o item mangueira MANGUEIRA CJ CATERPILLAR 2887543 - solicitar previsão de faturamento do rodrigo",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92180010",requisicao:"10520122",pedido:"4500341888",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR CONJUNTO DRENO ÓLEO CARTER MO",statusSap:"AGMA",custoPlan:3126.18,fornecedor:"SOTREQ",observacao:"Previsão de faturamento dia 18/08",dataPrevista:"2026-07-30",atendida:false},
+{ordem:"92041383",requisicao:"10509133",pedido:"4500334657",equipamento:"7040EM",criadoPor:"CBJUNIOR",textoBreve:"SOLICITA PARA TERMOS PARA CORRETIVA DO E",statusSap:"AGMA",custoPlan:28639.23,fornecedor:"Delta Maquinas",observacao:"NF 25577 - material chegou 03/08 - item ACIONADOR NF 25611 - material chegou dia 03/08",dataPrevista:null,atendida:true},
+{ordem:"92182652",requisicao:"10520059",pedido:"4500341886",equipamento:"7043EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ PARAFUSOS ARO RODA TRASEIRO E D",statusSap:"AGMA",custoPlan:2157.8,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
+{ordem:"92173988",requisicao:"10519100",pedido:"4500341900",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RADIADOR LIQUIDO ARREFECIMENTO",statusSap:"AGMA",custoPlan:1500.01,fornecedor:"Delta Maquinas",observacao:"Previsão de faturamento dia 14/08/2026",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92186581",requisicao:"10520829",pedido:"4500342585",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGAS EIXOS CUBOS DE RODAS TIRANTES DIREÇÃO",statusSap:"AGMA",custoPlan:3928,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento dia 25/08",dataPrevista:"2026-07-26",atendida:false},
+{ordem:"92172595",requisicao:"10517344",pedido:"4500340662",equipamento:"7019EM",criadoPor:"ECARIOCA",textoBreve:"AQUISICAO DE RECURSOS PARA CORRIGIR VAZAMENTO",statusSap:"AGMA",custoPlan:516.58,fornecedor:"Delta Maquinas",observacao:"NF 25716 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
+{ordem:"92182044",requisicao:"10520134",pedido:"4500341760",equipamento:"7034EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGPR",custoPlan:3134.3,fornecedor:"Delta Maquinas",observacao:"NF 25609 - material chegou dia 03/08",dataPrevista:null,atendida:true},
+{ordem:"92184899",requisicao:"10521094",pedido:"4500343132",equipamento:"7006RE",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR MANGUEIRAS DO EQUIPAMENTO 7006RE",statusSap:"AGMA",custoPlan:34578.17,fornecedor:"SOTREQ",observacao:"Solicitar faturamento parcial do material que já esta disponivel",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92184323",requisicao:"10522099",pedido:"4500343679",equipamento:"7086CC",criadoPor:"TCLUNA",textoBreve:"MATERIAIS FEITOS VALES SEM REGISTROS.",statusSap:"AGMA",custoPlan:14766.82,fornecedor:"SUPERMAC",observacao:"NF 72430 - Previsão em ptg dia 18/08/2026",dataPrevista:"2026-07-20",atendida:false},
+{ordem:"92184540",requisicao:"10520446",pedido:"4500342040",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR FLANGE DO CARDAN",statusSap:"AGPR",custoPlan:6588.37,fornecedor:"SUPERMAC",observacao:"NF 71979 - Material chegou dia 13/07/2026",dataPrevista:null,atendida:true},
+{ordem:"92184572",requisicao:"10520447",pedido:"4500342041",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"APLICAR ALAVANCA DE ENCOSTO DO BANCO L/E",statusSap:"AGPR",custoPlan:166.88,fornecedor:"SUPERMAC",observacao:"NF 72343 - Material chegou dia 06/08/2026",dataPrevista:null,atendida:true},
+{ordem:"92171704",requisicao:"10517312",pedido:"4500343130",equipamento:"7012ES",criadoPor:"JDINIZ",textoBreve:"LEVANTAMENTO DE PEÇAS REALIZADO PELOS TE",statusSap:"AGMA",custoPlan:144319.29,fornecedor:"SOTREQ",observacao:"Verificar se pode faturar 17/08",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92156754",requisicao:"10514746",pedido:"4500338653",equipamento:"7013ES",criadoPor:"CBJUNIOR",textoBreve:"DEGRAU LADO D/E.",statusSap:"AGPR",custoPlan:36157.55,fornecedor:"SOTREQ",observacao:"NF 190629 chegou 24/06 - NF 190632 chegou 24/06- NF 189928 chegou 20/07 - NF 190248 chegou 08/06",dataPrevista:null,atendida:true},
+{ordem:"92136474",requisicao:"10512485",pedido:"4500338645",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS LINHAS MOTOR VENTI",statusSap:"AGPR",custoPlan:9159.57,fornecedor:"SOTREQ",observacao:"NF 190329 Material chegou dia 20/07 - NF 190164 material chegou dia 08/06 - NF 190448 material chegou dia 20/06- NF 190611 material chegou dia 24/06 - NF 191121 material chegou 04/07 - NF 191483 material chegou dia 25/07",dataPrevista:null,atendida:true},
+{ordem:"92059069",requisicao:"10499009",pedido:"4500335970",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GUIAS DAS ESTEIRAS",statusSap:"AGMA",custoPlan:286406.36,fornecedor:"SOTREQ",observacao:"Foi solicitado cancelamento via email pelo Paulo Lindoso, verificar se a OM foi encerrada",dataPrevista:"2026-07-17",atendida:false},
+{ordem:"92182074",requisicao:"10521436",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182067",requisicao:"10521445",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:889.2,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182078",requisicao:"10521448",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182466",requisicao:"10520928",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CORREIA COMPRESSOR A/C",statusSap:"AGMA",custoPlan:150,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182071",requisicao:"10521439",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92181866",requisicao:"10520930",pedido:"4500344454",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR TUBO CONEXÃO INFERIORES CILIN",statusSap:"AGMA",custoPlan:205,fornecedor:"Delta Maquinas",observacao:"NF 25711 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
+{ordem:"92184827",requisicao:"10520467",pedido:"4500342688",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"BAIXA EFICIENTE NO GRUPO DE VALVULA",statusSap:"AGMA",custoPlan:111104.76,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 17/08",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92186759",requisicao:"10521133",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CORREIA COMPRESSOR A/C",statusSap:"AGMA",custoPlan:1000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92189028",requisicao:"10521134",pedido:"4500342999",equipamento:"7020TE",criadoPor:"MBRAGANÇA",textoBreve:"SOS - VERIFICAR E TROCAR VEDAÇÕES SISTEMA COMBUSTÍVEL",statusSap:"AGMA",custoPlan:5938.74,fornecedor:"SOTREQ",observacao:"Atualizar dia 17/08 prev faturamento",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92188029",requisicao:"10522592",pedido:"4500344343",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBST TURBINA E JUNTAS COLETORES ESCAPE E ADMISSÃO",statusSap:"AGPR",custoPlan:9777.67,fornecedor:"MARDISA",observacao:"NF 120254 - Material chegou dia 06/08",dataPrevista:null,atendida:true},
+{ordem:"92186757",requisicao:"10521456",pedido:"4500344455",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR CONJUNTO MOLA GÁS CAPÔ MOTOR DIESEL",statusSap:"AGMA",custoPlan:280,fornecedor:"Delta Maquinas",observacao:"prev de faturamento dia 22/10",dataPrevista:"2026-09-25",atendida:false},
+{ordem:"92189792",requisicao:"10522874",pedido:"4500344460",equipamento:"7043EM",criadoPor:"GRIBEIRO",textoBreve:"AQUISIÇÃO DE PEÇAS PARA APLICAÇÃO NA EMPILHADEIRA 7043EM.",statusSap:"AGMA",custoPlan:3958.4,fornecedor:"Delta Maquinas",observacao:"Previsão faturamento dia 24/09/2026",dataPrevista:"2026-08-19",atendida:false},
+{ordem:"92162826",requisicao:"10518071",pedido:"4500344933",equipamento:"7086CC",criadoPor:"PLINDOSO",textoBreve:"MUDAR PARA TANQUE PIPA",statusSap:"AGMA",custoPlan:11516.8,fornecedor:"TBA",observacao:"previsão de faturamento dia 31/08/2026",dataPrevista:"2026-08-18",atendida:false},
+{ordem:"92184558",requisicao:"",pedido:"",equipamento:"7087CC",criadoPor:"TCLUNA",textoBreve:"SOLICITAÇÃO DE SERVIÇO PARA SISTEMA SEIVE",statusSap:"AGPL",custoPlan:0,fornecedor:"COTANDO",observacao:"Aguardando Tony adicionar itens na OM para seguir a compra do material solicitado",dataPrevista:"2026-07-30",atendida:false},
+{ordem:"92186284",requisicao:"10522405",pedido:"4500344694",equipamento:"7776PC",criadoPor:"JDINIZ",textoBreve:"REPARAR O COMPRESSOR DO AR CONDICIONADO",statusSap:"AGPL",custoPlan:0,fornecedor:"SOTREQ",observacao:"previsão dia 20/08 faturamento",dataPrevista:"2026-08-03",atendida:false},
+{ordem:"92162690",requisicao:"10515207",pedido:"4500337907",equipamento:"7012ES",criadoPor:"PLINDOSO",textoBreve:"MANGUEIRA DA LINHA DA BOMBA HIDRAULICA.",statusSap:"AGMA",custoPlan:11484.53,fornecedor:"SOTREQ",observacao:"NF 191699 - verificar no IWBK se realmente chegou o material",dataPrevista:"2026-07-17",atendida:false},
+{ordem:"92176771",requisicao:"10519087",pedido:"4500341074",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO ALAVANCA PORTA CABIN",statusSap:"AGPR",custoPlan:3623.97,fornecedor:"SOTREQ",observacao:"NF 191707 - material chegou dia 26/07",dataPrevista:null,atendida:true},
+{ordem:"92159549",requisicao:"10514745",pedido:"4500340197",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR UNIDADES INJETORAS MOTOR DIES",statusSap:"AGPR",custoPlan:89988.84,fornecedor:"SOTREQ",observacao:"NF 191259 - material chegou 14/07",dataPrevista:null,atendida:true},
+{ordem:"92136472",requisicao:"10512483",pedido:"4500338644",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGUEIRAS LINHAS FILTROS COM",statusSap:"AGPR",custoPlan:9987.76,fornecedor:"SOTREQ",observacao:"NF 191353 - material chegou dia 24/07",dataPrevista:null,atendida:true},
+{ordem:"92136523",requisicao:"10512512",pedido:"4500335817",equipamento:"7013ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR LINK CAÇAMBA",statusSap:"AGMA",custoPlan:106706.13,fornecedor:"SOTREQ",observacao:"Atualizar previsão com raquel na segunda feira",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92041342",requisicao:"10496972",pedido:"4500332851",equipamento:"7013ES",criadoPor:"CBJUNIOR",textoBreve:"MANGUEIRA DE COMBUSTIVEIS.",statusSap:"AGPR",custoPlan:20664.67,fornecedor:"SOTREQ",observacao:"NF 191329 material chegou dia 11/07",dataPrevista:null,atendida:true},
+{ordem:"92142598",requisicao:"10514717",pedido:"4500338648",equipamento:"7014ES",criadoPor:"CBJUNIOR",textoBreve:"MAGUEIRAS DO SISTEMA HIDRAULICO.",statusSap:"AGMA",custoPlan:42158.69,fornecedor:"SOTREQ",observacao:"NF 190827 - material chegou dia 08/07 - confirmar no IWBK se chegou tudo.",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182066",requisicao:"10521451",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:2330.96,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182077",requisicao:"10521437",pedido:"",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182551",requisicao:"10520934",pedido:"4500343277",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MANGAS EIXOS CUBOS DE RODAS T",statusSap:"AGMA",custoPlan:6814.5,fornecedor:"Delta Maquinas",observacao:"prev de faturamento 27/08/2026",dataPrevista:"2026-07-27",atendida:false},
+{ordem:"92182072",requisicao:"10521447",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR MOTOR INTERRUPTOR LIMPADOR PA",statusSap:"AGMA",custoPlan:2606.64,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92181257",requisicao:"10520855",pedido:"4500343637",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR FAROIS FRONTAIS",statusSap:"AGMA",custoPlan:600,fornecedor:"Delta Maquinas",observacao:"previsão faturamento dia 10/08/2026",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182125",requisicao:"10520927",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BANCO OPERADOR",statusSap:"AGMA",custoPlan:2000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182069",requisicao:"10521366",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BATENTES TRAVAS PORTAS LADO D",statusSap:"AGMA",custoPlan:889.2,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182080",requisicao:"10521440",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BORRACHAS VEDAÇÕES PORTAS CAB",statusSap:"AGMA",custoPlan:667,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92179807",requisicao:"10519386",pedido:"4500341827",equipamento:"7020TE",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ MOTORES LIMPADORES PARA BRISAS APLICAÇÃO TRATORES D8",statusSap:"AGPR",custoPlan:13013.11,fornecedor:"SOTREQ",observacao:"NF 191579 (material chegou 07/08/2026) - NF 191583 material chegou 20/07 - NF 191584 material chegou 20/07 - NF 191581 material chegou dia 20/07 - NF 191580 (material chegou dia 24/07) - NF 191582 Material chegou dia 24/07/2026",dataPrevista:null,atendida:true},
+{ordem:"92184840",requisicao:"10520475",pedido:"4500342574",equipamento:"7014ES",criadoPor:"JDINIZ",textoBreve:"BAIXA EFICIENCIA NOS SOLENOIDES",statusSap:"AGPR",custoPlan:3243.3,fornecedor:"SOTREQ",observacao:"NF 191089 - material chegou dia 17/07",dataPrevista:null,atendida:true},
+{ordem:"92191079",requisicao:"10522206",pedido:"4500344123",equipamento:"7010ES",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR VEDAÇÃO DO GRUPO DE VALVULAS",statusSap:"AGPR",custoPlan:11470.81,fornecedor:"SOTREQ",observacao:"NF 191748 / 191749 - material chegou dia 07/08",dataPrevista:null,atendida:true},
+{ordem:"92167808",requisicao:"10516698",pedido:"4500338704",equipamento:"7019ES",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR PARAFUSOS FIXAÇÃO CONJUNTO ROLAMENTO ENGRENAGEM SISTEMA GIRO",statusSap:"AGPR",custoPlan:38475.6,fornecedor:"SOTREQ",observacao:"NF 190830 - material chegou dia 08/07",dataPrevista:null,atendida:true},
+{ordem:"92191056",requisicao:"10522591",pedido:"4500344144",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR CINTO DE SEGURANÇA L/E",statusSap:"AGPR",custoPlan:4537.13,fornecedor:"MARDISA",observacao:"NF 120196 - material chegou dia 01/08",dataPrevista:null,atendida:true},
+{ordem:"92188673",requisicao:"10521452",pedido:"4500343279",equipamento:"7081CB",criadoPor:"TCLUNA",textoBreve:"SUBSTITUIR MANGUEIRAS DA DIREÇÃO",statusSap:"AGMA",custoPlan:691.09,fornecedor:"MARDISA",observacao:"Solicitar previsão de faturamento do fornecedor",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92188012",requisicao:"10521138",pedido:"4500343000",equipamento:"7014ES",criadoPor:"MBRAGANÇA",textoBreve:"REESTABELECER SISTEMA DE PROTEÇÃO DA MÁQUINA",statusSap:"AGPR",custoPlan:12790.89,fornecedor:"SOTREQ",observacao:"NF 191521 - Material chegou dia 24/07",dataPrevista:null,atendida:true},
+{ordem:"92189779",requisicao:"10521441",pedido:"4500343007",equipamento:"7019EM",criadoPor:"GRIBEIRO",textoBreve:"CILINDROS HIDRAULICOS",statusSap:"AGMA",custoPlan:4006.7,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento dia 10/08/2026",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92186857",requisicao:"10521457",pedido:"",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR TAMPA RESERVATÓRIO ÁGUA LIMPADOR PARA BRISAS",statusSap:"AGMA",custoPlan:200,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92189790",requisicao:"10522873",pedido:"4500344855",equipamento:"7043EM",criadoPor:"GRIBEIRO",textoBreve:"AQUISIÇÃO DE PEÇAS PARA APLICAÇÃO NA EMPILHADEIRA 7043EM.",statusSap:"AGMA",custoPlan:9489.03,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182014",requisicao:"10520480",pedido:"4500342588",equipamento:"7034EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR SUPORTE GIROFLEX",statusSap:"AGMA",custoPlan:157.72,fornecedor:"Delta Maquinas",observacao:"NF 25680 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
+{ordem:"92182015",requisicao:"10520481",pedido:"4500342587",equipamento:"7037EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIR SUPORTE GIROFLEX",statusSap:"AGMA",custoPlan:157.72,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92182046",requisicao:"10520078",pedido:"4500341663",equipamento:"7034EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RETROVISORES",statusSap:"AGPR",custoPlan:105.48,fornecedor:"Delta Maquinas",observacao:"NF 25628 - material chegou 03/08",dataPrevista:null,atendida:true},
+{ordem:"92182048",requisicao:"10520077",pedido:"4500341662",equipamento:"7037EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR RETROVISORES",statusSap:"AGPR",custoPlan:105.48,fornecedor:"Delta Maquinas",observacao:"NF 25627 - material chegou 06/08",dataPrevista:null,atendida:true},
+{ordem:"92180310",requisicao:"10520156",pedido:"4500341886",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CARTER OLEO MOTOR DIESEL",statusSap:"AGMA",custoPlan:5180,fornecedor:"Delta Maquinas",observacao:"previsão de faturamento 24/08",dataPrevista:"2026-07-25",atendida:false},
+{ordem:"92180085",requisicao:"10519547",pedido:"4500341103",equipamento:"7037EM",criadoPor:"JDINIZ",textoBreve:"SUBSTITUIÇÃO DO ALARME DE RÉ",statusSap:"AGMA",custoPlan:459.18,fornecedor:"Delta Maquinas",observacao:"prev de faturamento 13/08/2026",dataPrevista:"2026-07-23",atendida:false},
+{ordem:"92185110",requisicao:"10520630",pedido:"4500342586",equipamento:"7023EM",criadoPor:"ECARIOCA",textoBreve:"AQUISICAO DE PEÇAS PARA REFORMA DA CAIXA DE TRANSMISSÃO",statusSap:"AGPR",custoPlan:15473.01,fornecedor:"Delta Maquinas",observacao:"NF 25636 - Material chegou 03/08",dataPrevista:null,atendida:true},
+{ordem:"92190062",requisicao:"10521883",pedido:"4500344456",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO FREIO LADO ESQUERDO LADO DIREITO",statusSap:"AGMA",custoPlan:3000,fornecedor:"Delta Maquinas",observacao:"NF 25676 - material na rota de entrega",dataPrevista:"2026-07-21",atendida:false},
+{ordem:"92190064",requisicao:"10522870",pedido:"4500344459",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BUCHAS SUPORTES CENTRAIS BALANÇA TRASEIRA",statusSap:"AGPR",custoPlan:585.32,fornecedor:"Delta Maquinas",observacao:"NF 25677 - material chegou dia 06/08",dataPrevista:null,atendida:true},
+{ordem:"92190085",requisicao:"10523564",pedido:"4500345186",equipamento:"7044EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR BUCHAS SUPORTES CENTRAIS BALANÇA TRASEIRA",statusSap:"AGMA",custoPlan:4928.84,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92190059",requisicao:"10522104",pedido:"4500344457",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CONJUNTO FREIO LADO ESQUERDO LADO DIREITO",statusSap:"AGPR",custoPlan:3700,fornecedor:"Delta Maquinas",observacao:"NF 25678 - material chegou dia 06/08",dataPrevista:null,atendida:true},
+{ordem:"92182453",requisicao:"10521462",pedido:"4500343134",equipamento:"7006RE",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GRUPO FREIO ESTACIONAMENTO E CABO ALANCA FREIO ESTACIONAMENTO",statusSap:"AGPR",custoPlan:5183.89,fornecedor:"SOTREQ",observacao:"NF 192025 - 192026 - 192027 - 192028 / material chegou dia 11/08",dataPrevista:null,atendida:true},
+{ordem:"92191932",requisicao:"10521827",pedido:"4500343327",equipamento:"7079CB",criadoPor:"PLINDOSO",textoBreve:"KANBAN DE MATERIAL PARA O ARLA",statusSap:"LIBE",custoPlan:21007.96,fornecedor:"MELO",observacao:"NF 1452639 - Material chegou 10/07 - NF 1457648 Material chegou dia 01/08",dataPrevista:null,atendida:true},
+{ordem:"92190149",requisicao:"10521571",pedido:"4500343376",equipamento:"7777CB",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ DOSADORA ARLA",statusSap:"LIBE",custoPlan:31511.94,fornecedor:"MELO",observacao:"NF 1457649 - Material chegou 01/08",dataPrevista:null,atendida:true},
+{ordem:"92186267",requisicao:"10520777",pedido:"4500343328",equipamento:"7777ES",criadoPor:"ATMARTINS",textoBreve:"ESTEIRA CATERPILLAR 6339336",statusSap:"AGMA",custoPlan:108274.9,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 15/09/2026",dataPrevista:"2026-08-20",atendida:false},
+{ordem:"92184414",requisicao:"10520347",pedido:"4500343136",equipamento:"7777ES",criadoPor:"MBRAGANÇA",textoBreve:"CILINDRO CATERPILLAR 5880714",statusSap:"AGMA",custoPlan:203050.1,fornecedor:"SOTREQ",observacao:"previsão de faturamento dia 09/10",dataPrevista:"2026-09-13",atendida:false},
+{ordem:"92186208",requisicao:"10522105",pedido:"",equipamento:"7777ES",criadoPor:"JDINIZ",textoBreve:"MOLA TENSORA MONTADA + MONTAGEM",statusSap:"AGMA",custoPlan:146077.23,fornecedor:"SOTREQ",observacao:"aguardando aprovação pela controladoria do pedido das peças",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92191286",requisicao:"10522718",pedido:"4500344181",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR CILINDRO MESTRE",statusSap:"AGPR",custoPlan:8507.26,fornecedor:"Delta Maquinas",observacao:"NF 25674 - material chegou 06/08",dataPrevista:null,atendida:true},
+{ordem:"92198449",requisicao:"10523938",pedido:"4500345190",equipamento:"7026PC",criadoPor:"PLINDOSO",textoBreve:"COMPLEMENTO DE PEÇAS PARA REFORMA PARCIAL DO MOTOR COMBUSTÃO",statusSap:"AGMA",custoPlan:0,fornecedor:"SOTREQ",observacao:"Solicitar faturamento da Raquel dia 17/08/2026",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92191612",requisicao:"10522959",pedido:"4500344524",equipamento:"7030 PC",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR COXINS DA TRANSMISSÃO",statusSap:"AGMA",custoPlan:2524.2,fornecedor:"NISSEY",observacao:"previsão de faturamento dia 18/08",dataPrevista:"2026-07-20",atendida:false},
+{ordem:"92191602",requisicao:"10523535",pedido:"4500345186",equipamento:"7043EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGMA",custoPlan:0,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão com a camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92194201",requisicao:"10522957",pedido:"4500344366",equipamento:"7030 PC",criadoPor:"JDINIZ",textoBreve:"REPOR VALE SISTEMA ELETRICO ELETRONICO",statusSap:"AGPR",custoPlan:21433.95,fornecedor:"NISSEY",observacao:"NF 1623 - Material chegou dia 11/08",dataPrevista:null,atendida:true},
+{ordem:"92194214",requisicao:"10522958",pedido:"4500344524",equipamento:"7030 PC",criadoPor:"JDINIZ",textoBreve:"REPOR VALE CONJUNTO DE ASSENTO COMPLETO",statusSap:"AGMA",custoPlan:50000,fornecedor:"NISSEY",observacao:"previsão de faturamento dia 18/08",dataPrevista:"2026-07-20",atendida:false},
+{ordem:"92203916",requisicao:"",pedido:"",equipamento:"7086CC",criadoPor:"PLINDOSO",textoBreve:"IMPLEMENTO DO CAMINHAO PIPA;MODELO:SCANIA P250 B6X4 XT ;",statusSap:"AGCO",custoPlan:0,fornecedor:"COTANDO",observacao:"Em processo de cadastro aguardando cod SAP",dataPrevista:"2026-07-22",atendida:false},
+{ordem:"92203543",requisicao:"10524534",pedido:"4500345394",equipamento:"7023EM",criadoPor:"PLINDOSO",textoBreve:"PENDÊNCIA DE PEÇA PARA REFORMA DA CAIXA DE TRANSMISSAO",statusSap:"AGMA",custoPlan:100,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92199416",requisicao:"10524089",pedido:"",equipamento:"7019ES",criadoPor:"PLINDOSO",textoBreve:"CILINDROS DE ELEVAÇÃO E CAÇAMBA ESCAVADEIRA 374 KHH",statusSap:"AGMA",custoPlan:250000,fornecedor:"COTANDO",observacao:"RC Em processo de aprovação na torre de controle",dataPrevista:"2026-07-30",atendida:false},
+{ordem:"92196726",requisicao:"10523205",pedido:"4500345186",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"INSTALAR RETROVISOR LADO DIREITO CABINE OPERADOR",statusSap:"AGMA",custoPlan:50,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92197108",requisicao:"10522940",pedido:"4500344411",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"KANBAN _ AROS DIANTERIO E TRASEIRO",statusSap:"AGMA",custoPlan:5229.22,fornecedor:"Delta Maquinas",observacao:"Atualizar previsão camille",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92191598",requisicao:"10523754",pedido:"",equipamento:"7045EM",criadoPor:"ATMARTINS",textoBreve:"SUBSTITUIR GARFOS",statusSap:"AGMA",custoPlan:12000,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92203915",requisicao:"10524635",pedido:"",equipamento:"7040EM",criadoPor:"PLINDOSO",textoBreve:"REPOR VALE FEITO NO EQUIPAMEWNTO PARA LIBERAÇÃO DA 7041EM",statusSap:"AGMA",custoPlan:3445.84,fornecedor:"COTANDO",observacao:"Solicitar apoio do Jefferson anselmo para gerar PC",dataPrevista:"2026-07-19",atendida:false},
+{ordem:"92199404",requisicao:"10524252",pedido:"",equipamento:"7045EM",criadoPor:"PLINDOSO",textoBreve:"CONDESADOR DO AR_CONDICIONADO",statusSap:"AGMA",custoPlan:26400,fornecedor:"COTANDO",observacao:"RC em processo de aprovação na controladoria",dataPrevista:"2026-07-30",atendida:false},
+{ordem:"92180101",requisicao:"10520123",pedido:"4500341827",equipamento:"7019ES",criadoPor:"JDINIZ",textoBreve:"VAZAMENTO NA BOMBA HIDRAULICA",statusSap:"AGPR",custoPlan:47935.41,fornecedor:"SOTREQ",observacao:"NF 191579 (material chegou 07/08/2026) - NF 191583 material chegou 20/07- NF 191584 material chegou 20/07 - NF 191581 material chegou dia 20/07- NF 191580 (material chegou dia 24/07) - NF 191582 Material chegou dia 24/07/2026",dataPrevista:null,atendida:true}
+];
+
+const LISTAS = {
+  criadoPor: ["TCLUNA","JBRAMOS","ATMARTINS","CBJUNIOR","JDINIZ","PLINDOSO","ECARIOCA","MBRAGANÇA","GRIBEIRO"],
+  statusSap: ["AGMA","AGPR","AGPL","AGCO","LIBE"],
+  fornecedor: ["CASA CASTRO","Delta Maquinas","HIDRAU TORQUE","JAPURA","MARDISA","MELO","NISSEY","SOTREQ","SUPERMAC","TBA","COTANDO"]
+};
+
+// ===================== LÓGICA DO APLICATIVO =====================
+const STORAGE_KEY = "followup_corretiva_registros_v1";
+const EDIT_PASSWORD = "Frota@2026";
+let registros = [];
+let editingId = null;
+let deleteId = null;
+let pendingEditAction = null; // função a executar após senha correta
+
+function hojeISO() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function parseISO(dateStr) { if (!dateStr) return null; const [y,m,d] = dateStr.split("-").map(Number); return new Date(y,m-1,d); }
+function diffDias(dataPrevista) { const hoje = hojeISO(); const d = new Date(dataPrevista); d.setHours(0,0,0,0); return Math.round((hoje - d) / 86400000); }
+
+function calcularSituacao(registro) {
+  if (registro.atendida) return "Atendida";
+  if (!registro.dataPrevista) return "Sem Data";
+  const dias = diffDias(registro.dataPrevista);
+  if (dias > 0) return "VENCIDA";
+  if (-dias <= 3) return "Prox. Venc.";
+  return "No Prazo";
+}
+
+function calcularDiasLabel(registro) {
+  if (registro.atendida) return "Atendida";
+  if (!registro.dataPrevista) return "\u2014";
+  return String(diffDias(registro.dataPrevista));
+}
+
+function situacaoBadgeClass(s) { return s==="Atendida"?"badge-atendida":s==="No Prazo"?"badge-noprazo":s==="Prox. Venc."?"badge-proxvenc":s==="VENCIDA"?"badge-vencida":"badge-semdata"; }
+function situacaoRowClass(s) { return s==="Atendida"?"row-atendida":s==="No Prazo"?"row-noprazo":s==="Prox. Venc."?"row-proxvenc":s==="VENCIDA"?"row-vencida":"row-semdata"; }
+function formatCurrency(v) { return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function formatDateBR(iso) { if(!iso) return ""; const [y,m,d]=iso.split("-"); return d+"/"+m+"/"+y; }
+function uid() { return "r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+// Armazenamento seguro: usa localStorage quando disponível (persiste entre sessões
+// no navegador local) e cai automaticamente para memória (persiste só durante o uso
+// da página) se o ambiente bloquear o acesso ao localStorage (ex.: pré-visualizações
+// em sandbox), evitando que o aplicativo quebre.
+const _memoryStorage = {};
+function safeGetItem(key) {
+  try { return localStorage.getItem(key); } catch(e) { return _memoryStorage[key] ?? null; }
+}
+function safeSetItem(key, value) {
+  try { localStorage.setItem(key, value); } catch(e) { _memoryStorage[key] = value; }
+}
+
+function loadRegistros() {
+  const raw = safeGetItem(STORAGE_KEY);
+  if (raw) { try { registros = JSON.parse(raw); return; } catch(e) {} }
+  registros = SEED_DATA.map(r => ({id:uid(),...r}));
+  saveRegistros();
+}
+function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); }
+
+// ===================== SINCRONIZAÇÃO ENTRE DISPOSITIVOS =====================
+// Usa o serviço público jsonblob.com (anônimo, sem necessidade de conta/chave)
+// como um "documento compartilhado" simples. O código de sincronização é o ID
+// do blob, devolvido pelo servidor no cabeçalho "Location" da resposta de
+// criação. Qualquer dispositivo com o mesmo código lê e grava os mesmos dados.
+// Não há login: quem tiver o código tem acesso total.
+const SYNC_API_BASE = "https://jsonblob.com/api/jsonBlob";
+const SYNC_ID_KEY = "followup_corretiva_sync_id";
+let syncId = safeGetItem(SYNC_ID_KEY) || null;
+let syncPollTimer = null;
+let syncBusy = false;
+
+function syncUrl(id) {
+  if (!id) return null;
+  return `${SYNC_API_BASE}/${encodeURIComponent(id)}`;
+}
+
+function modalAbertoAlgum() {
+  return ["modalOverlay","confirmOverlay","passwordOverlay"].some(id=>document.getElementById(id).style.display==="flex");
+}
+
+function definirStatusSync(tipo, texto) {
+  const el = document.getElementById("syncStatusLine");
+  if (!el) return;
+  el.className = "sync-status" + (tipo?(" "+tipo):"");
+  el.textContent = texto || "";
+}
+
+function atualizarUiSync() {
+  const conectado = !!syncId;
+  document.getElementById("syncNotConnected").style.display = conectado ? "none" : "block";
+  document.getElementById("syncConnected").style.display = conectado ? "block" : "none";
+  if (conectado) document.getElementById("fSyncCodeDisplay").value = syncId;
+  if (!conectado) definirStatusSync("", "");
+}
+
+function mostrarSyncMsg(texto, tipo) {
+  const el = document.getElementById("syncMsg");
+  el.textContent = texto; el.style.display = texto ? "block" : "none";
+  el.style.color = tipo==="err" ? "#b02a2a" : (tipo==="ok" ? "#1e7d38" : "var(--color-text-muted)");
+}
+
+async function syncCriar() {
+  syncBusy = true; mostrarSyncMsg("Criando compartilhamento...");
+  try {
+    const resp = await fetch(SYNC_API_BASE, { method:"POST", headers:{"Content-Type":"application/json","Accept":"application/json"}, body: JSON.stringify(registros) });
+    if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
+    const loc = resp.headers.get("Location") || resp.headers.get("location");
+    if (!loc) throw new Error("o servidor não informou o código do compartilhamento (cabeçalho indisponível)");
+    const novoId = loc.split("/").filter(Boolean).pop();
+    if (!novoId) throw new Error("não foi possível interpretar o código retornado");
+    syncId = novoId; safeSetItem(SYNC_ID_KEY, novoId);
+    atualizarUiSync();
+    mostrarSyncMsg("Compartilhamento criado! Use o código no outro dispositivo.", "ok");
+    definirStatusSync("ok", "🟢 Sincronizado agora");
+    iniciarPollingSync();
+  } catch(e) {
+    mostrarSyncMsg("Não foi possível criar o compartilhamento (" + e.message + "). Verifique sua conexão e tente novamente.", "err");
+  } finally { syncBusy = false; }
+}
+
+async function syncConectar(codigo) {
+  codigo = (codigo||"").trim();
+  const url = syncUrl(codigo);
+  if (!url) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
+  syncBusy = true; mostrarSyncMsg("Conectando...");
+  try {
+    const resp = await fetch(url, { headers:{"Accept":"application/json"} });
+    if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
+    const dados = await resp.json();
+    if (!Array.isArray(dados)) throw new Error("formato de dados inesperado");
+    registros = dados;
+    syncId = codigo; safeSetItem(SYNC_ID_KEY, codigo);
+    refresh(); inicializarDropdowns(); atualizarUiSync();
+    mostrarSyncMsg("Conectado! Os dados deste dispositivo agora seguem o compartilhamento.", "ok");
+    definirStatusSync("ok", "🟢 Sincronizado agora");
+    iniciarPollingSync();
+  } catch(e) {
+    mostrarSyncMsg("Código não encontrado ou sem conexão (" + e.message + "). Confira o código e tente novamente.", "err");
+  } finally { syncBusy = false; }
+}
+
+function syncDesconectar() {
+  syncId = null; safeSetItem(SYNC_ID_KEY, "");
+  atualizarUiSync(); mostrarSyncMsg("Desconectado. Este dispositivo voltou a usar apenas os dados locais.", "ok");
+  pararPollingSync();
+}
+
+async function syncEnviar() {
+  const url = syncUrl(syncId); if (!url) return;
+  try {
+    const resp = await fetch(url, { method:"PUT", headers:{"Content-Type":"application/json","Accept":"application/json"}, body: JSON.stringify(registros) });
+    if (!resp.ok) throw new Error("HTTP "+resp.status);
+    definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+  } catch(e) {
+    definirStatusSync("err", "🔴 Falha ao sincronizar (sem conexão?)");
+  }
+}
+
+async function syncReceber(mostrarStatus) {
+  const url = syncUrl(syncId); if (!url) return;
+  if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
+  try {
+    const resp = await fetch(url, { headers:{"Accept":"application/json"} });
+    if (!resp.ok) throw new Error("HTTP "+resp.status);
+    const dados = await resp.json();
+    if (Array.isArray(dados)) {
+      registros = dados; saveRegistros();
+      if (!modalAbertoAlgum()) { renderTabela(); }
+      atualizarDatalistEquipamento();
+    }
+    definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+  } catch(e) {
+    definirStatusSync("err", "🔴 Falha ao sincronizar (sem conexão?)");
+  }
+}
+
+async function syncAgora() {
+  if (!syncId || syncBusy) return;
+  syncBusy = true; mostrarSyncMsg("Sincronizando...");
+  await syncReceber(true);
+  await syncEnviar();
+  mostrarSyncMsg("Sincronizado.", "ok");
+  syncBusy = false;
+}
+
+function iniciarPollingSync() {
+  pararPollingSync();
+  if (!syncId) return;
+  // jsonblob.com permite até 60 requisições por minuto no uso anônimo,
+  // então dá pra verificar com uma frequência bem mais próxima do tempo real.
+  syncPollTimer = setInterval(()=>{ if(!modalAbertoAlgum()) syncReceber(false); }, 45*1000);
+}
+function pararPollingSync() { if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; } }
+
+// Chamado depois de qualquer alteração local (salvar/excluir) para propagar aos outros dispositivos
+function syncPropagar() { if (syncId) syncEnviar(); }
+
+// ===================== TRANSFERÊNCIA MANUAL (sem rede) =====================
+// Alternativa que não depende de nenhum serviço externo: gera um texto com
+// todos os registros para copiar e colar manualmente entre dispositivos
+// (por WhatsApp, e-mail, etc.). Funciona mesmo em redes que bloqueiam
+// chamadas automáticas a serviços de nuvem.
+function mostrarManualMsg(texto, tipo) {
+  const el = document.getElementById("manualMsg");
+  el.textContent = texto; el.style.display = texto ? "block" : "none";
+  el.style.color = tipo==="err" ? "#b02a2a" : (tipo==="ok" ? "#1e7d38" : "var(--color-text-muted)");
+}
+
+async function copiarDadosManual() {
+  const payload = "FOLLOWUP_CORRETIVA_DADOS_V1:" + JSON.stringify(registros);
+  try {
+    await navigator.clipboard.writeText(payload);
+    mostrarManualMsg("Dados copiados! Cole em uma mensagem (WhatsApp, e-mail) e envie para o outro dispositivo.", "ok");
+  } catch(e) {
+    // Alternativa para navegadores/contextos sem permissão de clipboard automático
+    const ta = document.createElement("textarea");
+    ta.value = payload; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try { document.execCommand("copy"); mostrarManualMsg("Dados copiados! Cole em uma mensagem (WhatsApp, e-mail) e envie para o outro dispositivo.", "ok"); }
+    catch(e2) { mostrarManualMsg("Não foi possível copiar automaticamente. Selecione e copie o texto manualmente.", "err"); }
+    document.body.removeChild(ta);
+  }
+}
+
+function importarDadosManual() {
+  const bruto = document.getElementById("fManualImport").value.trim();
+  if (!bruto) { mostrarManualMsg("Cole o texto recebido do outro dispositivo antes de importar.", "err"); return; }
+  const prefixo = "FOLLOWUP_CORRETIVA_DADOS_V1:";
+  const semPrefixo = bruto.startsWith(prefixo) ? bruto.slice(prefixo.length) : bruto;
+  try {
+    const dados = JSON.parse(semPrefixo);
+    if (!Array.isArray(dados)) throw new Error("formato inesperado");
+    if (!confirm(`Importar ${dados.length} registro(s)? Isso vai substituir os ${registros.length} registro(s) atuais deste dispositivo.`)) return;
+    registros = dados; saveRegistros();
+    refresh(); inicializarDropdowns();
+    document.getElementById("fManualImport").value = "";
+    mostrarManualMsg("Dados importados com sucesso!", "ok");
+    if (syncId) syncPropagar();
+  } catch(e) {
+    mostrarManualMsg("Não foi possível ler os dados colados. Confira se copiou o texto completo.", "err");
+  }
+}
+
+function popularSelect(sel, vals, ph) { sel.innerHTML=""; if(ph){const o=document.createElement("option");o.value="";o.textContent=ph;sel.appendChild(o);} vals.forEach(v=>{const o=document.createElement("option");o.value=v;o.textContent=v;sel.appendChild(o);}); }
+function popularDatalist(dl, vals) { dl.innerHTML=""; [...new Set(vals)].sort().forEach(v=>{const o=document.createElement("option");o.value=v;dl.appendChild(o);}); }
+
+function inicializarDropdowns() {
+  popularSelect(document.getElementById("fStatusSap"), LISTAS.statusSap, "Status SAP (todos)");
+  popularSelect(document.getElementById("fFornecedor"), LISTAS.fornecedor, "Fornecedor (todos)");
+  popularSelect(document.getElementById("fCriadoPor"), LISTAS.criadoPor, "Criado por (todos)");
+  popularDatalist(document.getElementById("dlStatusSap"), [...LISTAS.statusSap, ...registros.map(r=>r.statusSap)]);
+  popularDatalist(document.getElementById("dlCriadoPor"), LISTAS.criadoPor);
+  popularDatalist(document.getElementById("dlFornecedor"), LISTAS.fornecedor);
+  atualizarDatalistEquipamento();
+}
+function atualizarDatalistEquipamento() { popularDatalist(document.getElementById("dlEquipamento"), registros.map(r=>r.equipamento).filter(Boolean)); }
+
+function atualizarDashboard(lista) {
+  let at=0,np=0,pv=0,ve=0,sd=0,ct=0;
+  lista.forEach(r=>{ const s=calcularSituacao(r); ct+=Number(r.custoPlan)||0; if(s==="Atendida")at++;else if(s==="No Prazo")np++;else if(s==="Prox. Venc.")pv++;else if(s==="VENCIDA")ve++;else sd++; });
+  document.getElementById("kpiTotal").textContent=lista.length;
+  document.getElementById("kpiAtendida").textContent=at;
+  document.getElementById("kpiNoPrazo").textContent=np;
+  document.getElementById("kpiProxVenc").textContent=pv;
+  document.getElementById("kpiVencida").textContent=ve;
+  document.getElementById("kpiSemData").textContent=sd;
+  document.getElementById("kpiCusto").textContent=formatCurrency(ct);
+  document.getElementById("kpiPct").textContent=lista.length?Math.round((at/lista.length)*100)+"%":"0%";
+}
+
+function aplicarFiltros() {
+  const t=document.getElementById("fSearch").value.trim().toLowerCase();
+  const sf=document.getElementById("fSituacao").value;
+  const ss=document.getElementById("fStatusSap").value;
+  const ff=document.getElementById("fFornecedor").value;
+  const cf=document.getElementById("fCriadoPor").value;
+  const dDe=document.getElementById("fDataDe").value;
+  const dAte=document.getElementById("fDataAte").value;
+  return registros.filter(r=>{
+    if(sf&&calcularSituacao(r)!==sf) return false;
+    if(ss&&r.statusSap!==ss) return false;
+    if(ff&&r.fornecedor!==ff) return false;
+    if(cf&&r.criadoPor!==cf) return false;
+    if((dDe||dAte)){
+      if(!r.dataPrevista) return false;
+      if(dDe&&r.dataPrevista<dDe) return false;
+      if(dAte&&r.dataPrevista>dAte) return false;
+    }
+    if(t){ const a=[r.ordem,r.requisicao,r.pedido,r.equipamento,r.textoBreve,r.observacao,r.fornecedor,r.criadoPor].join(" ").toLowerCase(); if(!a.includes(t)) return false; }
+    return true;
+  });
+}
+
+function escapeHtml(s) { if(s===null||s===undefined) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function renderTabela() {
+  const lista=aplicarFiltros(); const tbody=document.getElementById("tblBody"); const es=document.getElementById("emptyState"); const cardsWrap=document.getElementById("cardsWrap");
+  tbody.innerHTML=""; cardsWrap.innerHTML="";
+  es.style.display=lista.length===0?"block":"none";
+  lista.forEach(r=>{
+    const sit=calcularSituacao(r); const dias=calcularDiasLabel(r); const rowClass=situacaoRowClass(sit);
+
+    const tr=document.createElement("tr"); tr.className=rowClass;
+    tr.innerHTML=`<td>${escapeHtml(r.ordem)}</td><td>${escapeHtml(r.requisicao)}</td><td>${escapeHtml(r.pedido)}</td><td>${escapeHtml(r.equipamento)}</td><td>${escapeHtml(r.criadoPor)}</td><td class="col-texto">${escapeHtml(r.textoBreve)}</td><td>${escapeHtml(r.statusSap)}</td><td>${formatCurrency(r.custoPlan)}</td><td>${escapeHtml(r.fornecedor)}</td><td class="col-obs">${escapeHtml(r.observacao)}</td><td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td><td>${escapeHtml(dias)}</td><td><span class="badge ${situacaoBadgeClass(sit)}">${sit}</span></td><td class="col-actions"><button class="icon-btn edit" data-id="${r.id}" title="Editar">✎</button> <button class="icon-btn delete" data-id="${r.id}" title="Excluir">🗑</button></td>`;
+    tbody.appendChild(tr);
+
+    const card=document.createElement("div"); card.className="record-card "+rowClass;
+    card.innerHTML=`
+      <div class="record-card-header">
+        <div>
+          <div class="record-card-ordem">OM ${escapeHtml(r.ordem)||"—"}</div>
+          <div class="record-card-sub">${escapeHtml(r.equipamento)||"—"} · ${escapeHtml(r.criadoPor)||"—"}</div>
+        </div>
+        <span class="badge ${situacaoBadgeClass(sit)}">${sit}</span>
+      </div>
+      <div class="record-card-body">
+        <div class="record-card-field record-card-field-wide"><label>Texto Breve</label><span>${escapeHtml(r.textoBreve)||"—"}</span></div>
+        <div class="record-card-field"><label>Status SAP</label><span>${escapeHtml(r.statusSap)||"—"}</span></div>
+        <div class="record-card-field"><label>Fornecedor</label><span>${escapeHtml(r.fornecedor)||"—"}</span></div>
+        <div class="record-card-field"><label>Custo Plan.</label><span>${formatCurrency(r.custoPlan)}</span></div>
+        <div class="record-card-field"><label>Data Prevista</label><span>${r.atendida?"Atendida":(formatDateBR(r.dataPrevista)||"—")}</span></div>
+        <div class="record-card-field"><label>Dias</label><span>${escapeHtml(dias)}</span></div>
+        <div class="record-card-field"><label>Requisição</label><span>${escapeHtml(r.requisicao)||"—"}</span></div>
+        <div class="record-card-field"><label>Pedido</label><span>${escapeHtml(r.pedido)||"—"}</span></div>
+      </div>
+      ${r.observacao?`<div class="record-card-obs">${escapeHtml(r.observacao)}</div>`:""}
+      <div class="record-card-actions">
+        <button class="edit" data-id="${r.id}">✎ Editar</button>
+        <button class="delete" data-id="${r.id}">🗑 Excluir</button>
+      </div>`;
+    cardsWrap.appendChild(card);
+  });
+  document.getElementById("recordCount").textContent=`Exibindo ${lista.length} de ${registros.length} registro(s).`;
+  atualizarDashboard(lista);
+}
+
+function refresh() { saveRegistros(); atualizarDatalistEquipamento(); renderTabela(); }
+
+// ===================== SENHA DE EDIÇÃO =====================
+let editUnlocked = false; // fica true após digitar a senha corretamente nesta sessão
+
+function solicitarSenha(acao) {
+  if (editUnlocked) { acao(); return; }
+  pendingEditAction = acao;
+  document.getElementById("fPassword").value = "";
+  document.getElementById("passwordError").style.display = "none";
+  document.getElementById("passwordOverlay").style.display = "flex";
+  setTimeout(()=>document.getElementById("fPassword").focus(), 50);
+}
+
+function fecharModalSenha() {
+  document.getElementById("passwordOverlay").style.display = "none";
+  pendingEditAction = null;
+}
+
+function confirmarSenha(e) {
+  e.preventDefault();
+  const valor = document.getElementById("fPassword").value;
+  if (valor === EDIT_PASSWORD) {
+    editUnlocked = true;
+    const acao = pendingEditAction;
+    fecharModalSenha();
+    if (acao) acao();
+  } else {
+    document.getElementById("passwordError").style.display = "block";
+    document.getElementById("fPassword").value = "";
+    document.getElementById("fPassword").focus();
+  }
+}
+
+function abrirModalNovo() {
+  editingId=null; document.getElementById("modalTitle").textContent="Novo Registro";
+  document.getElementById("formRegistro").reset(); document.getElementById("fId").value="";
+  document.getElementById("fDataPrevista").valueAsDate=null; document.getElementById("fAtendida").checked=false;
+  document.getElementById("fOrdem").classList.remove("input-error"); document.getElementById("fOrdemError").classList.remove("show");
+  atualizarPreviewSituacao(); document.getElementById("modalOverlay").style.display="flex"; document.getElementById("fOrdem").focus();
+}
+
+function abrirModalEditar(id) {
+  const r=registros.find(x=>x.id===id); if(!r) return; editingId=id;
+  document.getElementById("modalTitle").textContent="Editar Registro";
+  document.getElementById("fId").value=r.id;
+  document.getElementById("fOrdem").value=r.ordem||"";
+  document.getElementById("fRequisicao").value=r.requisicao||"";
+  document.getElementById("fPedido").value=r.pedido||"";
+  document.getElementById("fEquipamento").value=r.equipamento||"";
+  document.getElementById("mCriadoPor").value=r.criadoPor||"";
+  document.getElementById("mStatusSap").value=r.statusSap||"";
+  document.getElementById("fCustoPlan").value=r.custoPlan??"";
+  document.getElementById("mFornecedor").value=r.fornecedor||"";
+  document.getElementById("fTextoBreve").value=r.textoBreve||"";
+  document.getElementById("fObservacao").value=r.observacao||"";
+  document.getElementById("fDataPrevista").value=r.dataPrevista||"";
+  document.getElementById("fAtendida").checked=!!r.atendida;
+  document.getElementById("fOrdem").classList.remove("input-error"); document.getElementById("fOrdemError").classList.remove("show");
+  atualizarPreviewSituacao(); document.getElementById("modalOverlay").style.display="flex";
+}
+
+function fecharModal() { document.getElementById("modalOverlay").style.display="none"; editingId=null; }
+
+function atualizarPreviewSituacao() {
+  const at=document.getElementById("fAtendida").checked; const dp=document.getElementById("fDataPrevista").value||null;
+  const temp={atendida:at,dataPrevista:dp}; const sit=calcularSituacao(temp); const dias=calcularDiasLabel(temp);
+  const b=document.getElementById("previewSituacao"); b.textContent=sit; b.className="badge "+situacaoBadgeClass(sit);
+  document.getElementById("previewDias").textContent=dias; document.getElementById("fDataPrevista").disabled=at;
+}
+
+function ordemDuplicada(valor) {
+  const alvo=(valor||"").trim().toLowerCase();
+  if(!alvo) return false;
+  return registros.some(r=>r.id!==editingId && (r.ordem||"").trim().toLowerCase()===alvo);
+}
+
+function verificarOrdemDuplicada() {
+  const input=document.getElementById("fOrdem");
+  const errMsg=document.getElementById("fOrdemError");
+  const duplicada=ordemDuplicada(input.value);
+  input.classList.toggle("input-error",duplicada);
+  errMsg.classList.toggle("show",duplicada);
+  return duplicada;
+}
+
+function salvarFormulario(e) {
+  e.preventDefault();
+  if(verificarOrdemDuplicada()){document.getElementById("fOrdem").focus();return;}
+  const dados={
+    ordem:document.getElementById("fOrdem").value.trim(),
+    requisicao:document.getElementById("fRequisicao").value.trim(),
+    pedido:document.getElementById("fPedido").value.trim(),
+    equipamento:document.getElementById("fEquipamento").value.trim(),
+    criadoPor:document.getElementById("mCriadoPor").value.trim(),
+    statusSap:document.getElementById("mStatusSap").value.trim().toUpperCase(),
+    custoPlan:parseFloat(document.getElementById("fCustoPlan").value)||0,
+    fornecedor:document.getElementById("mFornecedor").value.trim(),
+    textoBreve:document.getElementById("fTextoBreve").value.trim(),
+    observacao:document.getElementById("fObservacao").value.trim(),
+    dataPrevista:document.getElementById("fAtendida").checked?null:(document.getElementById("fDataPrevista").value||null),
+    atendida:document.getElementById("fAtendida").checked,
+  };
+  if(!dados.ordem){alert("Informe o número da Ordem (OM).");document.getElementById("fOrdem").focus();return;}
+  if(editingId){const i=registros.findIndex(x=>x.id===editingId);if(i!==-1) registros[i]={...registros[i],...dados};}
+  else{registros.unshift({id:uid(),...dados});}
+  refresh(); inicializarDropdowns(); fecharModal(); syncPropagar();
+}
+
+function abrirConfirmExclusao(id) {
+  const r=registros.find(x=>x.id===id); if(!r) return; deleteId=id;
+  document.getElementById("confirmOrdem").textContent=r.ordem||"(sem número)";
+  document.getElementById("confirmOverlay").style.display="flex";
+}
+function fecharConfirmExclusao() { document.getElementById("confirmOverlay").style.display="none"; deleteId=null; }
+function confirmarExclusao() { if(deleteId){registros=registros.filter(x=>x.id!==deleteId);refresh();syncPropagar();} fecharConfirmExclusao(); }
+
+function exportarExcel() {
+  const lista=aplicarFiltros();
+  const linhas=lista.map(r=>({"Ordem":r.ordem,"Requisição":r.requisicao,"Pedido":r.pedido,"Equipamento":r.equipamento,"Criado por":r.criadoPor,"Texto Breve":r.textoBreve,"Status SAP":r.statusSap,"Custo Plan. (R$)":Number(r.custoPlan)||0,"Fornecedor":r.fornecedor,"STATUS / Observação":r.observacao,"Data Prevista":r.atendida?"Atendida":formatDateBR(r.dataPrevista),"Dias (+atraso/-resta)":calcularDiasLabel(r),"Situação":calcularSituacao(r)}));
+  const ws=XLSX.utils.json_to_sheet(linhas);
+  ws["!cols"]=[{wch:12},{wch:12},{wch:30},{wch:14},{wch:12},{wch:40},{wch:12},{wch:14},{wch:16},{wch:50},{wch:14},{wch:12},{wch:12}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"FOLLOW-UP MATERIAIS");
+  const h=new Date(); XLSX.writeFile(wb,`FOLLOW_UP_CORRETIVA_${String(h.getDate()).padStart(2,"0")}-${String(h.getMonth()+1).padStart(2,"0")}-${h.getFullYear()}.xlsx`);
+}
+
+// ===================== PAINEL GERENCIAL (executivo, passagem de turno) =====================
+
+const SITUACAO_ORDEM = {"VENCIDA":0,"Prox. Venc.":1,"Sem Data":2,"No Prazo":3,"Atendida":4};
+
+function agruparContagem(lista, campo, semValorLabel) {
+  const mapa = new Map();
+  lista.forEach(r=>{
+    const chave = (r[campo]||"").trim() || semValorLabel;
+    if(!mapa.has(chave)) mapa.set(chave,{qtd:0,custo:0});
+    const e=mapa.get(chave); e.qtd++; e.custo+=Number(r.custoPlan)||0;
+  });
+  return [...mapa.entries()].map(([chave,v])=>({chave,...v})).sort((a,b)=>b.qtd-a.qtd);
+}
+
+function linhaTabelaDetalhe(r) {
+  const sit = calcularSituacao(r);
+  const cls = sit==="VENCIDA"?"pg-row-vencida":sit==="Prox. Venc."?"pg-row-proxvenc":sit==="Atendida"?"pg-row-atendida":sit==="No Prazo"?"pg-row-noprazo":"pg-row-semdata";
+  return `<tr class="${cls}">
+    <td>${escapeHtml(r.ordem)}</td>
+    <td>${escapeHtml(r.requisicao)}</td>
+    <td>${escapeHtml(r.pedido)}</td>
+    <td>${escapeHtml(r.equipamento)}</td>
+    <td>${escapeHtml(r.textoBreve)}</td>
+    <td>${escapeHtml(r.fornecedor)}</td>
+    <td>${escapeHtml(r.statusSap)}</td>
+    <td>${escapeHtml(r.criadoPor)}</td>
+    <td>${escapeHtml(r.observacao)}</td>
+    <td style="text-align:right;">${formatCurrency(r.custoPlan)}</td>
+    <td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td>
+    <td style="text-align:right;">${calcularDiasLabel(r)}</td>
+    <td><span class="pg-badge pg-badge-${sit==="VENCIDA"?"vencida":sit==="Prox. Venc."?"proxvenc":sit==="Atendida"?"atendida":sit==="No Prazo"?"noprazo":"semdata"}">${sit}</span></td>
+  </tr>`;
+}
+
+function linhaAgrupada(item, totalQtd) {
+  const pct = totalQtd ? Math.round((item.qtd/totalQtd)*100) : 0;
+  return `<tr>
+    <td>${escapeHtml(item.chave)}</td>
+    <td style="text-align:right;">${item.qtd}</td>
+    <td style="text-align:right;">${formatCurrency(item.custo)}</td>
+    <td>
+      <div class="pg-bar-track"><div class="pg-bar-fill" style="width:${pct}%"></div></div>
+      <span class="pg-bar-pct">${pct}%</span>
+    </td>
+  </tr>`;
+}
+
+function gerarPainelGerencial() {
+  const listaBase = aplicarFiltros();
+  const filtrosAtivos = !!(document.getElementById("fSearch").value.trim() || document.getElementById("fSituacao").value || document.getElementById("fStatusSap").value || document.getElementById("fFornecedor").value || document.getElementById("fCriadoPor").value || document.getElementById("fDataDe").value || document.getElementById("fDataAte").value);
+  const lista = [...listaBase].sort((a,b)=> (SITUACAO_ORDEM[calcularSituacao(a)]-SITUACAO_ORDEM[calcularSituacao(b)]) || ((Number(diffDias(a.dataPrevista||"2999-12-31"))>Number(diffDias(b.dataPrevista||"2999-12-31")))?-1:1));
+
+  let at=0,np=0,pv=0,ve=0,sd=0,ct=0;
+  lista.forEach(r=>{ const s=calcularSituacao(r); ct+=Number(r.custoPlan)||0; if(s==="Atendida")at++;else if(s==="No Prazo")np++;else if(s==="Prox. Venc.")pv++;else if(s==="VENCIDA")ve++;else sd++; });
+  const total = lista.length;
+  const pctAtendimento = total ? Math.round((at/total)*100) : 0;
+
+  const vencidas = lista.filter(r=>calcularSituacao(r)==="VENCIDA");
+  const proxVenc = lista.filter(r=>calcularSituacao(r)==="Prox. Venc.");
+
+  const porFornecedor = agruparContagem(lista, "fornecedor", "(Sem fornecedor)").slice(0,8);
+  const porStatusSap = agruparContagem(lista, "statusSap", "(Sem status)").slice(0,8);
+  const porCriadoPor = agruparContagem(lista, "criadoPor", "(Não informado)").slice(0,8);
+
+  const logoSrc = document.querySelector(".topbar-title img").src;
+  const agora = new Date();
+  const dataGeracao = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  const de10dias = new Date(agora); de10dias.setDate(de10dias.getDate()-10);
+  const periodoRef = de10dias.toLocaleDateString("pt-BR") + " a " + agora.toLocaleDateString("pt-BR");
+
+  const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel Gerencial | Follow-up Corretiva | Mineração Taboca</title>
+<style>
+  :root{
+    --pg-primary:#1e3a5f; --pg-accent:#2f6fed; --pg-bg:#f4f6f9; --pg-surface:#fff; --pg-border:#e2e6ec;
+    --pg-text:#1f2937; --pg-text-muted:#6b7280;
+    --pg-atendida-bg:#e8f0fd; --pg-atendida-text:#2952a3;
+    --pg-noprazo-bg:#e6f7ea; --pg-noprazo-text:#1e7d38;
+    --pg-proxvenc-bg:#fff2e0; --pg-proxvenc-text:#a35a00;
+    --pg-vencida-bg:#fde3e3; --pg-vencida-text:#b02a2a;
+    --pg-semdata-bg:#eceef1; --pg-semdata-text:#5a6472;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--pg-bg);color:var(--pg-text);font-size:14px;}
+  .pg-header{background:var(--pg-primary);color:#fff;padding:22px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .pg-header-left{display:flex;align-items:center;gap:16px;}
+  .pg-header-left img{height:36px;background:#fff;padding:4px 8px;border-radius:6px;}
+  .pg-header h1{margin:0;font-size:21px;font-weight:700;}
+  .pg-header .pg-sub{margin:4px 0 0;font-size:13px;color:#cbd8ea;}
+  .pg-header-right{text-align:right;font-size:12.5px;color:#cbd8ea;}
+  .pg-toolbar{display:flex;justify-content:flex-end;gap:10px;padding:14px 32px;background:var(--pg-bg);}
+  .pg-btn{border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .pg-btn-primary{background:var(--pg-accent);color:#fff;}
+  .pg-btn-ghost{background:#fff;border:1px solid var(--pg-border);color:var(--pg-text-muted);}
+  .pg-container{max-width:1300px;margin:0 auto;padding:0 32px 50px;}
+  .pg-section-title{font-size:15px;font-weight:700;color:var(--pg-primary);margin:28px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--pg-border);}
+  .pg-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  .pg-kpi{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:16px 16px;border-left:5px solid var(--pg-border);}
+  .pg-kpi .v{font-size:26px;font-weight:800;}
+  .pg-kpi .l{font-size:12px;color:var(--pg-text-muted);margin-top:4px;}
+  .pg-kpi.total{border-left-color:var(--pg-primary);}
+  .pg-kpi.atendida{border-left-color:var(--pg-atendida-text);}
+  .pg-kpi.noprazo{border-left-color:var(--pg-noprazo-text);}
+  .pg-kpi.proxvenc{border-left-color:var(--pg-proxvenc-text);}
+  .pg-kpi.vencida{border-left-color:var(--pg-vencida-text);}
+  .pg-kpi.semdata{border-left-color:var(--pg-semdata-text);}
+  .pg-kpi.custo{border-left-color:var(--pg-accent);}
+  .pg-kpi.pct{border-left-color:#7c3aed;}
+  .pg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .pg-panel{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:16px 18px;}
+  .pg-panel h3{margin:0 0 10px;font-size:13.5px;color:var(--pg-text);}
+  table.pg-table{width:100%;border-collapse:collapse;table-layout:fixed;}
+  table.pg-table th{text-align:left;font-size:11px;color:var(--pg-text-muted);padding:7px 6px;border-bottom:2px solid var(--pg-border);white-space:normal;word-break:break-word;}
+  table.pg-table td{padding:7px 6px;font-size:12px;border-bottom:1px solid var(--pg-border);vertical-align:middle;white-space:normal;word-break:break-word;overflow-wrap:break-word;}
+  table.pg-table-detalhe th:nth-child(1),table.pg-table-detalhe td:nth-child(1){width:6.5%;}
+  table.pg-table-detalhe th:nth-child(2),table.pg-table-detalhe td:nth-child(2){width:6.5%;}
+  table.pg-table-detalhe th:nth-child(3),table.pg-table-detalhe td:nth-child(3){width:7%;}
+  table.pg-table-detalhe th:nth-child(4),table.pg-table-detalhe td:nth-child(4){width:7%;}
+  table.pg-table-detalhe th:nth-child(5),table.pg-table-detalhe td:nth-child(5){width:12%;}
+  table.pg-table-detalhe th:nth-child(6),table.pg-table-detalhe td:nth-child(6){width:8%;}
+  table.pg-table-detalhe th:nth-child(7),table.pg-table-detalhe td:nth-child(7){width:6.5%;}
+  table.pg-table-detalhe th:nth-child(8),table.pg-table-detalhe td:nth-child(8){width:7%;}
+  table.pg-table-detalhe th:nth-child(9),table.pg-table-detalhe td:nth-child(9){width:13.5%;}
+  table.pg-table-detalhe th:nth-child(10),table.pg-table-detalhe td:nth-child(10){width:8%;text-align:right;}
+  table.pg-table-detalhe th:nth-child(11),table.pg-table-detalhe td:nth-child(11){width:7%;}
+  table.pg-table-detalhe th:nth-child(12),table.pg-table-detalhe td:nth-child(12){width:4%;text-align:right;}
+  table.pg-table-detalhe th:nth-child(13),table.pg-table-detalhe td:nth-child(13){width:7%;}
+  .pg-bar-track{display:inline-block;width:70px;height:7px;background:#eef1f6;border-radius:99px;overflow:hidden;vertical-align:middle;margin-right:6px;}
+  .pg-bar-fill{height:100%;background:var(--pg-accent);border-radius:99px;}
+  .pg-bar-pct{font-size:11px;color:var(--pg-text-muted);}
+  .pg-badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:normal;word-break:break-word;line-height:1.3;}
+  .pg-badge-atendida{background:var(--pg-atendida-bg);color:var(--pg-atendida-text);}
+  .pg-badge-noprazo{background:var(--pg-noprazo-bg);color:var(--pg-noprazo-text);}
+  .pg-badge-proxvenc{background:var(--pg-proxvenc-bg);color:var(--pg-proxvenc-text);}
+  .pg-badge-vencida{background:var(--pg-vencida-bg);color:var(--pg-vencida-text);}
+  .pg-badge-semdata{background:var(--pg-semdata-bg);color:var(--pg-semdata-text);}
+  tr.pg-row-vencida{background:#fef6f6;}
+  tr.pg-row-proxvenc{background:#fffaf3;}
+  tr.pg-row-atendida{background:#f7faff;}
+  tr.pg-row-noprazo{background:#f6fdf8;}
+  tr.pg-row-semdata{background:#fafbfc;}
+  .pg-table-wrap{overflow-x:auto;background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);}
+  .pg-table-wrap table.pg-table-detalhe{min-width:0;width:100%;}
+  @media (max-width:800px){
+    .pg-table-wrap table.pg-table-detalhe{min-width:900px;}
+  }
+  .pg-empty{padding:16px;color:var(--pg-text-muted);font-size:13px;text-align:center;}
+  .pg-alert{display:flex;align-items:center;gap:10px;background:var(--pg-vencida-bg);color:var(--pg-vencida-text);border-radius:10px;padding:12px 16px;font-size:13.5px;font-weight:600;margin-bottom:14px;}
+  .pg-footer{text-align:center;color:var(--pg-text-muted);font-size:11.5px;padding:30px 0 10px;}
+  @media print{
+    .pg-toolbar{display:none;}
+    body{background:#fff;}
+    .pg-panel,.pg-table-wrap,.pg-kpi{box-shadow:none;border:1px solid var(--pg-border);}
+    .pg-section-title{break-after:avoid;}
+    .pg-table-wrap{overflow-x:visible;}
+    .pg-table-wrap table.pg-table-detalhe{min-width:0;}
+  }
+  @media (max-width:900px){
+    .pg-kpis{grid-template-columns:repeat(2,1fr);}
+    .pg-grid-2{grid-template-columns:1fr;}
+    .pg-container{padding:0 16px 40px;}
+    .pg-header{padding:18px;}
+  }
+</style>
+</head>
+<body>
+<div class="pg-header">
+  <div class="pg-header-left">
+    <img src="${logoSrc}" alt="Mineração Taboca">
+    <div>
+      <h1>Painel Gerencial — Follow-up de Manutenção Corretiva</h1>
+      <p class="pg-sub">Passagem de turno · Aprovisionamento · Oficina de Frota</p>
+    </div>
+  </div>
+  <div class="pg-header-right">
+    Gerado em ${dataGeracao}<br>
+    Período de referência: últimos 10 dias (${periodoRef})${filtrosAtivos?"<br><strong>Filtros ativos aplicados</strong>":""}
+  </div>
+</div>
+<div class="pg-toolbar">
+  <button class="pg-btn pg-btn-ghost" onclick="window.close()">Fechar</button>
+  <button class="pg-btn pg-btn-primary" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+</div>
+<div class="pg-container">
+
+  <div class="pg-section-title">Visão Executiva</div>
+  ${ve>0?`<div class="pg-alert">⚠️ ${ve} ordem(ns) VENCIDA(S) requerendo atenção imediata do aprovisionador.</div>`:""}
+  <div class="pg-kpis">
+    <div class="pg-kpi total"><div class="v">${total}</div><div class="l">Total de OMs</div></div>
+    <div class="pg-kpi atendida"><div class="v">${at}</div><div class="l">Atendidas</div></div>
+    <div class="pg-kpi noprazo"><div class="v">${np}</div><div class="l">No Prazo</div></div>
+    <div class="pg-kpi proxvenc"><div class="v">${pv}</div><div class="l">Próx. Venc.</div></div>
+    <div class="pg-kpi vencida"><div class="v">${ve}</div><div class="l">Vencidas</div></div>
+    <div class="pg-kpi semdata"><div class="v">${sd}</div><div class="l">Sem Data</div></div>
+    <div class="pg-kpi custo"><div class="v">${formatCurrency(ct)}</div><div class="l">Custo Total Planejado</div></div>
+    <div class="pg-kpi pct"><div class="v">${pctAtendimento}%</div><div class="l">% Atendimento</div></div>
+  </div>
+
+  <div class="pg-section-title">Distribuições</div>
+  <div class="pg-grid-2">
+    <div class="pg-panel">
+      <h3>Por Fornecedor</h3>
+      <table class="pg-table"><thead><tr><th>Fornecedor</th><th style="text-align:right;">Qtd</th><th style="text-align:right;">Custo Plan.</th><th>%</th></tr></thead>
+      <tbody>${porFornecedor.length?porFornecedor.map(i=>linhaAgrupada(i,total)).join(""):`<tr><td colspan="4" class="pg-empty">Sem dados</td></tr>`}</tbody></table>
+    </div>
+    <div class="pg-panel">
+      <h3>Por Status SAP</h3>
+      <table class="pg-table"><thead><tr><th>Status SAP</th><th style="text-align:right;">Qtd</th><th style="text-align:right;">Custo Plan.</th><th>%</th></tr></thead>
+      <tbody>${porStatusSap.length?porStatusSap.map(i=>linhaAgrupada(i,total)).join(""):`<tr><td colspan="4" class="pg-empty">Sem dados</td></tr>`}</tbody></table>
+    </div>
+  </div>
+  <div class="pg-grid-2" style="margin-top:20px;">
+    <div class="pg-panel">
+      <h3>Por Responsável (Criado por)</h3>
+      <table class="pg-table"><thead><tr><th>Responsável</th><th style="text-align:right;">Qtd</th><th style="text-align:right;">Custo Plan.</th><th>%</th></tr></thead>
+      <tbody>${porCriadoPor.length?porCriadoPor.map(i=>linhaAgrupada(i,total)).join(""):`<tr><td colspan="4" class="pg-empty">Sem dados</td></tr>`}</tbody></table>
+    </div>
+    <div class="pg-panel">
+      <h3>Resumo por Situação</h3>
+      <table class="pg-table"><thead><tr><th>Situação</th><th style="text-align:right;">Qtd</th><th>%</th></tr></thead>
+      <tbody>
+        ${[["VENCIDA",ve,"vencida"],["Prox. Venc.",pv,"proxvenc"],["No Prazo",np,"noprazo"],["Sem Data",sd,"semdata"],["Atendida",at,"atendida"]].map(([l,q])=>linhaAgrupada({chave:l,qtd:q,custo:0},total)).join("")}
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="pg-section-title">🔴 Itens Vencidos (${vencidas.length})</div>
+  <div class="pg-table-wrap">
+    <table class="pg-table pg-table-detalhe"><thead><tr><th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Texto Breve</th><th>Fornecedor</th><th>Status SAP</th><th>Criado por</th><th>Observação</th><th style="text-align:right;">Custo Plan.</th><th>Data Prevista</th><th style="text-align:right;">Dias</th><th>Situação</th></tr></thead>
+    <tbody>${vencidas.length?vencidas.map(linhaTabelaDetalhe).join(""):`<tr><td colspan="13" class="pg-empty">Nenhum item vencido 🎉</td></tr>`}</tbody></table>
+  </div>
+
+  <div class="pg-section-title">🟠 Próximos ao Vencimento (${proxVenc.length})</div>
+  <div class="pg-table-wrap">
+    <table class="pg-table pg-table-detalhe"><thead><tr><th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Texto Breve</th><th>Fornecedor</th><th>Status SAP</th><th>Criado por</th><th>Observação</th><th style="text-align:right;">Custo Plan.</th><th>Data Prevista</th><th style="text-align:right;">Dias</th><th>Situação</th></tr></thead>
+    <tbody>${proxVenc.length?proxVenc.map(linhaTabelaDetalhe).join(""):`<tr><td colspan="13" class="pg-empty">Nenhum item próximo ao vencimento</td></tr>`}</tbody></table>
+  </div>
+
+  <div class="pg-section-title">Detalhamento Completo (${total})</div>
+  <div class="pg-table-wrap">
+    <table class="pg-table pg-table-detalhe"><thead><tr><th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Texto Breve</th><th>Fornecedor</th><th>Status SAP</th><th>Criado por</th><th>Observação</th><th style="text-align:right;">Custo Plan.</th><th>Data Prevista</th><th style="text-align:right;">Dias</th><th>Situação</th></tr></thead>
+    <tbody>${lista.length?lista.map(linhaTabelaDetalhe).join(""):`<tr><td colspan="13" class="pg-empty">Nenhum registro encontrado</td></tr>`}</tbody></table>
+  </div>
+
+  <p class="pg-footer">Painel gerado automaticamente pelo sistema Follow-up de Manutenção Corretiva — Mineração Taboca S.A.</p>
+</div>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  loadRegistros(); inicializarDropdowns();
+  const hoje=new Date(); document.getElementById("subtitle").textContent=`Acompanhamento de materiais e ordens de manutenção — atualizado em ${hoje.toLocaleDateString("pt-BR")}`;
+  refresh();
+  atualizarUiSync();
+  if (syncId) { syncReceber(true).then(()=>{ atualizarDatalistEquipamento(); }); iniciarPollingSync(); }
+
+  document.getElementById("btnSync").addEventListener("click",()=>{ mostrarSyncMsg(""); document.getElementById("fSyncCodeInput").value=""; document.getElementById("syncOverlay").style.display="flex"; });
+  document.getElementById("btnCloseSync").addEventListener("click",()=>{document.getElementById("syncOverlay").style.display="none";});
+  document.getElementById("btnSyncClose2").addEventListener("click",()=>{document.getElementById("syncOverlay").style.display="none";});
+  document.getElementById("syncOverlay").addEventListener("click",e=>{if(e.target.id==="syncOverlay")document.getElementById("syncOverlay").style.display="none";});
+  document.getElementById("btnSyncCreate").addEventListener("click",async()=>{ await syncCriar(); iniciarPollingSync(); });
+  document.getElementById("btnSyncConnect").addEventListener("click",async()=>{ await syncConectar(document.getElementById("fSyncCodeInput").value); iniciarPollingSync(); });
+  document.getElementById("btnSyncNow").addEventListener("click",syncAgora);
+  document.getElementById("btnSyncDisconnect").addEventListener("click",syncDesconectar);
+  document.getElementById("btnSyncCopy").addEventListener("click",()=>{
+    const inp=document.getElementById("fSyncCodeDisplay"); inp.select(); inp.setSelectionRange(0,999);
+    try{ navigator.clipboard.writeText(inp.value); mostrarSyncMsg("Código copiado!","ok"); }catch(e){ document.execCommand("copy"); mostrarSyncMsg("Código copiado!","ok"); }
+  });
+  document.getElementById("btnManualExport").addEventListener("click",copiarDadosManual);
+  document.getElementById("btnManualImport").addEventListener("click",importarDadosManual);
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && syncId) syncReceber(false); });
+
+  document.getElementById("fSearch").addEventListener("input",renderTabela);
+  document.getElementById("fSituacao").addEventListener("change",renderTabela);
+  document.getElementById("fStatusSap").addEventListener("change",renderTabela);
+  document.getElementById("fFornecedor").addEventListener("change",renderTabela);
+  document.getElementById("fCriadoPor").addEventListener("change",renderTabela);
+  document.getElementById("fDataDe").addEventListener("change",renderTabela);
+  document.getElementById("fDataAte").addEventListener("change",renderTabela);
+  document.getElementById("btnClearFilters").addEventListener("click",()=>{document.getElementById("fSearch").value="";document.getElementById("fSituacao").value="";document.getElementById("fStatusSap").value="";document.getElementById("fFornecedor").value="";document.getElementById("fCriadoPor").value="";document.getElementById("fDataDe").value="";document.getElementById("fDataAte").value="";renderTabela();});
+
+  document.getElementById("tblBody").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
+  document.getElementById("cardsWrap").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
+
+  document.getElementById("btnAdd").addEventListener("click",()=>solicitarSenha(abrirModalNovo));
+  document.getElementById("btnCloseModal").addEventListener("click",fecharModal);
+  document.getElementById("btnCancel").addEventListener("click",fecharModal);
+  document.getElementById("modalOverlay").addEventListener("click",e=>{if(e.target.id==="modalOverlay")fecharModal();});
+  document.getElementById("formRegistro").addEventListener("submit",salvarFormulario);
+  document.getElementById("fDataPrevista").addEventListener("change",atualizarPreviewSituacao);
+  document.getElementById("fAtendida").addEventListener("change",atualizarPreviewSituacao);
+  document.getElementById("fOrdem").addEventListener("input",verificarOrdemDuplicada);
+  document.getElementById("mStatusSap").addEventListener("input",e=>{const p=e.target.selectionStart;e.target.value=e.target.value.toUpperCase();e.target.setSelectionRange(p,p);});
+
+  document.getElementById("btnCancelDelete").addEventListener("click",fecharConfirmExclusao);
+  document.getElementById("btnConfirmDelete").addEventListener("click",confirmarExclusao);
+  document.getElementById("confirmOverlay").addEventListener("click",e=>{if(e.target.id==="confirmOverlay")fecharConfirmExclusao();});
+
+  document.getElementById("btnClosePassword").addEventListener("click",fecharModalSenha);
+  document.getElementById("btnCancelPassword").addEventListener("click",fecharModalSenha);
+  document.getElementById("formPassword").addEventListener("submit",confirmarSenha);
+  document.getElementById("passwordOverlay").addEventListener("click",e=>{if(e.target.id==="passwordOverlay")fecharModalSenha();});
+
+  document.getElementById("btnExport").addEventListener("click",exportarExcel);
+  document.getElementById("btnPainelGerencial").addEventListener("click",gerarPainelGerencial);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"){fecharModal();fecharConfirmExclusao();fecharModalSenha();document.getElementById("syncOverlay").style.display="none";}});
+});
+</script>
+</body>
+</html>
