@@ -447,12 +447,12 @@ function syncJsonp(params) {
       if (finished) return;
       finished = true; clearTimeout(timer); cleanup();
       if (payload && payload.erro) reject(new Error(payload.erro));
-      else resolve(payload ? payload.resultado : null);
+      else resolve(payload || null);
     };
     script.onerror = function() {
       if (finished) return;
       finished = true; clearTimeout(timer); cleanup();
-      reject(new Error("não foi possível acessar o servidor"));
+      reject(new Error("não foi possível acessar o servidor (JSONP)"));
     };
     script.src = SYNC_API_BASE + "?" + query.toString();
     document.head.appendChild(script);
