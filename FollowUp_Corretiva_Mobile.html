@@ -585,11 +585,20 @@ async function syncReceber(mostrarStatus) {
   try {
     const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
     const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (Array.isArray(dados)) {
-      registros = dados; saveRegistros();
-      if (!modalAbertoAlgum()) { renderTabela(); }
-      atualizarDatalistEquipamento();
+    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
+
+    // Proteção importante: se o servidor estiver vazio, NÃO apagamos os
+    // registros locais. Isso permite que o computador que já possui a base
+    // seja usado para inicializar um compartilhamento novo/vazio.
+    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
+      await syncEnviar();
+      definirStatusSync("ok", "🟢 Base local enviada para o compartilhamento");
+      return;
     }
+
+    registros = dados; saveRegistros();
+    if (!modalAbertoAlgum()) { renderTabela(); }
+    atualizarDatalistEquipamento();
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
     definirStatusSync("err", "🔴 Falha ao sincronizar (" + e.message + ")");
@@ -599,10 +608,32 @@ async function syncReceber(mostrarStatus) {
 async function syncAgora() {
   if (!syncId || syncBusy) return;
   syncBusy = true; mostrarSyncMsg("Sincronizando...");
-  await syncReceber(true);
-  await syncEnviar();
-  mostrarSyncMsg("Sincronizado.", "ok");
-  syncBusy = false;
+  try {
+    const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
+    const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
+    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
+
+    // Se a nuvem ainda estiver vazia e este computador tiver registros,
+    // preservamos os dados locais e os enviamos para a base compartilhada.
+    // Se a nuvem já tiver dados, eles são considerados a fonte compartilhada.
+    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
+      await syncEnviar();
+      refresh();
+      mostrarSyncMsg("Dados deste computador enviados para o compartilhamento.", "ok");
+    } else {
+      registros = dados;
+      saveRegistros();
+      refresh();
+      atualizarDatalistEquipamento();
+      mostrarSyncMsg("Dados compartilhados carregados.", "ok");
+      definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+    }
+  } catch(e) {
+    mostrarSyncMsg("Falha ao sincronizar: " + e.message, "err");
+    definirStatusSync("err", "🔴 Falha ao sincronizar");
+  } finally {
+    syncBusy = false;
+  }
 }
 
 function iniciarPollingSync() {
