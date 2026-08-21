@@ -409,8 +409,8 @@ function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); 
 
 // ===================== SINCRONIZAÇÃO ENTRE DISPOSITIVOS =====================
 // Comunicação compatível com GitHub Pages + Google Apps Script sem CORS.
-// LEITURA: JSONP via <script src="..."> (scripts cross-origin são permitidos).
-// GRAVAÇÃO: formulário POST para iframe oculto (também não usa fetch/XHR).
+// LEITURA E GRAVAÇÃO: iframe oculto + postMessage.
+// Não usa fetch/XHR/JSONP, evitando CORS no GitHub Pages.
 const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec";
 
 function syncConfigurado() {
@@ -424,75 +424,76 @@ function syncGerarCodigoLocal() {
   return "FC-" + s;
 }
 
-function syncJsonp(params) {
+function syncRequest(params, method) {
+  method = (method || "GET").toUpperCase();
   return new Promise(function(resolve, reject) {
-    const cb = "__followup_cb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    let finished = false;
-    const query = new URLSearchParams();
-    Object.keys(params || {}).forEach(k => query.set(k, params[k]));
-    query.set("callback", cb);
-    query.set("_", String(Date.now()));
-
-    function cleanup() {
-      try { delete window[cb]; } catch(e) { window[cb] = undefined; }
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-    const timer = setTimeout(function() {
-      if (finished) return;
-      finished = true; cleanup(); reject(new Error("tempo esgotado"));
-    }, 20000);
-
-    window[cb] = function(payload) {
-      if (finished) return;
-      finished = true; clearTimeout(timer); cleanup();
-      if (payload && payload.erro) reject(new Error(payload.erro));
-      else resolve(payload || null);
-    };
-    script.onerror = function() {
-      if (finished) return;
-      finished = true; clearTimeout(timer); cleanup();
-      reject(new Error("não foi possível acessar o servidor (JSONP)"));
-    };
-    script.src = SYNC_API_BASE + "?" + query.toString();
-    document.head.appendChild(script);
-  });
-}
-
-function syncPost(campos) {
-  return new Promise(function(resolve, reject) {
-    const nomeFrame = "syncPostFrame_" + Date.now() + Math.random().toString(36).slice(2);
+    const reqId = "req_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+    const nomeFrame = "syncFrame_" + Date.now() + Math.random().toString(36).slice(2);
     const iframeEl = document.createElement("iframe");
     iframeEl.name = nomeFrame;
     iframeEl.style.display = "none";
     document.body.appendChild(iframeEl);
-    const formEl = document.createElement("form");
-    formEl.method = "POST";
-    formEl.action = SYNC_API_BASE;
-    formEl.target = nomeFrame;
-    formEl.style.display = "none";
-    Object.keys(campos || {}).forEach(function(k) {
-      const inp = document.createElement("input");
-      inp.type = "hidden"; inp.name = k; inp.value = campos[k] == null ? "" : String(campos[k]);
-      formEl.appendChild(inp);
-    });
-    document.body.appendChild(formEl);
-    let done = false;
-    const timer = setTimeout(function() {
-      if (done) return;
-      done = true;
-      cleanup();
-      // O POST pode ter sido aceito mesmo sem uma resposta legível.
-      resolve(true);
-    }, 1800);
+    let finished = false;
+
     function cleanup() {
+      window.removeEventListener("message", onMessage);
       setTimeout(function() {
         if (iframeEl.parentNode) iframeEl.parentNode.removeChild(iframeEl);
-        if (formEl.parentNode) formEl.parentNode.removeChild(formEl);
-      }, 300);
+      }, 100);
     }
-    try { formEl.submit(); }
-    catch(e) { clearTimeout(timer); done = true; cleanup(); reject(e); }
+    function finishOk(payload) {
+      if (finished) return;
+      finished = true;
+      clearTimeout(timer);
+      cleanup();
+      if (payload && payload.erro) reject(new Error(payload.erro));
+      else resolve(payload ? payload.resultado : null);
+    }
+    function onMessage(ev) {
+      const data = ev && ev.data;
+      if (!data || data.reqId !== reqId) return;
+      finishOk(data);
+    }
+    window.addEventListener("message", onMessage);
+
+    const timer = setTimeout(function() {
+      if (finished) return;
+      finished = true;
+      cleanup();
+      reject(new Error("tempo esgotado ao acessar o servidor"));
+    }, 20000);
+
+    try {
+      const query = new URLSearchParams();
+      Object.keys(params || {}).forEach(function(k) { query.set(k, params[k] == null ? "" : String(params[k])); });
+      query.set("reqId", reqId);
+      query.set("_", String(Date.now()));
+
+      if (method === "GET") {
+        iframeEl.src = SYNC_API_BASE + "?" + query.toString();
+      } else {
+        const formEl = document.createElement("form");
+        formEl.method = "POST";
+        formEl.action = SYNC_API_BASE;
+        formEl.target = nomeFrame;
+        formEl.style.display = "none";
+        query.forEach(function(value, key) {
+          const inp = document.createElement("input");
+          inp.type = "hidden";
+          inp.name = key;
+          inp.value = value;
+          formEl.appendChild(inp);
+        });
+        document.body.appendChild(formEl);
+        formEl.submit();
+        setTimeout(function() { if (formEl.parentNode) formEl.parentNode.removeChild(formEl); }, 500);
+      }
+    } catch(e) {
+      clearTimeout(timer);
+      finished = true;
+      cleanup();
+      reject(e);
+    }
   });
 }
 
@@ -533,7 +534,7 @@ async function syncCriar() {
     // O código é gerado no navegador. Isso elimina a necessidade de esperar
     // uma resposta cross-origin do Apps Script para descobrir o código.
     const novoId = syncGerarCodigoLocal();
-    await syncPost({ action:"criar", codigo:novoId, dados:JSON.stringify(registros) });
+    await syncRequest({ action:"criar", codigo:novoId, dados:JSON.stringify(registros) }, "POST");
     syncId = novoId; safeSetItem(SYNC_ID_KEY, novoId);
     atualizarUiSync();
     mostrarSyncMsg("Compartilhamento criado! Use o código no outro dispositivo.", "ok");
@@ -549,7 +550,7 @@ async function syncConectar(codigo) {
   if (!codigo || !syncConfigurado()) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Conectando...");
   try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:codigo });
+    const resposta = await syncRequest({ action:"buscar", codigo:codigo }, "GET");
     const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
     if (!dados) throw new Error("código não encontrado");
     registros = dados;
@@ -572,7 +573,7 @@ function syncDesconectar() {
 async function syncEnviar() {
   if (!syncId || !syncConfigurado()) return;
   try {
-    await syncPost({ action:"salvar", codigo:syncId, dados:JSON.stringify(registros) });
+    await syncRequest({ action:"salvar", codigo:syncId, dados:JSON.stringify(registros) }, "POST");
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
     definirStatusSync("err", "🔴 Falha ao sincronizar (" + e.message + ")");
@@ -583,22 +584,13 @@ async function syncReceber(mostrarStatus) {
   if (!syncId || !syncConfigurado()) return;
   if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
   try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
+    const resposta = await syncRequest({ action:"buscar", codigo:syncId }, "GET");
     const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
-
-    // Proteção importante: se o servidor estiver vazio, NÃO apagamos os
-    // registros locais. Isso permite que o computador que já possui a base
-    // seja usado para inicializar um compartilhamento novo/vazio.
-    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
-      await syncEnviar();
-      definirStatusSync("ok", "🟢 Base local enviada para o compartilhamento");
-      return;
+    if (Array.isArray(dados)) {
+      registros = dados; saveRegistros();
+      if (!modalAbertoAlgum()) { renderTabela(); }
+      atualizarDatalistEquipamento();
     }
-
-    registros = dados; saveRegistros();
-    if (!modalAbertoAlgum()) { renderTabela(); }
-    atualizarDatalistEquipamento();
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
     definirStatusSync("err", "🔴 Falha ao sincronizar (" + e.message + ")");
@@ -608,32 +600,10 @@ async function syncReceber(mostrarStatus) {
 async function syncAgora() {
   if (!syncId || syncBusy) return;
   syncBusy = true; mostrarSyncMsg("Sincronizando...");
-  try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
-    const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
-
-    // Se a nuvem ainda estiver vazia e este computador tiver registros,
-    // preservamos os dados locais e os enviamos para a base compartilhada.
-    // Se a nuvem já tiver dados, eles são considerados a fonte compartilhada.
-    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
-      await syncEnviar();
-      refresh();
-      mostrarSyncMsg("Dados deste computador enviados para o compartilhamento.", "ok");
-    } else {
-      registros = dados;
-      saveRegistros();
-      refresh();
-      atualizarDatalistEquipamento();
-      mostrarSyncMsg("Dados compartilhados carregados.", "ok");
-      definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
-    }
-  } catch(e) {
-    mostrarSyncMsg("Falha ao sincronizar: " + e.message, "err");
-    definirStatusSync("err", "🔴 Falha ao sincronizar");
-  } finally {
-    syncBusy = false;
-  }
+  await syncReceber(true);
+  await syncEnviar();
+  mostrarSyncMsg("Sincronizado.", "ok");
+  syncBusy = false;
 }
 
 function iniciarPollingSync() {
