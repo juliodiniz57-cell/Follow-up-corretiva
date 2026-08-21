@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="followup-build" content="CORRIGIDO-V5-SINCRONIZACAO-2026-08-21">
+<meta name="followup-build" content="EXECUTIVO-KPI-DONUT-V6-SINCRONIZACAO-2026-08-21">
 <title>Follow-up Corretiva | Mineração Taboca</title>
 <style>
 :root {
@@ -978,6 +978,14 @@ function gerarPainelGerencial() {
   lista.forEach(r=>{ const s=calcularSituacao(r); ct+=Number(r.custoPlan)||0; if(s==="Atendida")at++;else if(s==="No Prazo")np++;else if(s==="Prox. Venc.")pv++;else if(s==="VENCIDA")ve++;else sd++; });
   const total = lista.length;
   const pctAtendimento = total ? Math.round((at/total)*100) : 0;
+  const situacaoTotal = at + np + pv;
+  const pctAt = situacaoTotal ? Math.round((at/situacaoTotal)*100) : 0;
+  const pctNp = situacaoTotal ? Math.round((np/situacaoTotal)*100) : 0;
+  const pctPv = situacaoTotal ? Math.max(0,100-pctAt-pctNp) : 0;
+  const donutData = [{q:np,p:pctNp},{q:at,p:pctAt},{q:pv,p:pctPv}];
+  let donutStart = -90;
+  const donutLabels = donutData.map(d=>{ const mid = donutStart + (d.p*3.6)/2; const rad=mid*Math.PI/180; const x=50+34*Math.cos(rad); const y=50+34*Math.sin(rad); donutStart += d.p*3.6; return {x:x.toFixed(2),y:y.toFixed(2),q:d.q,p:d.p}; });
+  const donutGradient = "conic-gradient(from -90deg, #16a34a 0 " + pctNp + "%, #2563eb " + pctNp + "% " + (pctNp+pctAt) + "%, #f59e0b " + (pctNp+pctAt) + "% 100%)";
 
   const vencidas = lista.filter(r=>calcularSituacao(r)==="VENCIDA");
   const proxVenc = lista.filter(r=>calcularSituacao(r)==="Prox. Venc.");
@@ -1033,6 +1041,23 @@ function gerarPainelGerencial() {
   .pg-kpi.semdata{border-left-color:var(--pg-semdata-text);}
   .pg-kpi.custo{border-left-color:var(--pg-accent);}
   .pg-kpi.pct{border-left-color:#7c3aed;}
+  .pg-situacao-panel{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:18px 20px;margin-bottom:20px;}
+  .pg-situacao-wrap{display:flex;align-items:center;justify-content:center;gap:38px;flex-wrap:wrap;}
+  .pg-donut{position:relative;width:310px;height:310px;border-radius:50%;flex:0 0 310px;}
+  .pg-donut::after{content:"";position:absolute;inset:74px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(226,230,236,.5);}
+  .pg-donut-label{position:absolute;z-index:2;transform:translate(-50%,-50%);text-align:center;color:#fff;font-weight:800;line-height:1.08;text-shadow:0 1px 3px rgba(0,0,0,.35);pointer-events:none;min-width:54px;}
+  .pg-donut-label .q{font-size:25px;display:block;}
+  .pg-donut-label .p{font-size:17px;display:block;margin-top:3px;}
+  .pg-donut-center{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:var(--pg-primary);font-weight:800;}
+  .pg-donut-center .n{font-size:25px;line-height:1;}
+  .pg-donut-center .t{font-size:11px;color:var(--pg-text-muted);margin-top:5px;font-weight:600;}
+  .pg-situacao-legend{display:flex;flex-direction:column;gap:14px;min-width:210px;}
+  .pg-legend-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--pg-text);}
+  .pg-legend-dot{width:15px;height:15px;border-radius:3px;flex:0 0 15px;}
+  .pg-legend-value{font-weight:800;margin-left:auto;}
+  .pg-legend-pct{color:var(--pg-text-muted);width:44px;text-align:right;}
+  .pg-legend-green{background:#16a34a;} .pg-legend-blue{background:#2563eb;} .pg-legend-orange{background:#f59e0b;}
+  .pg-situacao-note{margin-top:10px;text-align:center;color:var(--pg-text-muted);font-size:11px;}
   .pg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
   .pg-panel{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:16px 18px;}
   .pg-panel h3{margin:0 0 10px;font-size:13.5px;color:var(--pg-text);}
@@ -1087,6 +1112,8 @@ function gerarPainelGerencial() {
     .pg-grid-2{grid-template-columns:1fr;}
     .pg-container{padding:0 16px 40px;}
     .pg-header{padding:18px;}
+    .pg-donut{width:280px;height:280px;flex-basis:280px;}
+    .pg-donut::after{inset:67px;}
   }
 </style>
 </head>
@@ -1121,6 +1148,22 @@ function gerarPainelGerencial() {
     <div class="pg-kpi semdata"><div class="v">${sd}</div><div class="l">Sem Data</div></div>
     <div class="pg-kpi custo"><div class="v">${formatCurrency(ct)}</div><div class="l">Custo Total Planejado</div></div>
     <div class="pg-kpi pct"><div class="v">${pctAtendimento}%</div><div class="l">% Atendimento</div></div>
+  </div>
+
+  <div class="pg-section-title">Situação das OMs</div>
+  <div class="pg-situacao-panel">
+    <div class="pg-situacao-wrap">
+      <div class="pg-donut" style="background:${donutGradient};" aria-label="Situação das OMs">
+        ${donutLabels.map(d=>'<div class="pg-donut-label" style="left:'+d.x+'%;top:'+d.y+'%;"><span class="q">'+d.q+'</span><span class="p">'+d.p+'%</span></div>').join("")}
+        <div class="pg-donut-center"><div class="n">${situacaoTotal}</div><div class="t">OMs</div></div>
+      </div>
+      <div class="pg-situacao-legend">
+        <div class="pg-legend-item"><span class="pg-legend-dot pg-legend-green"></span><span>No Prazo</span><span class="pg-legend-value">${np}</span><span class="pg-legend-pct">${pctNp}%</span></div>
+        <div class="pg-legend-item"><span class="pg-legend-dot pg-legend-blue"></span><span>Atendidas</span><span class="pg-legend-value">${at}</span><span class="pg-legend-pct">${pctAt}%</span></div>
+        <div class="pg-legend-item"><span class="pg-legend-dot pg-legend-orange"></span><span>Próx. Venc.</span><span class="pg-legend-value">${pv}</span><span class="pg-legend-pct">${pctPv}%</span></div>
+      </div>
+    </div>
+    <div class="pg-situacao-note">Percentuais calculados sobre as OMs classificadas como Atendidas, No Prazo e Próx. Venc. — total de ${situacaoTotal} OMs.</div>
   </div>
 
   <div class="pg-section-title">Distribuições</div>
