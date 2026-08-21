@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="followup-build" content="CORRIGIDO-2026-08-21">
 <title>Follow-up Corretiva | Mineração Taboca</title>
 <style>
 :root {
@@ -407,12 +408,10 @@ function loadRegistros() {
 function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); }
 
 // ===================== SINCRONIZAÇÃO ENTRE DISPOSITIVOS =====================
-// Usa o serviço público jsonblob.com (anônimo, sem necessidade de conta/chave)
-// como um "documento compartilhado" simples. O código de sincronização é o ID
-// do blob, devolvido pelo servidor no cabeçalho "Location" da resposta de
-// criação. Qualquer dispositivo com o mesmo código lê e grava os mesmos dados.
-// Não há login: quem tiver o código tem acesso total.
-const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec"; // URL do Google Apps Script (Implantar > Nova implantação > App da Web), termina em /exec
+// O endereço abaixo é o Web App do Google Apps Script.
+// O HTML NÃO usa fetch/XMLHttpRequest: usa formulário + iframe + postMessage
+// para evitar bloqueio de CORS entre GitHub Pages e Google Apps Script.
+const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec";
 
 function syncConfigurado() {
   return !!(SYNC_API_BASE && SYNC_API_BASE.indexOf("COLE_AQUI") !== 0);
@@ -579,9 +578,8 @@ async function syncAgora() {
 function iniciarPollingSync() {
   pararPollingSync();
   if (!syncId) return;
-  // Verificação periódica via Google Apps Script (Web App do Google),
-  // então dá pra verificar com uma frequência bem mais próxima do tempo real.
-  syncPollTimer = setInterval(()=>{ if(!modalAbertoAlgum()) syncReceber(false); }, 45*1000);
+  // Verificação periódica no servidor compartilhado; o intervalo padrão é de 30 segundos.
+  syncPollTimer = setInterval(()=>{ if(!modalAbertoAlgum()) syncReceber(false); }, 30*1000);
 }
 function pararPollingSync() { if (syncPollTimer) { clearInterval(syncPollTimer); syncPollTimer = null; } }
 
