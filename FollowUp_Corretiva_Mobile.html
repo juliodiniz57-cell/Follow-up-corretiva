@@ -414,31 +414,60 @@ function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); 
 // Não há login: quem tiver o código tem acesso total.
 const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec"; // URL do Google Apps Script (Implantar > Nova implantação > App da Web), termina em /exec
 
-function syncUrl(codigo) {
-  if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return null;
-  return `${SYNC_API_BASE}?action=buscar&codigo=${encodeURIComponent(codigo)}`;
+function syncConfigurado() {
+  return !!(SYNC_API_BASE && SYNC_API_BASE.indexOf("COLE_AQUI") !== 0);
 }
 
-// O Google Apps Script (Web App) redireciona a resposta final para
-// script.googleusercontent.com. Em alguns navegadores, o fetch() moderno
-// tem problema para seguir esse redirecionamento em requisições cross-origin,
-// especialmente em POST. O XMLHttpRequest tradicional lida melhor com isso,
-// então usamos ele por baixo dos panos, mas com uma interface parecida com fetch.
-function syncRequest(url, opts) {
-  opts = opts || {};
+// Envia a requisição por um formulário oculto + iframe invisível, e recebe a
+// resposta por postMessage. Essa técnica não sofre bloqueio de CORS (ao
+// contrário de fetch/XMLHttpRequest), porque navegação e postMessage sempre
+// funcionam entre sites diferentes — só a leitura direta da resposta via
+// JavaScript é que era bloqueada.
+function syncPonte(campos) {
   return new Promise(function (resolve, reject) {
-    const xhr = new XMLHttpRequest();
-    xhr.open(opts.method || "GET", url, true);
-    xhr.onload = function () {
-      resolve({
-        ok: xhr.status >= 200 && xhr.status < 300,
-        status: xhr.status,
-        json: function () { return Promise.resolve().then(function () { return JSON.parse(xhr.responseText); }); },
-        text: function () { return Promise.resolve(xhr.responseText); }
-      });
-    };
-    xhr.onerror = function () { reject(new Error("falha de rede")); };
-    xhr.send(opts.body || null);
+    const reqId = "r" + Date.now() + Math.random().toString(36).slice(2);
+    let concluido = false;
+    const timeoutId = setTimeout(function () {
+      if (concluido) return;
+      concluido = true; limpar();
+      reject(new Error("tempo esgotado, tente novamente"));
+    }, 20000);
+    function onMessage(ev) {
+      if (!ev.data || ev.data.reqId !== reqId) return;
+      if (concluido) return;
+      concluido = true; clearTimeout(timeoutId); limpar();
+      if (ev.data.erro) reject(new Error(ev.data.erro));
+      else resolve(ev.data.resultado);
+    }
+    function limpar() {
+      window.removeEventListener("message", onMessage);
+      setTimeout(function () {
+        if (iframeEl.parentNode) iframeEl.parentNode.removeChild(iframeEl);
+        if (formEl.parentNode) formEl.parentNode.removeChild(formEl);
+      }, 200);
+    }
+    window.addEventListener("message", onMessage);
+    const nomeFrame = "syncFrame_" + reqId;
+    const iframeEl = document.createElement("iframe");
+    iframeEl.name = nomeFrame;
+    iframeEl.style.display = "none";
+    document.body.appendChild(iframeEl);
+    const formEl = document.createElement("form");
+    formEl.method = campos._metodo || "POST";
+    formEl.action = SYNC_API_BASE;
+    formEl.target = nomeFrame;
+    formEl.style.display = "none";
+    Object.keys(campos).forEach(function (k) {
+      if (k === "_metodo") return;
+      const inp = document.createElement("input");
+      inp.name = k; inp.value = campos[k];
+      formEl.appendChild(inp);
+    });
+    const inpReq = document.createElement("input");
+    inpReq.name = "reqId"; inpReq.value = reqId;
+    formEl.appendChild(inpReq);
+    document.body.appendChild(formEl);
+    formEl.submit();
   });
 }
 const SYNC_ID_KEY = "followup_corretiva_sync_id";
@@ -472,12 +501,10 @@ function mostrarSyncMsg(texto, tipo) {
 }
 
 async function syncCriar() {
-  if (!SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) { mostrarSyncMsg("Sincronização não configurada. Cole a URL do Web App no início do script.", "err"); return; }
+  if (!syncConfigurado()) { mostrarSyncMsg("Sincronização não configurada. Cole a URL do Web App no início do script.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Criando compartilhamento...");
   try {
-    const resp = await syncRequest(SYNC_API_BASE + "?action=criar", { method:"POST", body: JSON.stringify(registros) });
-    if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
-    const data = await resp.json();
+    const data = await syncPonte({ action: "criar", dados: JSON.stringify(registros) });
     if (!data || !data.codigo) throw new Error("o servidor não informou o código do compartilhamento");
     const novoId = data.codigo;
     syncId = novoId; safeSetItem(SYNC_ID_KEY, novoId);
@@ -492,15 +519,11 @@ async function syncCriar() {
 
 async function syncConectar(codigo) {
   codigo = (codigo||"").trim();
-  const url = syncUrl(codigo);
-  if (!url) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
+  if (!codigo || !syncConfigurado()) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
   syncBusy = true; mostrarSyncMsg("Conectando...");
   try {
-    const resp = await syncRequest(url);
-    if (!resp.ok) { let t=""; try{t=await resp.text();}catch(_){} throw new Error("HTTP "+resp.status+(t?": "+t.slice(0,120):"")); }
-    const dados = await resp.json();
-    if (dados && dados.erro) throw new Error("código não encontrado");
-    if (!Array.isArray(dados)) throw new Error("formato de dados inesperado");
+    const dados = await syncPonte({ _metodo:"GET", action: "buscar", codigo: codigo });
+    if (!Array.isArray(dados)) throw new Error("código não encontrado");
     registros = dados;
     syncId = codigo; safeSetItem(SYNC_ID_KEY, codigo);
     refresh(); inicializarDropdowns(); atualizarUiSync();
@@ -519,10 +542,9 @@ function syncDesconectar() {
 }
 
 async function syncEnviar() {
-  if (!syncId || !SYNC_API_BASE || SYNC_API_BASE.indexOf("COLE_AQUI") === 0) return;
+  if (!syncId || !syncConfigurado()) return;
   try {
-    const resp = await syncRequest(SYNC_API_BASE + "?action=salvar&codigo=" + encodeURIComponent(syncId), { method:"POST", body: JSON.stringify(registros) });
-    if (!resp.ok) throw new Error("HTTP "+resp.status);
+    await syncPonte({ action:"salvar", codigo: syncId, dados: JSON.stringify(registros) });
     definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
     definirStatusSync("err", "🔴 Falha ao sincronizar (sem conexão?)");
@@ -530,12 +552,10 @@ async function syncEnviar() {
 }
 
 async function syncReceber(mostrarStatus) {
-  const url = syncUrl(syncId); if (!url) return;
+  if (!syncId || !syncConfigurado()) return;
   if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
   try {
-    const resp = await syncRequest(url);
-    if (!resp.ok) throw new Error("HTTP "+resp.status);
-    const dados = await resp.json();
+    const dados = await syncPonte({ _metodo:"GET", action:"buscar", codigo: syncId });
     if (Array.isArray(dados)) {
       registros = dados; saveRegistros();
       if (!modalAbertoAlgum()) { renderTabela(); }
