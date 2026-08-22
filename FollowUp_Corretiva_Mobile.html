@@ -1875,10 +1875,11 @@ function gerarPainelGerencial() {
     page-break-after:avoid;
   }
 
+  /* Tabelas longas podem continuar na página seguinte, mas nunca cortam uma linha. */
   .pg-table-wrap{
     overflow:visible !important;
-    break-inside:avoid;
-    page-break-inside:avoid;
+    break-inside:auto;
+    page-break-inside:auto;
   }
 
   .pg-table-wrap table{
@@ -1892,8 +1893,8 @@ function gerarPainelGerencial() {
   }
 
   .pg-table-wrap tbody tr{
-    break-inside:avoid;
-    page-break-inside:avoid;
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
   }
 
   .pg-table-wrap th,
@@ -1902,46 +1903,82 @@ function gerarPainelGerencial() {
     box-sizing:border-box;
   }
 
-  /* Alinhamento consistente: Qtd / Custo Plan. / %. */
-  .pg-table-wrap th:nth-child(2),
-  .pg-table-wrap td:nth-child(2){
-    width:58px !important;
-    text-align:right !important;
-    white-space:nowrap !important;
+  /* O gráfico/ranking inteiro permanece junto na mesma página. */
+  .pg-bars-grid{
+    display:block !important;
+  }
+  .pg-bars-panel{
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
+    margin-bottom:10px;
+  }
+  .pg-bars-panel h3,
+  .pg-chart-note,
+  .pg-hbar{
+    break-inside:avoid !important;
+    page-break-inside:avoid !important;
+  }
+  .pg-bars-panel h3{
+    break-after:avoid !important;
+    page-break-after:avoid !important;
   }
 
-  .pg-table-wrap th:nth-child(3),
-  .pg-table-wrap td:nth-child(3){
-    width:145px !important;
-    text-align:right !important;
-    white-space:nowrap !important;
+  /* A orientação de mouse não faz sentido no PDF. */
+  .pg-interactive-hint{
+    display:none !important;
   }
 
-  .pg-table-wrap th:nth-child(4),
-  .pg-table-wrap td:nth-child(4){
-    width:58px !important;
-    text-align:right !important;
-    white-space:nowrap !important;
+  /* Detalhamento completo: larguras próprias para as 13 colunas em A4 paisagem. */
+  .pg-table-wrap table.pg-table-detalhe{
+    font-size:8px;
   }
-
-  /* Quando a tabela possui apenas 3 colunas (ex.: Situação / Qtd / %). */
-  .pg-table-wrap th:last-child:nth-child(3),
-  .pg-table-wrap td:last-child:nth-child(3){
-    width:58px !important;
-    text-align:right !important;
-    white-space:nowrap !important;
+  .pg-table-wrap table.pg-table-detalhe th{
+    font-size:7.4px !important;
+    line-height:1.15;
+    padding:5px 4px !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere;
   }
-
-  .pg-table-wrap th:first-child,
-  .pg-table-wrap td:first-child{
-    text-align:left !important;
-  }
-
-  /* Evita que texto longo force uma coluna sobre a porcentagem. */
-  .pg-table-wrap th,
-  .pg-table-wrap td{
-    overflow-wrap:break-word;
+  .pg-table-wrap table.pg-table-detalhe td{
+    font-size:7.6px !important;
+    line-height:1.22;
+    padding:5px 4px !important;
+    overflow-wrap:anywhere;
     word-break:normal;
+  }
+
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(1),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(1){width:7% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(2),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(2){width:8% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(3),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(3){width:8% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(4),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(4){width:6% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(5),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(5){width:12% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(6),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(6){width:8% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(7),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(7){width:5% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(8),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(8){width:6% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(9),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(9){width:15% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(10),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(10){width:8% !important;text-align:right !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(11),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(11){width:7% !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(12),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(12){width:4% !important;text-align:right !important;}
+  .pg-table-wrap table.pg-table-detalhe th:nth-child(13),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(13){width:6% !important;}
+
+  /* Campos numéricos e datas permanecem legíveis e alinhados. */
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(10),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(11),
+  .pg-table-wrap table.pg-table-detalhe td:nth-child(12){
+    white-space:normal !important;
   }
 
   /* Evita títulos órfãos e rodapés separados do conteúdo. */
