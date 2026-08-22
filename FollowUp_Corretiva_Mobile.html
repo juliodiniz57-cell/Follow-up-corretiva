@@ -1842,7 +1842,7 @@ document.getElementById("fSearch").addEventListener("input",renderTabela);
 
   document.getElementById("btnExport").addEventListener("click",exportarExcel);
   document.getElementById("btnPainelGerencial").addEventListener("click",gerarPainelGerencial);
-  document.getElementById("btnDashboard").addEventListener("click",gerarDashboardModerno);
+  document.getElementById("btnDashboard").addEventListener("click",()=>gerarDashboardModerno());
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){fecharModal();fecharConfirmExclusao();fecharModalSenha();document.getElementById("syncOverlay").style.display="none";}});
 });
 </script>
