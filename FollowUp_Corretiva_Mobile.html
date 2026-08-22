@@ -1572,7 +1572,16 @@ function gerarDashboardModerno(janelaDashboard) {
     .dash-top{margin-bottom:10px!important;display:block!important}
     .dash-kpis{grid-template-columns:repeat(6,1fr)!important;gap:8px!important}
     .dash-grid{grid-template-columns:1.45fr .9fr 1.05fr!important;gap:10px!important}
-    .dash-distrib{grid-template-columns:repeat(3,1fr)!important;gap:9px!important}
+    .dash-distrib{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important}
+    #distrib .dash-distrib>div{min-width:0!important;max-width:100%!important;overflow:visible!important;padding-bottom:0!important}
+    #distrib .dash-table{width:100%!important;min-width:0!important;max-width:100%!important;table-layout:fixed!important}
+    #distrib .dash-table th,#distrib .dash-table td{font-size:9.5px!important;padding:5px 2px!important;white-space:normal!important;overflow:visible!important}
+    #distrib .dash-table th:first-child,#distrib .dash-table td:first-child{width:34%!important;word-break:break-word!important}
+    #distrib .dash-table th:nth-child(2),#distrib .dash-table td:nth-child(2){width:10%!important;text-align:right!important}
+    #distrib .dash-table th:nth-child(3),#distrib .dash-table td:nth-child(3){width:30%!important;text-align:right!important;white-space:nowrap!important}
+    #distrib .dash-table th:last-child,#distrib .dash-table td:last-child{width:26%!important;text-align:right!important;white-space:nowrap!important}
+    #distrib .dash-bar{width:30px!important;height:6px!important;margin-right:2px!important}
+    #distrib h3{font-size:11px!important;margin:0 0 7px!important}
     .dash-exec-grid{grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
     .dash-charts-grid{grid-template-columns:1fr 1fr!important;gap:10px!important}
     .dash-chart-panel.full,.dash-status-panel{grid-column:1/-1!important}
