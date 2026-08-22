@@ -446,12 +446,12 @@ function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); 
 
 // ===================== SINCRONIZAÇÃO ENTRE DISPOSITIVOS =====================
 // Backend: Supabase REST API (GitHub Pages -> Supabase via HTTPS/CORS).
-// A tabela já existente é public.acompanhamento_corretivo.
+// A tabela já existente no Supabase é public.follow_up_corretiva.
 // O código exibido no painel identifica este projeto de sincronização; os dados
 // continuam sendo armazenados diretamente na tabela Supabase existente.
 const SUPABASE_URL = "https://vkqcgqitpjzultqebfaw.supabase.co";
 const SUPABASE_KEY = "sb_publishable_0R-8vTZbWacUwNBF_Ney6Q_vF9d0uzP";
-const SUPABASE_TABLE = "acompanhamento_corretivo";
+const SUPABASE_TABLE = "follow_up_corretiva";
 let supabaseSchemaColumns = new Set();
 
 function syncConfigurado() {
