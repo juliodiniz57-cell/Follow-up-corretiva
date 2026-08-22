@@ -51,7 +51,18 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .btn-close { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--color-text-muted); }
 .btn-close:hover { color: var(--color-text); }
 .dashboard { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 22px; }
-.card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); }
+.card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); position: relative; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease; }
+.card.kpi-interactive { cursor: pointer; }
+.card.kpi-interactive:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,58,95,.16); }
+.card.kpi-interactive:active { transform: translateY(-1px); }
+.card.kpi-interactive.is-active { outline: 3px solid rgba(47,111,237,.18); box-shadow: 0 10px 28px rgba(47,111,237,.18); }
+.card.kpi-interactive.is-muted { opacity: .48; }
+.card .kpi-hint { margin-top: 6px; font-size: 10.5px; color: var(--color-text-muted); }
+.kpi-filter-status { display:none; align-items:center; gap:8px; margin:-10px 0 14px; padding:9px 12px; background:#eef6ff; border:1px solid #cfe0fb; border-radius:9px; color:#234b82; font-size:12px; }
+.kpi-filter-status.show { display:flex; }
+.kpi-filter-status button { margin-left:auto; border:1px solid #b8cbe8; background:#fff; color:#234b82; border-radius:7px; padding:5px 9px; cursor:pointer; font-weight:700; }
+.kpi-filter-status button:hover { background:#f4f8ff; }
+
 .card-value { font-size: 22px; font-weight: 700; color: var(--color-text); }
 .card-label { font-size: 11.5px; color: var(--color-text-muted); margin-top: 4px; }
 .card-total { border-left-color: var(--color-primary); }
@@ -183,15 +194,35 @@ tr.row-semdata { background: #fafbfc; }
 
 <main class="container">
   <section class="dashboard" id="dashboard">
-    <div class="card card-total"><span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span></div>
-    <div class="card card-atendida"><span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span></div>
-    <div class="card card-noprazo"><span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span></div>
-    <div class="card card-proxvenc"><span class="card-value" id="kpiProxVenc">0</span><span class="card-label">Próx. Venc.</span></div>
-    <div class="card card-vencida"><span class="card-value" id="kpiVencida">0</span><span class="card-label">Vencidas</span></div>
-    <div class="card card-semdata"><span class="card-value" id="kpiSemData">0</span><span class="card-label">Sem Data</span></div>
-    <div class="card card-custo"><span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span></div>
-    <div class="card card-pct"><span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span></div>
+    <div class="card card-total kpi-interactive" data-kpi-filter="" tabindex="0" title="Clique para mostrar todas as OMs">
+      <span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span><span class="kpi-hint">Clique para ver todas</span>
+    </div>
+    <div class="card card-atendida kpi-interactive" data-kpi-filter="Atendida" tabindex="0" title="Clique para filtrar somente OMs atendidas">
+      <span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-noprazo kpi-interactive" data-kpi-filter="No Prazo" tabindex="0" title="Clique para filtrar somente OMs no prazo">
+      <span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-proxvenc kpi-interactive" data-kpi-filter="Prox. Venc." tabindex="0" title="Clique para filtrar OMs próximas do vencimento">
+      <span class="card-value" id="kpiProxVenc">0</span><span class="card-label">Próx. Venc.</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-vencida kpi-interactive" data-kpi-filter="VENCIDA" tabindex="0" title="Clique para filtrar somente OMs vencidas">
+      <span class="card-value" id="kpiVencida">0</span><span class="card-label">Vencidas</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-semdata kpi-interactive" data-kpi-filter="Sem Data" tabindex="0" title="Clique para filtrar OMs sem data">
+      <span class="card-value" id="kpiSemData">0</span><span class="card-label">Sem Data</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-custo" title="Custo total planejado das OMs atualmente exibidas">
+      <span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span><span class="kpi-hint">Atualiza com os filtros</span>
+    </div>
+    <div class="card card-pct" title="Percentual de OMs atendidas dentro do conjunto atualmente exibido">
+      <span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span><span class="kpi-hint">Atualiza com os filtros</span>
+    </div>
   </section>
+  <div id="kpiFilterStatus" class="kpi-filter-status">
+    <span>🔎</span><span id="kpiFilterText"></span>
+    <button type="button" id="btnClearKpiFilter">Limpar seleção</button>
+  </div>
 
   <section class="filters">
     <input type="search" id="fSearch" class="input-search" placeholder="Buscar por Ordem, Equipamento, Descrição, Observação...">
@@ -1480,6 +1511,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadRegistros(); inicializarDropdowns();
   const hoje=new Date(); document.getElementById("subtitle").textContent=`Acompanhamento de materiais e ordens de manutenção — atualizado em ${hoje.toLocaleDateString("pt-BR")}`;
   refresh();
+  atualizarEstadoKpisInterativos();
   atualizarUiSync();
   if (syncId) { syncReceber(true).then(()=>{ atualizarDatalistEquipamento(); }); iniciarPollingSync(); }
 
@@ -1499,14 +1531,82 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("btnManualImport").addEventListener("click",importarDadosManual);
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && syncId) syncReceber(false); });
 
-  document.getElementById("fSearch").addEventListener("input",renderTabela);
-  document.getElementById("fSituacao").addEventListener("change",renderTabela);
+  
+  // ===================== INTERAÇÃO DOS KPIs PRINCIPAIS =====================
+  function atualizarEstadoKpisInterativos() {
+    const atual = document.getElementById("fSituacao").value || "";
+    const cards = document.querySelectorAll("#dashboard .kpi-interactive");
+    cards.forEach(card => {
+      const key = card.dataset.kpiFilter || "";
+      card.classList.toggle("is-active", key === atual);
+      card.classList.toggle("is-muted", !!atual && key !== atual && key !== "");
+    });
+
+    const box = document.getElementById("kpiFilterStatus");
+    const txt = document.getElementById("kpiFilterText");
+    if (box && txt) {
+      if (atual) {
+        const nomes = {
+          "Atendida":"Atendidas",
+          "No Prazo":"No Prazo",
+          "Prox. Venc.":"Próx. Venc.",
+          "VENCIDA":"Vencidas",
+          "Sem Data":"Sem Data"
+        };
+        txt.textContent = "Filtro ativo pelo KPI: " + (nomes[atual] || atual) + ". O restante do painel foi recalculado para este grupo.";
+        box.classList.add("show");
+      } else {
+        box.classList.remove("show");
+        txt.textContent = "";
+      }
+    }
+  }
+
+  function selecionarKpiFiltro(valor) {
+    const select = document.getElementById("fSituacao");
+    if (!select) return;
+
+    // Clique no mesmo KPI novamente = volta para todas as OMs.
+    if (select.value === valor && valor) {
+      select.value = "";
+    } else {
+      select.value = valor;
+    }
+
+    renderTabela();
+    atualizarEstadoKpisInterativos();
+
+    // Leva o usuário diretamente para o resultado filtrado.
+    document.querySelector(".table-wrap")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  document.querySelectorAll("#dashboard .kpi-interactive").forEach(card => {
+    card.addEventListener("click", () => selecionarKpiFiltro(card.dataset.kpiFilter || ""));
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selecionarKpiFiltro(card.dataset.kpiFilter || "");
+      }
+    });
+  });
+
+  document.getElementById("btnClearKpiFilter")?.addEventListener("click", () => {
+    document.getElementById("fSituacao").value = "";
+    renderTabela();
+    atualizarEstadoKpisInterativos();
+  });
+
+document.getElementById("fSearch").addEventListener("input",renderTabela);
+  document.getElementById("fSituacao").addEventListener("change",()=>{renderTabela(); atualizarEstadoKpisInterativos();});
   document.getElementById("fStatusSap").addEventListener("change",renderTabela);
   document.getElementById("fFornecedor").addEventListener("change",renderTabela);
   document.getElementById("fCriadoPor").addEventListener("change",renderTabela);
   document.getElementById("fDataDe").addEventListener("change",renderTabela);
   document.getElementById("fDataAte").addEventListener("change",renderTabela);
-  document.getElementById("btnClearFilters").addEventListener("click",()=>{document.getElementById("fSearch").value="";document.getElementById("fSituacao").value="";document.getElementById("fStatusSap").value="";document.getElementById("fFornecedor").value="";document.getElementById("fCriadoPor").value="";document.getElementById("fDataDe").value="";document.getElementById("fDataAte").value="";renderTabela();});
+  document.getElementById("btnClearFilters").addEventListener("click",()=>{document.getElementById("fSearch").value="";document.getElementById("fSituacao").value="";document.getElementById("fStatusSap").value="";document.getElementById("fFornecedor").value="";document.getElementById("fCriadoPor").value="";document.getElementById("fDataDe").value="";document.getElementById("fDataAte").value="";renderTabela();atualizarEstadoKpisInterativos();});
 
   document.getElementById("tblBody").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
   document.getElementById("cardsWrap").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
