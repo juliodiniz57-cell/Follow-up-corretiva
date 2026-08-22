@@ -1188,6 +1188,7 @@ function gerarPainelGerencial() {
   const dataGeracao = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   const de10dias = new Date(agora); de10dias.setDate(de10dias.getDate()-10);
   const periodoRef = de10dias.toLocaleDateString("pt-BR") + " a " + agora.toLocaleDateString("pt-BR");
+  const periodoLinha = filtrosAtivos ? `Período de referência: ${periodoRef}<br><strong>Filtros ativos aplicados</strong>` : "";
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -1329,14 +1330,116 @@ function gerarPainelGerencial() {
   @media(max-width:1100px){.pg-extra-grid{grid-template-columns:repeat(2,1fr)}.pg-bars-grid{grid-template-columns:1fr}}
   @media(max-width:650px){.pg-extra-grid{grid-template-columns:1fr}.pg-hbar{grid-template-columns:105px 1fr 78px 38px;gap:6px}}
   .pg-footer{text-align:center;color:var(--pg-text-muted);font-size:11.5px;padding:30px 0 10px;}
+  @page{size:A4 landscape;margin:10mm;}
   @media print{
-    .pg-toolbar{display:none;}
-    body{background:#fff;}
-    .pg-panel,.pg-table-wrap,.pg-kpi{box-shadow:none;border:1px solid var(--pg-border);}
-    .pg-section-title{break-after:avoid;}
-    .pg-table-wrap{overflow-x:visible;}
-    .pg-table-wrap table.pg-table-detalhe{min-width:0;}
+  @page{
+    size:A4 landscape;
+    margin:10mm;
   }
+
+  html, body{
+    background:#fff !important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  /* Somente impressão: mantém a tela/interatividade intactas. */
+  .pg-toolbar{
+    display:none !important;
+  }
+
+  .pg-section-title,
+  .pg-panel,
+  .pg-kpi,
+  .pg-extra-card,
+  .pg-donut-panel,
+  .pg-grid-2,
+  .pg-extra-grid,
+  .pg-kpis{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  .pg-section-title{
+    break-after:avoid;
+    page-break-after:avoid;
+  }
+
+  .pg-table-wrap{
+    overflow:visible !important;
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  .pg-table-wrap table{
+    width:100% !important;
+    table-layout:fixed;
+    border-collapse:collapse;
+  }
+
+  .pg-table-wrap thead{
+    display:table-header-group;
+  }
+
+  .pg-table-wrap tbody tr{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+
+  .pg-table-wrap th,
+  .pg-table-wrap td{
+    vertical-align:middle !important;
+    box-sizing:border-box;
+  }
+
+  /* Alinhamento consistente: Qtd / Custo Plan. / %. */
+  .pg-table-wrap th:nth-child(2),
+  .pg-table-wrap td:nth-child(2){
+    width:58px !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+  }
+
+  .pg-table-wrap th:nth-child(3),
+  .pg-table-wrap td:nth-child(3){
+    width:145px !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+  }
+
+  .pg-table-wrap th:nth-child(4),
+  .pg-table-wrap td:nth-child(4){
+    width:58px !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+  }
+
+  /* Quando a tabela possui apenas 3 colunas (ex.: Situação / Qtd / %). */
+  .pg-table-wrap th:last-child:nth-child(3),
+  .pg-table-wrap td:last-child:nth-child(3){
+    width:58px !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+  }
+
+  .pg-table-wrap th:first-child,
+  .pg-table-wrap td:first-child{
+    text-align:left !important;
+  }
+
+  /* Evita que texto longo force uma coluna sobre a porcentagem. */
+  .pg-table-wrap th,
+  .pg-table-wrap td{
+    overflow-wrap:break-word;
+    word-break:normal;
+  }
+
+  /* Evita títulos órfãos e rodapés separados do conteúdo. */
+  .pg-footer{
+    break-inside:avoid;
+    page-break-inside:avoid;
+  }
+}
   @media (max-width:900px){
     .pg-kpis{grid-template-columns:repeat(2,1fr);}
     .pg-grid-2{grid-template-columns:1fr;}
@@ -1355,8 +1458,7 @@ function gerarPainelGerencial() {
     </div>
   </div>
   <div class="pg-header-right">
-    Gerado em ${dataGeracao}<br>
-    Período de referência: últimos 10 dias (${periodoRef})${filtrosAtivos?"<br><strong>Filtros ativos aplicados</strong>":""}
+    Gerado em ${dataGeracao}${periodoLinha ? "<br>" + periodoLinha : ""}
   </div>
 </div>
 <div class="pg-toolbar">
