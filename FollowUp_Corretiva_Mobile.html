@@ -1104,11 +1104,13 @@ function linhaAgrupada(item, totalQtd) {
   </tr>`;
 }
 
-function gerarDonutSituacao(at,np,pv,total){
+function gerarDonutSituacao(at,np,pv,ve,sd,total){
   const itens=[
     {key:"noprazo",label:"No Prazo",qtd:np,cor:"#16a34a"},
     {key:"atendida",label:"Atendidas",qtd:at,cor:"#2563eb"},
-    {key:"proxvenc",label:"Próx. Venc.",qtd:pv,cor:"#f59e0b"}
+    {key:"proxvenc",label:"Próx. Venc.",qtd:pv,cor:"#f59e0b"},
+    {key:"vencida",label:"Vencidas",qtd:ve,cor:"#dc2626"},
+    {key:"semdata",label:"Sem Data",qtd:sd,cor:"#94a3b8"}
   ];
   const cx=190,cy=160,ro=116,ri=64;
   const polar=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
@@ -1637,7 +1639,7 @@ function gerarPainelGerencial() {
 
   <div class="pg-section-title">Situação das OMs</div>
   <div class="pg-donut-panel">
-    ${gerarDonutSituacao(at,np,pv,total)}
+    ${gerarDonutSituacao(at,np,pv,ve,sd,total)}
     <div class="pg-interactive-hint">Passe o mouse sobre as fatias, KPIs ou legendas para ver os detalhes. Clique em uma situação para destacar os registros correspondentes.</div>
   </div>
 
