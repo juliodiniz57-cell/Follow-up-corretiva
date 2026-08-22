@@ -1129,6 +1129,28 @@ function gerarPainelGerencial() {
   const porFornecedor = agruparContagem(lista, "fornecedor", "(Sem fornecedor)").slice(0,8);
   const porStatusSap = agruparContagem(lista, "statusSap", "(Sem status)").slice(0,8);
   const porCriadoPor = agruparContagem(lista, "criadoPor", "(Não informado)").slice(0,8);
+  const custoMedioOM = total ? ct/total : 0;
+  const fornecedoresQtdAll = agruparContagem(lista,"fornecedor","(Sem fornecedor)");
+  const fornecedorMaiorVolume = fornecedoresQtdAll[0] || {chave:"—",qtd:0,custo:0};
+  const fornecedoresCustoAll = [...fornecedoresQtdAll].sort((a,b)=>b.custo-a.custo);
+  const fornecedorMaiorCusto = fornecedoresCustoAll[0] || {chave:"—",qtd:0,custo:0};
+  const topStatusGer = agruparContagem(lista,"statusSap","(Sem status)").slice(0,10);
+  const topFornecQtdGer = fornecedoresQtdAll.slice(0,10);
+  const topFornecCustoGer = fornecedoresCustoAll.slice(0,10);
+  const topEquipGer = agruparContagem(lista,"equipamento","(Sem equipamento)").slice(0,10);
+  const prioridadeGer = ve>0 ? {tipo:"VENCIDAS",qtd:ve,cls:"pg-priority-alert"} : pv>0 ? {tipo:"PRÓX. VENCIMENTO",qtd:pv,cls:"pg-priority-warn"} : {tipo:"SEM PRIORIDADE",qtd:0,cls:"pg-priority-ok"};
+  const barrasGer = (arr,totalRef,modo="qtd") => {
+    if(!arr.length) return '<div class="pg-empty">Sem dados para exibição.</div>';
+    const max=Math.max(1,...arr.map(x=>modo==="custo"?x.custo:x.qtd));
+    const base=modo==="custo" ? (arr.reduce((sum,x)=>sum+x.custo,0)||1) : totalRef;
+    return arr.map((x,i)=>{
+      const raw=modo==="custo"?x.custo:x.qtd;
+      const value=modo==="custo"?formatCurrency(x.custo):x.qtd;
+      const share=base?Math.round(raw/base*100):0;
+      const width=Math.max(3,Math.round(raw/max*100));
+      return `<div class="pg-hbar" title="${escapeHtml(x.chave)} — ${escapeHtml(String(value))} — ${share}%"><div class="pg-hlabel">${i+1}. ${escapeHtml(x.chave)}</div><div class="pg-htrack"><div class="pg-hfill" style="width:${width}%"></div></div><div class="pg-hvalue">${value}</div><div class="pg-hpct">${share}%</div></div>`;
+    }).join('');
+  };
 
   const logoSrc = document.querySelector(".topbar-title img").src;
   const agora = new Date();
@@ -1248,6 +1270,33 @@ function gerarPainelGerencial() {
   }
   .pg-empty{padding:16px;color:var(--pg-text-muted);font-size:13px;text-align:center;}
   .pg-alert{display:flex;align-items:center;gap:10px;background:var(--pg-vencida-bg);color:var(--pg-vencida-text);border-radius:10px;padding:12px 16px;font-size:13.5px;font-weight:600;margin-bottom:14px;}
+  .pg-extra-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px;}
+  .pg-extra-card{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:15px 16px;border-top:4px solid var(--pg-accent);transition:.18s;cursor:default;}
+  .pg-extra-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(16,24,40,.12);}
+  .pg-extra-card .el{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--pg-text-muted);font-weight:700;}
+  .pg-extra-card .ev{font-size:20px;font-weight:800;margin-top:7px;color:var(--pg-primary);white-space:normal;word-break:break-word;}
+  .pg-extra-card .es{font-size:12px;color:var(--pg-text-muted);margin-top:5px;}
+  .pg-priority-alert{border-top-color:#dc2626;background:#fff8f8;}
+  .pg-priority-alert .ev{color:#b02a2a;}
+  .pg-priority-warn{border-top-color:#f59e0b;background:#fffaf2;}
+  .pg-priority-warn .ev{color:#a35a00;}
+  .pg-priority-ok{border-top-color:#16a34a;background:#f7fdf8;}
+  .pg-priority-ok .ev{color:#1e7d38;}
+  .pg-bars-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .pg-bars-panel{background:var(--pg-surface);border:1px solid var(--pg-border);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.08);transition:.18s;}
+  .pg-bars-panel:hover{box-shadow:0 8px 20px rgba(16,24,40,.10);}
+  .pg-bars-panel.full{grid-column:1/-1;}
+  .pg-bars-panel h3{margin:0 0 12px;color:var(--pg-primary);font-size:14px;}
+  .pg-hbar{display:grid;grid-template-columns:minmax(120px,1.3fr) minmax(100px,2.5fr) 100px 46px;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid #edf0f3;border-radius:6px;transition:.15s;}
+  .pg-hbar:hover{background:#f5f8fc;transform:translateX(2px);}
+  .pg-hlabel{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pg-htrack{height:10px;background:#eef1f6;border-radius:999px;overflow:hidden;}
+  .pg-hfill{height:100%;background:linear-gradient(90deg,#2f6fed,#73a1ff);border-radius:999px;}
+  .pg-hvalue{text-align:right;font-size:12px;font-weight:700;}
+  .pg-hpct{text-align:right;font-size:11px;color:var(--pg-text-muted);}
+  .pg-chart-note{font-size:10.5px;color:var(--pg-text-muted);margin-top:8px;}
+  @media(max-width:1100px){.pg-extra-grid{grid-template-columns:repeat(2,1fr)}.pg-bars-grid{grid-template-columns:1fr}}
+  @media(max-width:650px){.pg-extra-grid{grid-template-columns:1fr}.pg-hbar{grid-template-columns:105px 1fr 78px 38px;gap:6px}}
   .pg-footer{text-align:center;color:var(--pg-text-muted);font-size:11.5px;padding:30px 0 10px;}
   @media print{
     .pg-toolbar{display:none;}
@@ -1298,6 +1347,13 @@ function gerarPainelGerencial() {
     <div class="pg-kpi pct"><div class="v">${pctAtendimento}%</div><div class="l">% Atendimento</div></div>
   </div>
 
+  <div class="pg-extra-grid" aria-label="Indicadores executivos adicionais">
+    <div class="pg-extra-card"><div class="el">Custo médio por OM</div><div class="ev">${formatCurrency(custoMedioOM)}</div><div class="es">Custo planejado total ÷ ${total} OMs</div></div>
+    <div class="pg-extra-card"><div class="el">Maior fornecedor por volume</div><div class="ev">${escapeHtml(fornecedorMaiorVolume.chave)}</div><div class="es">${fornecedorMaiorVolume.qtd} OMs · ${total?Math.round(fornecedorMaiorVolume.qtd/total*100):0}% do total</div></div>
+    <div class="pg-extra-card"><div class="el">Maior fornecedor por custo</div><div class="ev">${escapeHtml(fornecedorMaiorCusto.chave)}</div><div class="es">${formatCurrency(fornecedorMaiorCusto.custo)} · ${fornecedorMaiorCusto.qtd} OMs</div></div>
+    <div class="pg-extra-card ${prioridadeGer.cls}"><div class="el">Situação prioritária</div><div class="ev">${prioridadeGer.tipo}</div><div class="es">${prioridadeGer.qtd} OM${prioridadeGer.qtd===1?'':'s'} para atenção imediata</div></div>
+  </div>
+
   <div class="pg-section-title">Situação das OMs</div>
   <div class="pg-donut-panel">
     ${gerarDonutSituacao(at,np,pv,total)}
@@ -1330,6 +1386,14 @@ function gerarPainelGerencial() {
         ${[["VENCIDA",ve,"vencida"],["Prox. Venc.",pv,"proxvenc"],["No Prazo",np,"noprazo"],["Sem Data",sd,"semdata"],["Atendida",at,"atendida"]].map(([l,q])=>linhaAgrupada({chave:l,qtd:q,custo:0},total)).join("")}
       </tbody></table>
     </div>
+  </div>
+
+  <div class="pg-section-title">Análises em Gráficos de Barras</div>
+  <div class="pg-bars-grid">
+    <div class="pg-bars-panel full"><h3>Status SAP — quantidade e participação</h3>${barrasGer(topStatusGer,total,"qtd")}<div class="pg-chart-note">Quantidade e percentual de cada Status SAP sobre o total de ${total} OMs.</div></div>
+    <div class="pg-bars-panel"><h3>TOP 10 fornecedores — quantidade de OM</h3>${barrasGer(topFornecQtdGer,total,"qtd")}<div class="pg-chart-note">Ranking por quantidade de ordens de manutenção.</div></div>
+    <div class="pg-bars-panel"><h3>TOP 10 fornecedores — custo planejado</h3>${barrasGer(topFornecCustoGer,ct,"custo")}<div class="pg-chart-note">Ranking pelo custo planejado acumulado.</div></div>
+    <div class="pg-bars-panel full"><h3>TOP 10 equipamentos — quantidade de OM</h3>${barrasGer(topEquipGer,total,"qtd")}<div class="pg-chart-note">Ranking dos equipamentos com maior quantidade de OMs.</div></div>
   </div>
 
   <div class="pg-section-title">🔴 Itens Vencidos (${vencidas.length})</div>
