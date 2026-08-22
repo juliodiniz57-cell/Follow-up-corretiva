@@ -1174,7 +1174,7 @@ function gerarDashboardModerno(janelaDashboard) {
     "VENCIDA":"#dc2626"
   };
   const situacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv],["Vencidas",ve],["Sem Data",sd]].filter(x=>x[1]>0 || total===0);
-  const mainSituacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv]].filter(x=>x[1]>0);
+  const mainSituacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv],["Vencidas",ve],["Sem Data",sd]].filter(x=>x[1]>0 || total===0);
   const radius=92, cx=130, cy=130, circ=2*Math.PI*radius;
   const gerarArcosPizza = (itens) => {
     let offsetPizza=0;
