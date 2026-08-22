@@ -39,6 +39,8 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .btn { border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s, transform 0.05s; white-space: nowrap; }
 .btn:active { transform: translateY(1px); }
 .btn-primary { background: var(--color-accent); color: #fff; }
+.btn-dashboard { background:#0b7a4b; color:#fff; border-color:#0b7a4b; }
+.btn-dashboard:hover { background:#09663f; border-color:#09663f; transform:translateY(-1px); }
 .btn-primary:hover { background: #2559c4; }
 .btn-secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
 .btn-secondary:hover { background: rgba(255,255,255,0.2); }
@@ -49,7 +51,18 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .btn-close { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--color-text-muted); }
 .btn-close:hover { color: var(--color-text); }
 .dashboard { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 22px; }
-.card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); }
+.card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); position: relative; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease; }
+.card.kpi-interactive { cursor: pointer; }
+.card.kpi-interactive:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,58,95,.16); }
+.card.kpi-interactive:active { transform: translateY(-1px); }
+.card.kpi-interactive.is-active { outline: 3px solid rgba(47,111,237,.18); box-shadow: 0 10px 28px rgba(47,111,237,.18); }
+.card.kpi-interactive.is-muted { opacity: .48; }
+.card .kpi-hint { margin-top: 6px; font-size: 10.5px; color: var(--color-text-muted); }
+.kpi-filter-status { display:none; align-items:center; gap:8px; margin:-10px 0 14px; padding:9px 12px; background:#eef6ff; border:1px solid #cfe0fb; border-radius:9px; color:#234b82; font-size:12px; }
+.kpi-filter-status.show { display:flex; }
+.kpi-filter-status button { margin-left:auto; border:1px solid #b8cbe8; background:#fff; color:#234b82; border-radius:7px; padding:5px 9px; cursor:pointer; font-weight:700; }
+.kpi-filter-status button:hover { background:#f4f8ff; }
+
 .card-value { font-size: 22px; font-weight: 700; color: var(--color-text); }
 .card-label { font-size: 11.5px; color: var(--color-text-muted); margin-top: 4px; }
 .card-total { border-left-color: var(--color-primary); }
@@ -174,21 +187,42 @@ tr.row-semdata { background: #fafbfc; }
     <button id="btnSync" class="btn btn-secondary">🔗 Sincronizar</button>
     <button id="btnExport" class="btn btn-secondary">Exportar Excel</button>
     <button id="btnPainelGerencial" class="btn btn-secondary">📊 Painel Gerencial</button>
+    <button id="btnDashboard" class="btn btn-dashboard">▦ Dashboard</button>
     <button id="btnAdd" class="btn btn-primary">+ Novo Registro</button>
   </div>
 </header>
 
 <main class="container">
   <section class="dashboard" id="dashboard">
-    <div class="card card-total"><span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span></div>
-    <div class="card card-atendida"><span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span></div>
-    <div class="card card-noprazo"><span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span></div>
-    <div class="card card-proxvenc"><span class="card-value" id="kpiProxVenc">0</span><span class="card-label">Próx. Venc.</span></div>
-    <div class="card card-vencida"><span class="card-value" id="kpiVencida">0</span><span class="card-label">Vencidas</span></div>
-    <div class="card card-semdata"><span class="card-value" id="kpiSemData">0</span><span class="card-label">Sem Data</span></div>
-    <div class="card card-custo"><span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span></div>
-    <div class="card card-pct"><span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span></div>
+    <div class="card card-total kpi-interactive" data-kpi-filter="" tabindex="0" title="Clique para mostrar todas as OMs">
+      <span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span><span class="kpi-hint">Clique para ver todas</span>
+    </div>
+    <div class="card card-atendida kpi-interactive" data-kpi-filter="Atendida" tabindex="0" title="Clique para filtrar somente OMs atendidas">
+      <span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-noprazo kpi-interactive" data-kpi-filter="No Prazo" tabindex="0" title="Clique para filtrar somente OMs no prazo">
+      <span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-proxvenc kpi-interactive" data-kpi-filter="Prox. Venc." tabindex="0" title="Clique para filtrar OMs próximas do vencimento">
+      <span class="card-value" id="kpiProxVenc">0</span><span class="card-label">Próx. Venc.</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-vencida kpi-interactive" data-kpi-filter="VENCIDA" tabindex="0" title="Clique para filtrar somente OMs vencidas">
+      <span class="card-value" id="kpiVencida">0</span><span class="card-label">Vencidas</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-semdata kpi-interactive" data-kpi-filter="Sem Data" tabindex="0" title="Clique para filtrar OMs sem data">
+      <span class="card-value" id="kpiSemData">0</span><span class="card-label">Sem Data</span><span class="kpi-hint">Clique para filtrar</span>
+    </div>
+    <div class="card card-custo" title="Custo total planejado das OMs atualmente exibidas">
+      <span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span><span class="kpi-hint">Atualiza com os filtros</span>
+    </div>
+    <div class="card card-pct" title="Percentual de OMs atendidas dentro do conjunto atualmente exibido">
+      <span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span><span class="kpi-hint">Atualiza com os filtros</span>
+    </div>
   </section>
+  <div id="kpiFilterStatus" class="kpi-filter-status">
+    <span>🔎</span><span id="kpiFilterText"></span>
+    <button type="button" id="btnClearKpiFilter">Limpar seleção</button>
+  </div>
 
   <section class="filters">
     <input type="search" id="fSearch" class="input-search" placeholder="Buscar por Ordem, Equipamento, Descrição, Observação...">
@@ -936,6 +970,18 @@ function agruparContagem(lista, campo, semValorLabel) {
   return [...mapa.entries()].map(([chave,v])=>({chave,...v})).sort((a,b)=>b.qtd-a.qtd);
 }
 
+function gerarBarrasHorizontais(arr, totalRef, modo="qtd") {
+  if(!arr.length) return '<div class="dash-empty">Sem dados para exibição.</div>';
+  const max = Math.max(1,...arr.map(x=>modo==="custo"?x.custo:x.qtd));
+  return arr.map((x,i)=>{
+    const valor = modo==="custo" ? formatCurrency(x.custo) : x.qtd;
+    const basePct = modo==="custo" ? (arr.reduce((s,y)=>s+y.custo,0)||1) : totalRef;
+    const pct = basePct ? Math.round(((modo==="custo"?x.custo:x.qtd)/basePct)*100) : 0;
+    const width = Math.max(3, Math.round(((modo==="custo"?x.custo:x.qtd)/max)*100));
+    return `<div class="dash-hbar-row" data-label="${escapeHtml(x.chave)}" data-value="${escapeHtml(String(valor))}" data-pct="${pct}%"><div class="dash-hbar-label" title="${escapeHtml(x.chave)}"><span>${i+1}. ${escapeHtml(x.chave)}</span></div><div class="dash-hbar-track"><i style="width:${width}%"></i></div><strong class="dash-hbar-value">${valor}</strong><span class="dash-hbar-pct">${pct}%</span></div>`;
+  }).join('');
+}
+
 function linhaTabelaDetalhe(r) {
   const sit = calcularSituacao(r);
   const cls = sit==="VENCIDA"?"pg-row-vencida":sit==="Prox. Venc."?"pg-row-proxvenc":sit==="Atendida"?"pg-row-atendida":sit==="No Prazo"?"pg-row-noprazo":"pg-row-semdata";
@@ -969,6 +1015,135 @@ function linhaAgrupada(item, totalQtd) {
   </tr>`;
 }
 
+function gerarDonutSituacao(at,np,pv,total){
+  const itens=[
+    {key:"noprazo",label:"No Prazo",qtd:np,cor:"#16a34a"},
+    {key:"atendida",label:"Atendidas",qtd:at,cor:"#2563eb"},
+    {key:"proxvenc",label:"Próx. Venc.",qtd:pv,cor:"#f59e0b"}
+  ];
+  const cx=190,cy=160,ro=116,ri=64;
+  const polar=(r,a)=>[cx+r*Math.cos(a),cy+r*Math.sin(a)];
+  const arc=(a0,a1)=>{
+    const p1=polar(ro,a0),p2=polar(ro,a1),p3=polar(ri,a1),p4=polar(ri,a0);
+    const large=(a1-a0)>Math.PI?1:0;
+    return `M ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} A ${ro} ${ro} 0 ${large} 1 ${p2[0].toFixed(2)} ${p2[1].toFixed(2)} L ${p3[0].toFixed(2)} ${p3[1].toFixed(2)} A ${ri} ${ri} 0 ${large} 0 ${p4[0].toFixed(2)} ${p4[1].toFixed(2)} Z`;
+  };
+  let ang=-Math.PI/2;
+  let paths="";
+  let legend="";
+  itens.forEach((it)=>{
+    const pct=total?Math.round(it.qtd/total*100):0;
+    const frac=total?it.qtd/total:0;
+    const end=ang+frac*Math.PI*2;
+    const mid=ang+(end-ang)/2;
+    const lp=polar(87,mid);
+    paths += `<g class="pg-donut-segment" data-key="${it.key}" data-label="${it.label}" data-qtd="${it.qtd}" data-pct="${pct}"><path d="${arc(ang,end)}" fill="${it.cor}"/><text x="${lp[0].toFixed(1)}" y="${(lp[1]-2).toFixed(1)}" text-anchor="middle" class="pg-donut-qtd">${it.qtd}</text><text x="${lp[0].toFixed(1)}" y="${(lp[1]+19).toFixed(1)}" text-anchor="middle" class="pg-donut-pct">${pct}%</text></g>`;
+    legend += `<div class="pg-donut-legend-item" data-key="${it.key}" data-label="${it.label}" data-qtd="${it.qtd}" data-pct="${pct}"><span class="pg-donut-dot" style="background:${it.cor}"></span><span class="pg-donut-legend-name">${it.label}</span><strong>${it.qtd}</strong><span>${pct}%</span></div>`;
+    ang=end;
+  });
+  return `<div class="pg-donut-wrap"><div class="pg-donut-chart"><svg class="pg-donut-svg" viewBox="0 0 600 320" role="img" aria-label="Situação das OMs"><g>${paths}</g><circle cx="190" cy="160" r="63" fill="#fff"/><text x="190" y="153" text-anchor="middle" class="pg-donut-total">${total}</text><text x="190" y="177" text-anchor="middle" class="pg-donut-total-label">OMs</text></svg><div class="pg-donut-tooltip" id="pgDonutTooltip"></div></div><div class="pg-donut-legend">${legend}</div></div>`;
+}
+
+
+function gerarDashboardModerno() {
+  const lista = aplicarFiltros();
+  const total = lista.length;
+  const at = lista.filter(r=>calcularSituacao(r)==="Atendida").length;
+  const np = lista.filter(r=>calcularSituacao(r)==="No Prazo").length;
+  const pv = lista.filter(r=>calcularSituacao(r)==="Prox. Venc.").length;
+  const ve = lista.filter(r=>calcularSituacao(r)==="VENCIDA").length;
+  const sd = lista.filter(r=>calcularSituacao(r)==="Sem Data").length;
+  const custo = lista.reduce((s,r)=>s+(Number(r.custoPlan)||0),0);
+  const pct = n => total ? Math.round(n/total*100) : 0;
+  const brl = n => formatCurrency(n);
+  const logoSrc = document.querySelector(".topbar-title img")?.src || "";
+  const hoje = new Date();
+  const dataAtual = hoje.toLocaleDateString("pt-BR") + " às " + hoje.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+
+  const palette = {"Atendida":"#2563eb","No Prazo":"#16a34a","Prox. Venc.":"#f59e0b","VENCIDA":"#dc2626","Sem Data":"#94a3b8"};
+  const situacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv],["Vencidas",ve],["Sem Data",sd]].filter(x=>x[1]>0 || total===0);
+  const mainSituacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv]].filter(x=>x[1]>0);
+  const radius=92, cx=130, cy=130, circ=2*Math.PI*radius;
+  let offset=0;
+  const arcs = mainSituacoes.map(([label,n])=>{
+    const len=total ? circ*n/total : 0; const o=offset; offset+=len;
+    return `<circle class="dash-arc dash-arc-${label.replace(/[^a-z]/gi,'').toLowerCase()}" cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${palette[label]||'#16a34a'}" stroke-width="38" stroke-linecap="butt" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-o}" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"></circle>`;
+  }).join('');
+  const legend = mainSituacoes.map(([label,n])=>`<div class="dash-legend-item" data-label="${label}"><span class="dash-dot" style="background:${palette[label]}"></span><span>${label}</span><b>${n}</b><strong>${pct(n)}%</strong></div>`).join('');
+
+  const porFornecedor = agruparContagem(lista,"fornecedor","(Sem fornecedor)").slice(0,8);
+  const porStatus = agruparContagem(lista,"statusSap","(Sem status)").slice(0,8);
+  const porResp = agruparContagem(lista,"criadoPor","(Não informado)").slice(0,8);
+  const custoMedioOM = total ? custo/total : 0;
+  const fornecedoresQtd = agruparContagem(lista,"fornecedor","(Sem fornecedor)");
+  const fornecedorMaiorVolume = fornecedoresQtd[0] || {chave:"—",qtd:0,custo:0};
+  const fornecedoresCusto = [...fornecedoresQtd].sort((a,b)=>b.custo-a.custo);
+  const fornecedorMaiorCusto = fornecedoresCusto[0] || {chave:"—",qtd:0,custo:0};
+  const equipamentosQtd = agruparContagem(lista,"equipamento","(Sem equipamento)");
+  const prioridade = ve>0 ? {tipo:"VENCIDAS",qtd:ve,cor:"red"} : pv>0 ? {tipo:"PRÓX. VENCIMENTO",qtd:pv,cor:"orange"} : {tipo:"SEM PRIORIDADE",qtd:0,cor:"green"};
+  const topStatus = agruparContagem(lista,"statusSap","(Sem status)").slice(0,10);
+  const topFornecQtd = fornecedoresQtd.slice(0,10);
+  const topFornecCusto = fornecedoresCusto.slice(0,10);
+  const topEquip = equipamentosQtd.slice(0,10);
+  const maxF = Math.max(1,...porFornecedor.map(x=>x.qtd));
+  const maxS = Math.max(1,...porStatus.map(x=>x.qtd));
+  const maxR = Math.max(1,...porResp.map(x=>x.qtd));
+  const table = (arr,max) => arr.length ? arr.map(x=>`<tr><td>${escapeHtml(x.chave)}</td><td>${x.qtd}</td><td>${brl(x.custo)}</td><td><div class="dash-bar"><i style="width:${Math.round(x.qtd/max*100)}%"></i></div><span>${pct(x.qtd)}%</span></td></tr>`).join('') : `<tr><td colspan="4" class="dash-empty">Sem dados</td></tr>`;
+
+  // Linha de custo acumulado por data prevista, mantendo apenas datas válidas.
+  const porData={};
+  lista.forEach(r=>{ if(r.dataPrevista && !r.atendida){ const d=r.dataPrevista; porData[d]=(porData[d]||0)+(Number(r.custoPlan)||0); }});
+  const datas=Object.keys(porData).sort();
+  let acum=0; const pts=[];
+  datas.forEach((d,i)=>{acum+=porData[d]; pts.push({d,v:acum});});
+  const W=640,H=230, pad=38, maxV=Math.max(1,...pts.map(p=>p.v));
+  const xy=pts.map((p,i)=>{const x=pad+(pts.length===1?0:i*(W-2*pad)/(pts.length-1));const y=H-pad-(p.v/maxV)*(H-2*pad);return [x,y,p];});
+  const poly=xy.map(a=>a[0]+','+a[1]).join(' ');
+  const area=xy.length?`M ${xy[0][0]} ${H-pad} L ${poly.replaceAll(',', ' ')} L ${xy[xy.length-1][0]} ${H-pad} Z`:'';
+  const lineSvg=xy.length?`<svg viewBox="0 0 ${W} ${H}" class="dash-line-svg"><defs><linearGradient id="dashGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#16804f" stop-opacity=".30"/><stop offset="1" stop-color="#16804f" stop-opacity="0"/></linearGradient></defs><path d="${area}" fill="url(#dashGrad)"/><polyline points="${poly}" fill="none" stroke="#16804f" stroke-width="3"/>${xy.map(a=>`<circle cx="${a[0]}" cy="${a[1]}" r="4.5" fill="#16804f" stroke="#fff" stroke-width="2"><title>${a[2].d}: ${brl(a[2].v)}</title></circle>`).join('')}<text x="10" y="20" class="dash-axis">${brl(maxV)}</text><text x="10" y="${H-18}" class="dash-axis">R$ 0</text>${xy.filter((_,i)=>i===0||i===xy.length-1||i===Math.floor(xy.length/2)).map(a=>`<text x="${a[0]}" y="${H-8}" text-anchor="middle" class="dash-axis">${formatDateBR(a[2].d).slice(0,5)}</text>`).join('')}</svg>`:`<div class="dash-empty">Sem datas para gráfico.</div>`;
+
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Dashboard — Follow-up Corretiva</title><style>
+  :root{--green:#087443;--green2:#16804f;--bg:#f6f8f7;--card:#fff;--text:#172033;--muted:#667085;--line:#e7ebe8;--blue:#2563eb;--orange:#f59e0b;--red:#dc2626;--shadow:0 6px 20px rgba(20,50,35,.08)}*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .dash-shell{display:flex;min-height:100vh}.dash-side{width:226px;background:#fff;border-right:1px solid var(--line);padding:24px 14px;position:sticky;top:0;height:100vh}.dash-logo{font-size:29px;font-weight:900;letter-spacing:1px;color:var(--green);padding:6px 10px 22px}.dash-nav{display:flex;flex-direction:column;gap:6px}.dash-nav button{border:0;background:transparent;text-align:left;padding:13px 14px;border-radius:10px;font-size:14px;cursor:pointer;color:#1f2937}.dash-nav button:hover,.dash-nav button.active{background:#eaf6f0;color:#075f39;font-weight:700}.dash-side-bottom{position:absolute;bottom:18px;left:14px;right:14px}.dash-brand{background:#edf7f2;border-radius:12px;padding:18px;text-align:center;color:var(--green);font-weight:800}
+  .dash-main{flex:1;padding:28px 32px;overflow:auto}.dash-top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px}.dash-kicker{font-size:29px;font-weight:850;color:#075f39;margin:0}.dash-title{font-size:15px;margin-top:4px}.dash-sub{font-size:13px;color:var(--muted);margin-top:8px}.dash-actions{display:flex;gap:10px}.dash-period{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 16px;min-width:310px}.dash-period small{display:block;color:var(--muted)}.dash-export{border:0;background:var(--green);color:#fff;border-radius:10px;padding:0 18px;font-weight:700;cursor:pointer}.dash-export:hover{filter:brightness(.94)}
+  .dash-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.dash-kpi{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;min-height:106px;box-shadow:var(--shadow);transition:.18s;cursor:pointer}.dash-kpi:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(8,116,67,.15)}.dash-kpi .icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e3f4ec;color:var(--green);font-size:20px}.dash-kpi .num{font-size:27px;font-weight:850;margin-top:-35px;margin-left:52px}.dash-kpi .lab{text-align:right;margin-top:4px;font-size:13px}.dash-kpi .pct{text-align:right;font-size:12px;font-weight:700;color:var(--green);margin-top:5px}.dash-kpi.orange .icon{background:#fff0d4;color:var(--orange)}.dash-kpi.orange .pct{color:#d97706}.dash-kpi.red .icon{background:#ffe0e0;color:var(--red)}.dash-kpi.gray .icon{background:#eee;color:#64748b}
+  .dash-grid{display:grid;grid-template-columns:1.45fr .9fr 1.05fr;gap:14px;margin-top:14px}.dash-card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:16px;transition:.18s}.dash-card:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(8,116,67,.12)}.dash-card h2{font-size:14px;margin:0 0 12px;color:#18352a}.dash-cost{font-size:25px;font-weight:850;color:var(--green);margin-bottom:4px}.dash-chart{height:235px}.dash-line-svg{width:100%;height:100%}.dash-axis{font-size:10px;fill:#667085}.dash-donut-box{display:flex;align-items:center;gap:10px}.dash-donut{width:220px;height:220px}.dash-donut svg{width:100%;height:100%;transform:rotate(-90deg)}.dash-donut circle{transition:.18s;cursor:pointer}.dash-donut circle:hover{filter:brightness(1.08);stroke-width:43}.dash-center{position:absolute;margin-left:83px;margin-top:83px;text-align:center;font-size:28px;font-weight:850;color:var(--green)}.dash-center span{display:block;font-size:12px;color:var(--muted);font-weight:500}.dash-legend{flex:1;display:flex;flex-direction:column;gap:9px}.dash-legend-item{display:grid;grid-template-columns:14px 1fr 32px 42px;gap:6px;align-items:center;padding:8px;border-radius:8px;cursor:pointer}.dash-legend-item:hover{background:#f2f7f4}.dash-dot{width:12px;height:12px;border-radius:50%}.dash-legend-item strong{color:var(--green);text-align:right}.dash-legend-item b{text-align:right}.dash-tooltip{position:fixed;display:none;background:#15231d;color:#fff;padding:8px 10px;border-radius:8px;font-size:12px;pointer-events:none;z-index:20}.dash-distrib{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}.dash-table{width:100%;border-collapse:collapse}.dash-table th,.dash-table td{padding:7px 4px;border-bottom:1px solid var(--line);font-size:11.5px}.dash-table th{text-align:left;color:#667085}.dash-table td:nth-child(2),.dash-table td:nth-child(3){text-align:right}.dash-table td:last-child{width:95px;text-align:right}.dash-bar{height:7px;background:#e8efeb;border-radius:9px;display:inline-block;width:55px;overflow:hidden;vertical-align:middle;margin-right:4px}.dash-bar i{display:block;height:100%;background:var(--green2);border-radius:9px}.dash-summary{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:14px}.dash-summary .s{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;transition:.18s}.dash-summary .s:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.dash-summary b{font-size:22px}.dash-summary small{float:right;color:var(--muted)}.dash-footer{margin-top:18px;color:var(--muted);font-size:11px;text-align:right}
+.dash-exec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}.dash-exec-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px;box-shadow:0 3px 12px rgba(20,50,35,.06);transition:.18s;cursor:default}.dash-exec-card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(8,116,67,.14)}.dash-exec-card .small{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}.dash-exec-card .big{font-size:21px;font-weight:850;color:#075f39;margin-top:6px}.dash-exec-card .sub{font-size:12px;color:#667085;margin-top:4px}.dash-priority{grid-column:span 1}.dash-priority.alert{background:#fff7ed;border-color:#fed7aa}.dash-priority.alert .big{color:#c2410c}.dash-charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.dash-chart-panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 3px 12px rgba(20,50,35,.05)}.dash-chart-panel.full{grid-column:1/-1}.dash-chart-panel h3{margin:0 0 12px;color:#075f39;font-size:14px}.dash-hbar-row{display:grid;grid-template-columns:minmax(130px,1.15fr) minmax(130px,2.4fr) 110px 48px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid #edf0ee;transition:.15s}.dash-hbar-row:hover{background:#f2f8f5;transform:translateX(2px);border-radius:7px}.dash-hbar-label{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dash-hbar-track{height:10px;background:#edf2ef;border-radius:999px;overflow:hidden}.dash-hbar-track i{display:block;height:100%;background:linear-gradient(90deg,#087443,#38a169);border-radius:999px}.dash-hbar-value{font-size:12px;text-align:right;color:#173a2b}.dash-hbar-pct{font-size:11px;text-align:right;color:#667085}.dash-chart-note{font-size:10.5px;color:#667085;margin-top:8px}.dash-status-panel{grid-column:1/-1}.dash-priority-list{font-size:12px;margin-top:6px;color:#7c2d12}.dash-priority-list b{font-size:20px}
+  @media(max-width:1150px){.dash-kpis{grid-template-columns:repeat(3,1fr)}.dash-grid{grid-template-columns:1fr}.dash-distrib{grid-template-columns:1fr}.dash-summary{grid-template-columns:repeat(3,1fr)}.dash-exec-grid{grid-template-columns:repeat(2,1fr)}.dash-charts-grid{grid-template-columns:1fr}}@media(max-width:800px){.dash-shell{display:block}.dash-side{width:auto;height:auto;position:static}.dash-side-bottom{display:none}.dash-nav{flex-direction:row;overflow:auto}.dash-main{padding:18px}.dash-kpis{grid-template-columns:repeat(2,1fr)}.dash-top{flex-direction:column}.dash-actions{width:100%}.dash-period{min-width:0;flex:1}.dash-donut-box{flex-direction:column}.dash-summary{grid-template-columns:repeat(2,1fr)}.dash-exec-grid{grid-template-columns:1fr}.dash-hbar-row{grid-template-columns:110px 1fr 85px 40px}}@media(max-width:520px){.dash-kpis{grid-template-columns:1fr}.dash-summary{grid-template-columns:1fr}.dash-actions{flex-direction:column}}
+  </style></head><body><div class="dash-shell"><aside class="dash-side"><div class="dash-logo">TABOCA</div><nav class="dash-nav"><button class="active">⌂ &nbsp; Visão Executiva</button><button onclick="document.getElementById('distrib').scrollIntoView({behavior:'smooth'})">☷ &nbsp; Detalhamento</button><button onclick="document.getElementById('distrib').scrollIntoView({behavior:'smooth'})">♧ &nbsp; Fornecedores</button><button onclick="document.getElementById('distrib').scrollIntoView({behavior:'smooth'})">▤ &nbsp; Status SAP</button><button onclick="document.getElementById('distrib').scrollIntoView({behavior:'smooth'})">♙ &nbsp; Responsáveis</button><button onclick="document.getElementById('custos').scrollIntoView({behavior:'smooth'})">ⓢ &nbsp; Análise de Custos</button><button onclick="document.getElementById('situacao').scrollIntoView({behavior:'smooth'})">◷ &nbsp; OMs Próx. Venc.</button><button onclick="document.getElementById('situacao').scrollIntoView({behavior:'smooth'})">⚠ &nbsp; OMs Vencidas</button><button onclick="window.print()">▣ &nbsp; Relatórios</button><button onclick="window.print()">⇩ &nbsp; Exportar Dados</button><button onclick="window.close()">⚙ &nbsp; Fechar Dashboard</button></nav><div class="dash-side-bottom"><div class="dash-brand">TABOCA<br><small>Mineração Taboca</small></div></div></aside><main class="dash-main">
+  <div class="dash-top"><div><h1 class="dash-kicker">VISÃO EXECUTIVA</h1><div class="dash-title">Painel Gerencial — Follow-up de Manutenção Corretiva</div><div class="dash-sub">Passagem de turno · Aprovisionamento · Oficina de Frota</div></div><div class="dash-actions"><div class="dash-period"><small>Período de referência</small><b>Dados atuais · ${dataAtual}</b></div><button class="dash-export" onclick="window.print()">⇩ Exportar</button></div></div>
+  <section class="dash-kpis">
+    <div class="dash-kpi"><div class="icon">▣</div><div class="num">${total}</div><div class="lab">Total de OMs</div></div>
+    <div class="dash-kpi" data-key="atendida"><div class="icon">✓</div><div class="num">${at}</div><div class="lab">Atendidas</div><div class="pct">${pct(at)}% do total</div></div>
+    <div class="dash-kpi" data-key="noprazo"><div class="icon">✓</div><div class="num">${np}</div><div class="lab">No Prazo</div><div class="pct">${pct(np)}% do total</div></div>
+    <div class="dash-kpi orange" data-key="proxvenc"><div class="icon">◷</div><div class="num">${pv}</div><div class="lab">Próx. Venc.</div><div class="pct">${pct(pv)}% do total</div></div>
+    <div class="dash-kpi red"><div class="icon">!</div><div class="num">${ve}</div><div class="lab">Vencidas</div><div class="pct" style="color:#dc2626">${pct(ve)}% do total</div></div>
+    <div class="dash-kpi gray"><div class="icon">—</div><div class="num">${sd}</div><div class="lab">Sem Data</div><div class="pct" style="color:#64748b">${pct(sd)}% do total</div></div>
+  </section>
+  <section class="dash-exec-grid" aria-label="Indicadores executivos adicionais">
+    <div class="dash-exec-card"><div class="small">Custo médio por OM</div><div class="big">${brl(custoMedioOM)}</div><div class="sub">Custo planejado ÷ ${total} OMs</div></div>
+    <div class="dash-exec-card"><div class="small">Maior fornecedor por volume</div><div class="big">${escapeHtml(fornecedorMaiorVolume.chave)}</div><div class="sub">${fornecedorMaiorVolume.qtd} OMs · ${pct(fornecedorMaiorVolume.qtd)}% do total</div></div>
+    <div class="dash-exec-card"><div class="small">Maior fornecedor por custo</div><div class="big">${escapeHtml(fornecedorMaiorCusto.chave)}</div><div class="sub">${brl(fornecedorMaiorCusto.custo)} · ${fornecedorMaiorCusto.qtd} OMs</div></div>
+    <div class="dash-exec-card dash-priority ${prioridade.cor==='green'?'':'alert'}"><div class="small">Situação prioritária</div><div class="big">${prioridade.tipo}</div><div class="sub">${prioridade.qtd} OM${prioridade.qtd===1?'':'s'} para atenção imediata</div></div>
+  </section>
+  <div class="dash-grid">
+    <section class="dash-card" id="custos"><h2>▣ &nbsp; CUSTO TOTAL PLANEJADO</h2><div class="dash-cost">${brl(custo)}</div><div class="dash-chart">${lineSvg}</div></section>
+    <section class="dash-card"><h2>◉ &nbsp; % ATENDIMENTO</h2><div class="dash-donut-box"><div class="dash-donut"><div class="dash-center">${pct(at)}%<span>Atendimento</span></div><svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="92" fill="none" stroke="#edf0ee" stroke-width="38"></circle>${arcs}</svg></div><div class="dash-legend">${mainSituacoes.map(([label,n])=>`<div class="dash-legend-item" data-key="${label.replace(/[^a-z]/gi,'').toLowerCase()}" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"><span class="dash-dot" style="background:${palette[label]}"></span><span>${label}</span><b>${n}</b><strong>${pct(n)}%</strong></div>`).join('')}</div></div></section>
+    <section class="dash-card" id="situacao"><h2>◔ &nbsp; SITUAÇÃO DAS OMs</h2><div class="dash-donut-box"><div class="dash-donut"><div class="dash-center" style="color:#173a2b">${total}<span>OMs</span></div><svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="92" fill="none" stroke="#edf0ee" stroke-width="38"></circle>${arcs}</svg></div><div class="dash-legend">${legend}</div></div><p style="font-size:11px;color:#667085;margin:8px 0 0">Percentuais calculados sobre as OMs classificadas em Atendidas, No Prazo e Próx. Venc.</p></section>
+  </div>
+  <section class="dash-card" id="distrib" style="margin-top:14px"><h2 style="font-size:17px;color:#075f39">▥ &nbsp; DISTRIBUIÇÕES</h2><div class="dash-distrib"><div><h3 style="font-size:13px;color:#075f39">POR FORNECEDOR</h3><table class="dash-table"><thead><tr><th>Fornecedor</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porFornecedor,maxF)}</tbody></table></div><div><h3 style="font-size:13px;color:#075f39">POR STATUS SAP</h3><table class="dash-table"><thead><tr><th>Status SAP</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porStatus,maxS)}</tbody></table></div><div><h3 style="font-size:13px;color:#075f39">POR RESPONSÁVEL (CRIADO POR)</h3><table class="dash-table"><thead><tr><th>Responsável</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porResp,maxR)}</tbody></table></div></div></section>
+  <section class="dash-charts-grid" aria-label="Análises em gráficos de barras">
+    <section class="dash-chart-panel dash-status-panel"><h3>STATUS SAP — QUANTIDADE E PARTICIPAÇÃO</h3>${gerarBarrasHorizontais(topStatus,total,"qtd")}<div class="dash-chart-note">Exemplo: AGMA 69 OMs. Percentual calculado sobre o total de ${total} OMs.</div></section>
+    <section class="dash-chart-panel"><h3>TOP 10 FORNECEDORES — QUANTIDADE DE OMs</h3>${gerarBarrasHorizontais(topFornecQtd,total,"qtd")}<div class="dash-chart-note">Ranking por quantidade de ordens de manutenção.</div></section>
+    <section class="dash-chart-panel"><h3>TOP 10 FORNECEDORES — CUSTO PLANEJADO</h3>${gerarBarrasHorizontais(topFornecCusto,custo,"custo")}<div class="dash-chart-note">Ranking pelo custo planejado acumulado.</div></section>
+    <section class="dash-chart-panel full"><h3>TOP 10 EQUIPAMENTOS — QUANTIDADE DE OMs</h3>${gerarBarrasHorizontais(topEquip,total,"qtd")}<div class="dash-chart-note">Equipamentos com maior concentração de ordens de manutenção.</div></section>
+  </section>
+  <section class="dash-summary">${[["Vencidas",ve,"red"],["Próx. Venc.",pv,"orange"],["No Prazo",np,"green"],["Sem Data",sd,"gray"],["Atendidas",at,"blue"],["Total de OMs",total,"green"]].map(([l,n,c])=>`<div class="s" data-key="${l.replace(/[^a-z]/gi,'').toLowerCase()}"><b style="color:${c==='red'?'#dc2626':c==='orange'?'#d97706':c==='gray'?'#64748b':'#087443'}">${n}</b><small>${pct(n)}%</small><div style="font-size:11px;margin-top:3px">${l}</div></div>`).join('')}</section>
+  <div class="dash-footer">Última atualização: ${dataAtual} · Dashboard gerencial integrado ao Follow-up</div>
+  </main></div><div class="dash-tooltip" id="dashTip"></div><scr'+'ipt>(function(){const tip=document.getElementById('dashTip');function show(t,e){tip.innerHTML=t;tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px'}function hide(){tip.style.display='none'}document.querySelectorAll('.dash-kpi[data-key],.dash-legend-item').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-arc').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseenter',()=>el.style.boxShadow='0 14px 32px rgba(8,116,67,.16)'));document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseleave',()=>el.style.boxShadow=''));document.querySelectorAll('.dash-hbar-row').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mouseleave',hide)})})();</scr'+'ipt></body></html>`;
+  const blob=new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob); window.open(url,'_blank');
+}
+
 function gerarPainelGerencial() {
   const listaBase = aplicarFiltros();
   const filtrosAtivos = !!(document.getElementById("fSearch").value.trim() || document.getElementById("fSituacao").value || document.getElementById("fStatusSap").value || document.getElementById("fFornecedor").value || document.getElementById("fCriadoPor").value || document.getElementById("fDataDe").value || document.getElementById("fDataAte").value);
@@ -985,6 +1160,28 @@ function gerarPainelGerencial() {
   const porFornecedor = agruparContagem(lista, "fornecedor", "(Sem fornecedor)").slice(0,8);
   const porStatusSap = agruparContagem(lista, "statusSap", "(Sem status)").slice(0,8);
   const porCriadoPor = agruparContagem(lista, "criadoPor", "(Não informado)").slice(0,8);
+  const custoMedioOM = total ? ct/total : 0;
+  const fornecedoresQtdAll = agruparContagem(lista,"fornecedor","(Sem fornecedor)");
+  const fornecedorMaiorVolume = fornecedoresQtdAll[0] || {chave:"—",qtd:0,custo:0};
+  const fornecedoresCustoAll = [...fornecedoresQtdAll].sort((a,b)=>b.custo-a.custo);
+  const fornecedorMaiorCusto = fornecedoresCustoAll[0] || {chave:"—",qtd:0,custo:0};
+  const topStatusGer = agruparContagem(lista,"statusSap","(Sem status)").slice(0,10);
+  const topFornecQtdGer = fornecedoresQtdAll.slice(0,10);
+  const topFornecCustoGer = fornecedoresCustoAll.slice(0,10);
+  const topEquipGer = agruparContagem(lista,"equipamento","(Sem equipamento)").slice(0,10);
+  const prioridadeGer = ve>0 ? {tipo:"VENCIDAS",qtd:ve,cls:"pg-priority-alert"} : pv>0 ? {tipo:"PRÓX. VENCIMENTO",qtd:pv,cls:"pg-priority-warn"} : {tipo:"SEM PRIORIDADE",qtd:0,cls:"pg-priority-ok"};
+  const barrasGer = (arr,totalRef,modo="qtd") => {
+    if(!arr.length) return '<div class="pg-empty">Sem dados para exibição.</div>';
+    const max=Math.max(1,...arr.map(x=>modo==="custo"?x.custo:x.qtd));
+    const base=modo==="custo" ? (arr.reduce((sum,x)=>sum+x.custo,0)||1) : totalRef;
+    return arr.map((x,i)=>{
+      const raw=modo==="custo"?x.custo:x.qtd;
+      const value=modo==="custo"?formatCurrency(x.custo):x.qtd;
+      const share=base?Math.round(raw/base*100):0;
+      const width=Math.max(3,Math.round(raw/max*100));
+      return `<div class="pg-hbar" title="${escapeHtml(x.chave)} — ${escapeHtml(String(value))} — ${share}%"><div class="pg-hlabel">${i+1}. ${escapeHtml(x.chave)}</div><div class="pg-htrack"><div class="pg-hfill" style="width:${width}%"></div></div><div class="pg-hvalue">${value}</div><div class="pg-hpct">${share}%</div></div>`;
+    }).join('');
+  };
 
   const logoSrc = document.querySelector(".topbar-title img").src;
   const agora = new Date();
@@ -1036,6 +1233,37 @@ function gerarPainelGerencial() {
   .pg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
   .pg-panel{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:16px 18px;}
   .pg-panel h3{margin:0 0 10px;font-size:13.5px;color:var(--pg-text);}
+  .pg-kpi,.pg-panel,.pg-table-wrap,.pg-donut-wrap{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+  .pg-kpi{position:relative;cursor:pointer;}
+  .pg-kpi:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(30,58,95,.16);}
+  .pg-kpi.is-active{outline:3px solid rgba(47,111,237,.22);transform:translateY(-3px);}
+  .pg-panel:hover{box-shadow:0 7px 18px rgba(16,24,40,.12);}
+  .pg-table tbody tr{transition:background .15s ease,transform .15s ease;}
+  .pg-table tbody tr:hover{background:#eef5ff!important;}
+  .pg-table-detalhe tbody tr.pg-highlight-muted{opacity:.28;}
+  .pg-donut-panel{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:18px;}
+  .pg-donut-wrap{display:grid;grid-template-columns:minmax(420px,1fr) 310px;align-items:center;gap:18px;}
+  .pg-donut-chart{position:relative;min-height:320px;display:flex;align-items:center;justify-content:center;}
+  .pg-donut-svg{width:min(100%,620px);height:auto;overflow:visible;}
+  .pg-donut-segment{cursor:pointer;transform-box:fill-box;transform-origin:center;transition:filter .18s ease,transform .18s ease,opacity .18s ease;}
+  .pg-donut-segment path{stroke:#fff;stroke-width:3;vector-effect:non-scaling-stroke;transition:stroke-width .18s ease,filter .18s ease;}
+  .pg-donut-segment:hover{filter:brightness(1.05) drop-shadow(0 5px 7px rgba(0,0,0,.18));transform:scale(1.035);}
+  .pg-donut-segment.is-muted{opacity:.34;}
+  .pg-donut-segment.is-active path{stroke-width:5;}
+  .pg-donut-qtd{font-size:24px;font-weight:800;fill:#fff;pointer-events:none;paint-order:stroke;stroke:rgba(0,0,0,.16);stroke-width:2px;}
+  .pg-donut-pct{font-size:15px;font-weight:800;fill:#fff;pointer-events:none;paint-order:stroke;stroke:rgba(0,0,0,.16);stroke-width:1.5px;}
+  .pg-donut-total{font-size:29px;font-weight:800;fill:var(--pg-primary);}
+  .pg-donut-total-label{font-size:13px;font-weight:600;fill:var(--pg-text-muted);}
+  .pg-donut-legend{display:flex;flex-direction:column;gap:10px;}
+  .pg-donut-legend-item{display:grid;grid-template-columns:16px 1fr 42px 42px;align-items:center;gap:8px;padding:10px 12px;border-radius:9px;cursor:pointer;transition:background .15s ease,transform .15s ease,box-shadow .15s ease;}
+  .pg-donut-legend-item:hover,.pg-donut-legend-item.is-active{background:#f2f6fb;transform:translateX(3px);box-shadow:0 3px 10px rgba(16,24,40,.08);}
+  .pg-donut-dot{width:15px;height:15px;border-radius:3px;display:block;}
+  .pg-donut-legend-name{font-size:13px;color:var(--pg-text);}
+  .pg-donut-legend-item strong{font-size:13px;text-align:right;color:var(--pg-text);}
+  .pg-donut-legend-item>span:last-child{font-size:12px;text-align:right;color:var(--pg-text-muted);}
+  .pg-donut-tooltip{position:fixed;z-index:9999;display:none;pointer-events:none;background:#172033;color:#fff;border-radius:8px;padding:8px 11px;font-size:12px;line-height:1.35;box-shadow:0 8px 24px rgba(0,0,0,.22);white-space:nowrap;}
+  .pg-interactive-hint{font-size:11.5px;color:var(--pg-text-muted);margin:8px 0 0;}
+  @media (max-width:900px){.pg-donut-wrap{grid-template-columns:1fr}.pg-donut-legend{max-width:520px;margin:0 auto;width:100%}.pg-donut-chart{min-height:280px}}
   table.pg-table{width:100%;border-collapse:collapse;table-layout:fixed;}
   table.pg-table th{text-align:left;font-size:11px;color:var(--pg-text-muted);padding:7px 6px;border-bottom:2px solid var(--pg-border);white-space:normal;word-break:break-word;}
   table.pg-table td{padding:7px 6px;font-size:12px;border-bottom:1px solid var(--pg-border);vertical-align:middle;white-space:normal;word-break:break-word;overflow-wrap:break-word;}
@@ -1073,125 +1301,41 @@ function gerarPainelGerencial() {
   }
   .pg-empty{padding:16px;color:var(--pg-text-muted);font-size:13px;text-align:center;}
   .pg-alert{display:flex;align-items:center;gap:10px;background:var(--pg-vencida-bg);color:var(--pg-vencida-text);border-radius:10px;padding:12px 16px;font-size:13.5px;font-weight:600;margin-bottom:14px;}
+  .pg-extra-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:14px;}
+  .pg-extra-card{background:var(--pg-surface);border-radius:10px;box-shadow:0 1px 3px rgba(16,24,40,.08);padding:15px 16px;border-top:4px solid var(--pg-accent);transition:.18s;cursor:default;}
+  .pg-extra-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(16,24,40,.12);}
+  .pg-extra-card .el{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--pg-text-muted);font-weight:700;}
+  .pg-extra-card .ev{font-size:20px;font-weight:800;margin-top:7px;color:var(--pg-primary);white-space:normal;word-break:break-word;}
+  .pg-extra-card .es{font-size:12px;color:var(--pg-text-muted);margin-top:5px;}
+  .pg-priority-alert{border-top-color:#dc2626;background:#fff8f8;}
+  .pg-priority-alert .ev{color:#b02a2a;}
+  .pg-priority-warn{border-top-color:#f59e0b;background:#fffaf2;}
+  .pg-priority-warn .ev{color:#a35a00;}
+  .pg-priority-ok{border-top-color:#16a34a;background:#f7fdf8;}
+  .pg-priority-ok .ev{color:#1e7d38;}
+  .pg-bars-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .pg-bars-panel{background:var(--pg-surface);border:1px solid var(--pg-border);border-radius:10px;padding:16px;box-shadow:0 1px 3px rgba(16,24,40,.08);transition:.18s;}
+  .pg-bars-panel:hover{box-shadow:0 8px 20px rgba(16,24,40,.10);}
+  .pg-bars-panel.full{grid-column:1/-1;}
+  .pg-bars-panel h3{margin:0 0 12px;color:var(--pg-primary);font-size:14px;}
+  .pg-hbar{display:grid;grid-template-columns:minmax(120px,1.3fr) minmax(100px,2.5fr) 100px 46px;gap:8px;align-items:center;padding:7px 4px;border-bottom:1px solid #edf0f3;border-radius:6px;transition:.15s;}
+  .pg-hbar:hover{background:#f5f8fc;transform:translateX(2px);}
+  .pg-hlabel{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .pg-htrack{height:10px;background:#eef1f6;border-radius:999px;overflow:hidden;}
+  .pg-hfill{height:100%;background:linear-gradient(90deg,#2f6fed,#73a1ff);border-radius:999px;}
+  .pg-hvalue{text-align:right;font-size:12px;font-weight:700;}
+  .pg-hpct{text-align:right;font-size:11px;color:var(--pg-text-muted);}
+  .pg-chart-note{font-size:10.5px;color:var(--pg-text-muted);margin-top:8px;}
+  @media(max-width:1100px){.pg-extra-grid{grid-template-columns:repeat(2,1fr)}.pg-bars-grid{grid-template-columns:1fr}}
+  @media(max-width:650px){.pg-extra-grid{grid-template-columns:1fr}.pg-hbar{grid-template-columns:105px 1fr 78px 38px;gap:6px}}
   .pg-footer{text-align:center;color:var(--pg-text-muted);font-size:11.5px;padding:30px 0 10px;}
   @media print{
-    @page{
-      size:A4 landscape;
-      margin:10mm;
-    }
-
-    html,body{
-      background:#fff !important;
-      -webkit-print-color-adjust:exact;
-      print-color-adjust:exact;
-    }
-
-    .pg-toolbar{display:none !important;}
-
-    .pg-header{
-      break-inside:avoid;
-      page-break-inside:avoid;
-    }
-
-    .pg-section-title{
-      break-after:avoid;
-      page-break-after:avoid;
-      break-before:auto;
-    }
-
-    .pg-kpis,
-    .pg-grid-2,
-    .pg-panel,
-    .pg-table-wrap{
-      break-inside:avoid;
-      page-break-inside:avoid;
-    }
-
-    .pg-panel,.pg-table-wrap,.pg-kpi{
-      box-shadow:none;
-      border:1px solid var(--pg-border);
-    }
-
-    .pg-table-wrap{
-      overflow:visible !important;
-    }
-
-    table.pg-table{
-      width:100% !important;
-      table-layout:fixed;
-    }
-
-    table.pg-table thead{
-      display:table-header-group;
-    }
-
-    table.pg-table tr{
-      break-inside:avoid;
-      page-break-inside:avoid;
-    }
-
-    table.pg-table th,
-    table.pg-table td{
-      overflow-wrap:anywhere;
-      word-break:normal;
-      vertical-align:middle;
-    }
-
-    /* Alinhamento das tabelas de distribuição */
-    table.pg-table:not(.pg-table-detalhe) th:nth-child(1),
-    table.pg-table:not(.pg-table-detalhe) td:nth-child(1){
-      width:auto;
-      text-align:left;
-    }
-
-    table.pg-table:not(.pg-table-detalhe) th:nth-child(2),
-    table.pg-table:not(.pg-table-detalhe) td:nth-child(2){
-      width:55px;
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    table.pg-table:not(.pg-table-detalhe) th:nth-child(3),
-    table.pg-table:not(.pg-table-detalhe) td:nth-child(3){
-      width:145px;
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    table.pg-table:not(.pg-table-detalhe) th:nth-child(4),
-    table.pg-table:not(.pg-table-detalhe) td:nth-child(4){
-      width:48px;
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    /* Tabelas com 3 colunas */
-    table.pg-table:not(.pg-table-detalhe) tr:has(th:nth-child(3):last-child) th:nth-child(3),
-    table.pg-table:not(.pg-table-detalhe) tr:has(th:nth-child(3):last-child) td:nth-child(3){
-      width:55px;
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    .pg-bar-track{
-      max-width:45px;
-    }
-
-    .pg-footer{
-      break-inside:avoid;
-      page-break-inside:avoid;
-    }
-
-    .pg-table-wrap table.pg-table-detalhe{
-      min-width:0 !important;
-      width:100% !important;
-    }
-
-    .pg-table-detalhe th,
-    .pg-table-detalhe td{
-      font-size:9.5px;
-      padding:5px 4px;
-    }
+    .pg-toolbar{display:none;}
+    body{background:#fff;}
+    .pg-panel,.pg-table-wrap,.pg-kpi{box-shadow:none;border:1px solid var(--pg-border);}
+    .pg-section-title{break-after:avoid;}
+    .pg-table-wrap{overflow-x:visible;}
+    .pg-table-wrap table.pg-table-detalhe{min-width:0;}
   }
   @media (max-width:900px){
     .pg-kpis{grid-template-columns:repeat(2,1fr);}
@@ -1212,7 +1356,7 @@ function gerarPainelGerencial() {
   </div>
   <div class="pg-header-right">
     Gerado em ${dataGeracao}<br>
-    ${filtrosAtivos?`Período de referência: ${periodoRef}<br><strong>Filtros ativos aplicados</strong>`:""}
+    Período de referência: últimos 10 dias (${periodoRef})${filtrosAtivos?"<br><strong>Filtros ativos aplicados</strong>":""}
   </div>
 </div>
 <div class="pg-toolbar">
@@ -1232,6 +1376,19 @@ function gerarPainelGerencial() {
     <div class="pg-kpi semdata"><div class="v">${sd}</div><div class="l">Sem Data</div></div>
     <div class="pg-kpi custo"><div class="v">${formatCurrency(ct)}</div><div class="l">Custo Total Planejado</div></div>
     <div class="pg-kpi pct"><div class="v">${pctAtendimento}%</div><div class="l">% Atendimento</div></div>
+  </div>
+
+  <div class="pg-extra-grid" aria-label="Indicadores executivos adicionais">
+    <div class="pg-extra-card"><div class="el">Custo médio por OM</div><div class="ev">${formatCurrency(custoMedioOM)}</div><div class="es">Custo planejado total ÷ ${total} OMs</div></div>
+    <div class="pg-extra-card"><div class="el">Maior fornecedor por volume</div><div class="ev">${escapeHtml(fornecedorMaiorVolume.chave)}</div><div class="es">${fornecedorMaiorVolume.qtd} OMs · ${total?Math.round(fornecedorMaiorVolume.qtd/total*100):0}% do total</div></div>
+    <div class="pg-extra-card"><div class="el">Maior fornecedor por custo</div><div class="ev">${escapeHtml(fornecedorMaiorCusto.chave)}</div><div class="es">${formatCurrency(fornecedorMaiorCusto.custo)} · ${fornecedorMaiorCusto.qtd} OMs</div></div>
+    <div class="pg-extra-card ${prioridadeGer.cls}"><div class="el">Situação prioritária</div><div class="ev">${prioridadeGer.tipo}</div><div class="es">${prioridadeGer.qtd} OM${prioridadeGer.qtd===1?'':'s'} para atenção imediata</div></div>
+  </div>
+
+  <div class="pg-section-title">Situação das OMs</div>
+  <div class="pg-donut-panel">
+    ${gerarDonutSituacao(at,np,pv,total)}
+    <div class="pg-interactive-hint">Passe o mouse sobre as fatias, KPIs ou legendas para ver os detalhes. Clique em uma situação para destacar os registros correspondentes.</div>
   </div>
 
   <div class="pg-section-title">Distribuições</div>
@@ -1262,6 +1419,14 @@ function gerarPainelGerencial() {
     </div>
   </div>
 
+  <div class="pg-section-title">Análises em Gráficos de Barras</div>
+  <div class="pg-bars-grid">
+    <div class="pg-bars-panel full"><h3>Status SAP — quantidade e participação</h3>${barrasGer(topStatusGer,total,"qtd")}<div class="pg-chart-note">Quantidade e percentual de cada Status SAP sobre o total de ${total} OMs.</div></div>
+    <div class="pg-bars-panel"><h3>TOP 10 fornecedores — quantidade de OM</h3>${barrasGer(topFornecQtdGer,total,"qtd")}<div class="pg-chart-note">Ranking por quantidade de ordens de manutenção.</div></div>
+    <div class="pg-bars-panel"><h3>TOP 10 fornecedores — custo planejado</h3>${barrasGer(topFornecCustoGer,ct,"custo")}<div class="pg-chart-note">Ranking pelo custo planejado acumulado.</div></div>
+    <div class="pg-bars-panel full"><h3>TOP 10 equipamentos — quantidade de OM</h3>${barrasGer(topEquipGer,total,"qtd")}<div class="pg-chart-note">Ranking dos equipamentos com maior quantidade de OMs.</div></div>
+  </div>
+
   <div class="pg-section-title">🔴 Itens Vencidos (${vencidas.length})</div>
   <div class="pg-table-wrap">
     <table class="pg-table pg-table-detalhe"><thead><tr><th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Texto Breve</th><th>Fornecedor</th><th>Status SAP</th><th>Criado por</th><th>Observação</th><th style="text-align:right;">Custo Plan.</th><th>Data Prevista</th><th style="text-align:right;">Dias</th><th>Situação</th></tr></thead>
@@ -1282,6 +1447,58 @@ function gerarPainelGerencial() {
 
   <p class="pg-footer">Painel gerado automaticamente pelo sistema Follow-up de Manutenção Corretiva — Mineração Taboca S.A.</p>
 </div>
+<script>
+(function(){
+  const tip=document.getElementById('pgDonutTooltip');
+  function showTip(text,x,y){if(!tip)return;tip.innerHTML=text;tip.style.display='block';tip.style.left=(x+14)+'px';tip.style.top=(y+14)+'px';}
+  function hideTip(){if(tip)tip.style.display='none';}
+  function situacaoClass(key){return key==='noprazo'?'pg-row-noprazo':key==='atendida'?'pg-row-atendida':key==='proxvenc'?'pg-row-proxvenc':'';}
+  function setActive(key){
+    document.querySelectorAll('.pg-donut-segment,.pg-donut-legend-item,.pg-kpi').forEach(el=>el.classList.remove('is-active','is-muted'));
+    if(!key){document.querySelectorAll('.pg-kpi').forEach(el=>el.classList.remove('is-active'));return;}
+    document.querySelectorAll('[data-key="'+key+'"]').forEach(el=>el.classList.add('is-active'));
+    document.querySelectorAll('.pg-donut-segment').forEach(el=>{if(el.dataset.key!==key)el.classList.add('is-muted');});
+    document.querySelectorAll('.pg-table-detalhe tbody tr').forEach(row=>{
+      const c=situacaoClass(key); if(c && !row.classList.contains(c)) row.classList.add('pg-highlight-muted');
+    });
+  }
+  function clearRows(){document.querySelectorAll('.pg-table-detalhe tbody tr').forEach(row=>row.classList.remove('pg-highlight-muted'));}
+  document.querySelectorAll('.pg-donut-segment').forEach(el=>{
+    el.addEventListener('mouseenter',e=>showTip('<strong>'+el.dataset.label+'</strong><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e.clientX,e.clientY));
+    el.addEventListener('mousemove',e=>showTip('<strong>'+el.dataset.label+'</strong><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e.clientX,e.clientY));
+    el.addEventListener('mouseleave',hideTip);
+    el.addEventListener('click',()=>{setActive(el.dataset.key);clearRows();document.querySelector('.pg-section-title:last-of-type')?.scrollIntoView({behavior:'smooth',block:'start'});});
+  });
+  document.querySelectorAll('.pg-donut-legend-item').forEach(el=>{
+    el.addEventListener('mouseenter',e=>{setActive(el.dataset.key);showTip('<strong>'+el.dataset.label+'</strong><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e.clientX,e.clientY);});
+    el.addEventListener('mouseleave',()=>{hideTip();setActive(null);});
+    el.addEventListener('click',()=>{setActive(el.dataset.key);clearRows();document.querySelector('.pg-table-detalhe')?.scrollIntoView({behavior:'smooth',block:'start'});});
+  });
+  const kpis=document.querySelectorAll('.pg-kpi');
+  const kpiMap={atendida:'atendida',noprazo:'noprazo',proxvenc:'proxvenc'};
+  kpis.forEach(card=>{
+    const key=Object.keys(kpiMap).find(k=>card.classList.contains(k));
+    const val=card.querySelector('.v')?.textContent||'';
+    const label=card.querySelector('.l')?.textContent||'';
+    card.addEventListener('mouseenter',e=>{
+      let extra='';
+      if(key){const n=Number(val.replace(/[^0-9]/g,''))||0; const pct=n ? Math.round((n/${total})*100) : 0; extra='<br>'+n+' OMs · '+pct+'% do total';}
+      else if(label==='% Atendimento') extra='<br>Percentual de OMs atendidas sobre o total.';
+      else if(label==='Custo Total Planejado') extra='<br>Somatório dos custos planejados.';
+      else if(label==='Total de OMs') extra='<br>Base total utilizada no dashboard.';
+      showTip('<strong>'+label+'</strong>'+extra,e.clientX,e.clientY);
+      if(key)setActive(key);
+    });
+    card.addEventListener('mousemove',e=>{if(tip&&tip.style.display==='block')showTip(tip.innerHTML,e.clientX,e.clientY);});
+    card.addEventListener('mouseleave',()=>{hideTip();setActive(null);clearRows();});
+    if(key) card.addEventListener('click',()=>{setActive(key);document.querySelector('.pg-table-detalhe')?.scrollIntoView({behavior:'smooth',block:'start'});});
+  });
+  document.querySelectorAll('.pg-table tbody tr').forEach(row=>{
+    row.addEventListener('mouseenter',()=>row.style.boxShadow='inset 3px 0 0 #2f6fed');
+    row.addEventListener('mouseleave',()=>row.style.boxShadow='');
+  });
+})();
+<\/script>
 </body>
 </html>`;
 
@@ -1294,6 +1511,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   loadRegistros(); inicializarDropdowns();
   const hoje=new Date(); document.getElementById("subtitle").textContent=`Acompanhamento de materiais e ordens de manutenção — atualizado em ${hoje.toLocaleDateString("pt-BR")}`;
   refresh();
+  atualizarEstadoKpisInterativos();
   atualizarUiSync();
   if (syncId) { syncReceber(true).then(()=>{ atualizarDatalistEquipamento(); }); iniciarPollingSync(); }
 
@@ -1313,14 +1531,82 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("btnManualImport").addEventListener("click",importarDadosManual);
   document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible" && syncId) syncReceber(false); });
 
-  document.getElementById("fSearch").addEventListener("input",renderTabela);
-  document.getElementById("fSituacao").addEventListener("change",renderTabela);
+  
+  // ===================== INTERAÇÃO DOS KPIs PRINCIPAIS =====================
+  function atualizarEstadoKpisInterativos() {
+    const atual = document.getElementById("fSituacao").value || "";
+    const cards = document.querySelectorAll("#dashboard .kpi-interactive");
+    cards.forEach(card => {
+      const key = card.dataset.kpiFilter || "";
+      card.classList.toggle("is-active", key === atual);
+      card.classList.toggle("is-muted", !!atual && key !== atual && key !== "");
+    });
+
+    const box = document.getElementById("kpiFilterStatus");
+    const txt = document.getElementById("kpiFilterText");
+    if (box && txt) {
+      if (atual) {
+        const nomes = {
+          "Atendida":"Atendidas",
+          "No Prazo":"No Prazo",
+          "Prox. Venc.":"Próx. Venc.",
+          "VENCIDA":"Vencidas",
+          "Sem Data":"Sem Data"
+        };
+        txt.textContent = "Filtro ativo pelo KPI: " + (nomes[atual] || atual) + ". O restante do painel foi recalculado para este grupo.";
+        box.classList.add("show");
+      } else {
+        box.classList.remove("show");
+        txt.textContent = "";
+      }
+    }
+  }
+
+  function selecionarKpiFiltro(valor) {
+    const select = document.getElementById("fSituacao");
+    if (!select) return;
+
+    // Clique no mesmo KPI novamente = volta para todas as OMs.
+    if (select.value === valor && valor) {
+      select.value = "";
+    } else {
+      select.value = valor;
+    }
+
+    renderTabela();
+    atualizarEstadoKpisInterativos();
+
+    // Leva o usuário diretamente para o resultado filtrado.
+    document.querySelector(".table-wrap")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+
+  document.querySelectorAll("#dashboard .kpi-interactive").forEach(card => {
+    card.addEventListener("click", () => selecionarKpiFiltro(card.dataset.kpiFilter || ""));
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        selecionarKpiFiltro(card.dataset.kpiFilter || "");
+      }
+    });
+  });
+
+  document.getElementById("btnClearKpiFilter")?.addEventListener("click", () => {
+    document.getElementById("fSituacao").value = "";
+    renderTabela();
+    atualizarEstadoKpisInterativos();
+  });
+
+document.getElementById("fSearch").addEventListener("input",renderTabela);
+  document.getElementById("fSituacao").addEventListener("change",()=>{renderTabela(); atualizarEstadoKpisInterativos();});
   document.getElementById("fStatusSap").addEventListener("change",renderTabela);
   document.getElementById("fFornecedor").addEventListener("change",renderTabela);
   document.getElementById("fCriadoPor").addEventListener("change",renderTabela);
   document.getElementById("fDataDe").addEventListener("change",renderTabela);
   document.getElementById("fDataAte").addEventListener("change",renderTabela);
-  document.getElementById("btnClearFilters").addEventListener("click",()=>{document.getElementById("fSearch").value="";document.getElementById("fSituacao").value="";document.getElementById("fStatusSap").value="";document.getElementById("fFornecedor").value="";document.getElementById("fCriadoPor").value="";document.getElementById("fDataDe").value="";document.getElementById("fDataAte").value="";renderTabela();});
+  document.getElementById("btnClearFilters").addEventListener("click",()=>{document.getElementById("fSearch").value="";document.getElementById("fSituacao").value="";document.getElementById("fStatusSap").value="";document.getElementById("fFornecedor").value="";document.getElementById("fCriadoPor").value="";document.getElementById("fDataDe").value="";document.getElementById("fDataAte").value="";renderTabela();atualizarEstadoKpisInterativos();});
 
   document.getElementById("tblBody").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
   document.getElementById("cardsWrap").addEventListener("click",e=>{const eb=e.target.closest(".edit");const db=e.target.closest(".delete");if(eb)solicitarSenha(()=>abrirModalEditar(eb.dataset.id));if(db)solicitarSenha(()=>abrirConfirmExclusao(db.dataset.id));});
@@ -1346,6 +1632,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   document.getElementById("btnExport").addEventListener("click",exportarExcel);
   document.getElementById("btnPainelGerencial").addEventListener("click",gerarPainelGerencial);
+  document.getElementById("btnDashboard").addEventListener("click",gerarDashboardModerno);
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){fecharModal();fecharConfirmExclusao();fecharModalSenha();document.getElementById("syncOverlay").style.display="none";}});
 });
 </script>
