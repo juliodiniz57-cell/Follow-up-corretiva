@@ -576,6 +576,35 @@ async function supabaseUpsertRegistros(lista) {
   });
 }
 
+
+async function supabaseSalvarRegistro(registro, existente) {
+  if (!registro) throw new Error("registro inválido");
+  if (!supabaseSchemaColumns.size) await supabaseBuscarTodos();
+  const payload = registroToRow(registro);
+  if (existente) {
+    const body = await supabaseRequest(SUPABASE_TABLE + "?id=eq." + encodeURIComponent(registro.id) + "&select=*", {
+      method: "PATCH",
+      headers: supabaseHeaders({"Prefer":"return=representation"}),
+      body: JSON.stringify(payload)
+    });
+    if (!Array.isArray(body) || body.length === 0) {
+      throw new Error("o Supabase não confirmou a atualização. Verifique a política RLS de UPDATE da tabela " + SUPABASE_TABLE);
+    }
+    registrarSchema(body);
+    return rowToRegistro(body[0]);
+  }
+  const body = await supabaseRequest(SUPABASE_TABLE + "?select=*", {
+    method: "POST",
+    headers: supabaseHeaders({"Prefer":"return=representation"}),
+    body: JSON.stringify(payload)
+  });
+  if (!Array.isArray(body) || body.length === 0) {
+    throw new Error("o Supabase não confirmou a inclusão. Verifique a política RLS de INSERT da tabela " + SUPABASE_TABLE);
+  }
+  registrarSchema(body);
+  return rowToRegistro(body[0]);
+}
+
 async function supabaseExcluirId(id) {
   if (!id) return;
   await supabaseRequest(SUPABASE_TABLE + "?id=eq." + encodeURIComponent(id), {
@@ -934,7 +963,7 @@ function verificarOrdemDuplicada() {
   return duplicada;
 }
 
-function salvarFormulario(e) {
+async function salvarFormulario(e) {
   e.preventDefault();
   if(verificarOrdemDuplicada()){document.getElementById("fOrdem").focus();return;}
   const dados={
@@ -952,9 +981,43 @@ function salvarFormulario(e) {
     atendida:document.getElementById("fAtendida").checked,
   };
   if(!dados.ordem){alert("Informe o número da Ordem (OM).");document.getElementById("fOrdem").focus();return;}
-  if(editingId){const i=registros.findIndex(x=>x.id===editingId);if(i!==-1) registros[i]={...registros[i],...dados};}
-  else{registros.unshift({id:uid(),...dados});}
-  refresh(); inicializarDropdowns(); fecharModal(); syncPropagar();
+
+  const btnSalvar = document.querySelector('#formRegistro button[type="submit"]');
+  const textoOriginal = btnSalvar ? btnSalvar.textContent : "Salvar Registro";
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = syncId ? "Salvando no Supabase..." : "Salvando..."; }
+  pararPollingSync();
+  try {
+    const existente = !!editingId;
+    const anterior = existente ? registros.find(x=>x.id===editingId) : null;
+    const candidato = existente ? {...anterior,...dados} : {id:uid(),...dados};
+
+    if (syncId) {
+      definirStatusSync("busy", "⏳ Salvando alteração no Supabase...");
+      const confirmado = await supabaseSalvarRegistro(candidato, existente);
+      if (existente) {
+        const i=registros.findIndex(x=>x.id===editingId);
+        if(i!==-1) registros[i]=confirmado;
+      } else {
+        registros.unshift(confirmado);
+      }
+      definirStatusSync("ok", "🟢 Alteração salva no Supabase");
+    } else {
+      if (existente) {
+        const i=registros.findIndex(x=>x.id===editingId);
+        if(i!==-1) registros[i]=candidato;
+      } else {
+        registros.unshift(candidato);
+      }
+    }
+
+    refresh(); inicializarDropdowns(); fecharModal();
+  } catch(err) {
+    definirStatusSync("err", "🔴 Não foi possível salvar no Supabase (" + err.message + ")");
+    alert("A alteração NÃO foi salva no Supabase.\n\n" + err.message + "\n\nO registro foi mantido com o valor anterior para evitar perda ou falsa confirmação.");
+  } finally {
+    if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = textoOriginal; }
+    if (syncId) iniciarPollingSync();
+  }
 }
 
 function abrirConfirmExclusao(id) {
