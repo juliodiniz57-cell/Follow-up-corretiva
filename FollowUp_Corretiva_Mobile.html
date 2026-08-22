@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="followup-build" content="CORRIGIDO-V5-SINCRONIZACAO-2026-08-21">
+<meta name="followup-build" content="SUPABASE-DASH-FILTRO-DATA-2026-08-22">
 <title>Follow-up Corretiva | Mineração Taboca</title>
 <style>
 :root {
@@ -333,7 +333,7 @@ tr.row-semdata { background: #fafbfc; }
       <button id="btnCloseSync" class="btn-close">&times;</button>
     </div>
     <div class="modal-body">
-      <p style="margin-top:0;color:var(--color-text-muted);font-size:13px;">Compartilhe os mesmos registros entre o computador e o celular usando um código. Quem tiver o código pode ver e editar os dados — não compartilhe com quem não deveria ter acesso. A verificação automática roda a cada poucos minutos (não é instantânea); use "Sincronizar agora" quando precisar atualizar na hora.</p>
+      <p style="margin-top:0;color:var(--color-text-muted);font-size:13px;">Sincronização conectada ao Supabase da equipe. Use o código deste projeto para conectar outro dispositivo ao mesmo conjunto de registros. A atualização automática roda a cada 30 segundos; use "Sincronizar agora" quando precisar atualizar imediatamente.</p>
 
       <div id="syncNotConnected">
         <div class="form-field" style="margin-bottom:12px;">
@@ -342,7 +342,7 @@ tr.row-semdata { background: #fafbfc; }
         </div>
         <button type="button" id="btnSyncConnect" class="btn btn-primary" style="width:100%;margin-bottom:10px;">Conectar com código existente</button>
         <div style="text-align:center;color:var(--color-text-muted);font-size:12px;margin:10px 0;">— ou —</div>
-        <button type="button" id="btnSyncCreate" class="btn btn-ghost" style="width:100%;">Criar novo compartilhamento</button>
+        <button type="button" id="btnSyncCreate" class="btn btn-ghost" style="width:100%;">Gerar código / conectar Supabase</button>
       </div>
 
       <div id="syncConnected" style="display:none;">
@@ -419,7 +419,10 @@ function situacaoBadgeClass(s) { return s==="Atendida"?"badge-atendida":s==="No 
 function situacaoRowClass(s) { return s==="Atendida"?"row-atendida":s==="No Prazo"?"row-noprazo":s==="Prox. Venc."?"row-proxvenc":s==="VENCIDA"?"row-vencida":"row-semdata"; }
 function formatCurrency(v) { return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
 function formatDateBR(iso) { if(!iso) return ""; const [y,m,d]=iso.split("-"); return d+"/"+m+"/"+y; }
-function uid() { return "r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function uid() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==="x"?r:(r&3|8);return v.toString(16);});
+}
 
 // Armazenamento seguro: usa localStorage quando disponível (persiste entre sessões
 // no navegador local) e cai automaticamente para memória (persiste só durante o uso
@@ -442,91 +445,142 @@ function loadRegistros() {
 function saveRegistros() { safeSetItem(STORAGE_KEY, JSON.stringify(registros)); }
 
 // ===================== SINCRONIZAÇÃO ENTRE DISPOSITIVOS =====================
-// Comunicação compatível com GitHub Pages + Google Apps Script sem CORS.
-// LEITURA: JSONP via <script src="..."> (scripts cross-origin são permitidos).
-// GRAVAÇÃO: formulário POST para iframe oculto (também não usa fetch/XHR).
-const SYNC_API_BASE = "https://script.google.com/macros/s/AKfycbwkjPq9-x2bUeouTIZZAizZQo5732bYJowkaJLuRzwBlexEdjmMngYMwJZV1UkcQftW/exec";
+// Backend: Supabase REST API (GitHub Pages -> Supabase via HTTPS/CORS).
+// A tabela já existente é public.acompanhamento_corretivo.
+// O código exibido no painel identifica este projeto de sincronização; os dados
+// continuam sendo armazenados diretamente na tabela Supabase existente.
+const SUPABASE_URL = "https://vkqcgqitpjzultqebfaw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_0R-8vTZbWacUwNBF_Ney6Q_vF9d0uzP";
+const SUPABASE_TABLE = "acompanhamento_corretivo";
+let supabaseSchemaColumns = new Set();
 
 function syncConfigurado() {
-  return !!(SYNC_API_BASE && SYNC_API_BASE.indexOf("COLE_AQUI") !== 0);
+  return !!(SUPABASE_URL && SUPABASE_KEY && SUPABASE_TABLE);
 }
 
-function syncGerarCodigoLocal() {
+function syncCodigoProjeto() {
+  // Código estável para este projeto/tabela. Não é senha nem mecanismo de segurança.
+  const base = SUPABASE_URL + "|" + SUPABASE_TABLE;
+  let h = 2166136261;
+  for (let i = 0; i < base.length; i++) {
+    h ^= base.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let s = "";
-  for (let i = 0; i < 8; i++) s += chars.charAt(Math.floor(Math.random() * chars.length));
+  let n = h >>> 0, s = "";
+  for (let i = 0; i < 8; i++) { s += chars[n % chars.length]; n = (Math.imul(n ^ (n >>> 13), 2654435761) >>> 0); }
   return "FC-" + s;
 }
 
-function syncJsonp(params) {
-  return new Promise(function(resolve, reject) {
-    const cb = "__followup_cb_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    let finished = false;
-    const query = new URLSearchParams();
-    Object.keys(params || {}).forEach(k => query.set(k, params[k]));
-    query.set("callback", cb);
-    query.set("_", String(Date.now()));
+function syncGerarCodigoLocal() { return syncCodigoProjeto(); }
 
-    function cleanup() {
-      try { delete window[cb]; } catch(e) { window[cb] = undefined; }
-      if (script.parentNode) script.parentNode.removeChild(script);
+function supabaseHeaders(extra) {
+  return Object.assign({
+    "apikey": SUPABASE_KEY,
+    "Authorization": "Bearer " + SUPABASE_KEY,
+    "Content-Type": "application/json"
+  }, extra || {});
+}
+
+async function supabaseRequest(path, options) {
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), 20000);
+  try {
+    const res = await fetch(SUPABASE_URL + "/rest/v1/" + path, Object.assign({
+      method: "GET",
+      headers: supabaseHeaders(),
+      signal: controller.signal,
+      cache: "no-store"
+    }, options || {}));
+    const bodyText = await res.text();
+    let body = null;
+    if (bodyText) { try { body = JSON.parse(bodyText); } catch(e) { body = bodyText; } }
+    if (!res.ok) {
+      const msg = body && (body.message || body.hint || body.details || body.error) ? (body.message || body.hint || body.details || body.error) : ("HTTP " + res.status);
+      throw new Error(msg);
     }
-    const timer = setTimeout(function() {
-      if (finished) return;
-      finished = true; cleanup(); reject(new Error("tempo esgotado"));
-    }, 20000);
+    return body;
+  } catch(e) {
+    if (e && e.name === "AbortError") throw new Error("tempo esgotado ao acessar o Supabase");
+    throw e;
+  } finally { clearTimeout(timer); }
+}
 
-    window[cb] = function(payload) {
-      if (finished) return;
-      finished = true; clearTimeout(timer); cleanup();
-      if (payload && payload.erro) reject(new Error(payload.erro));
-      else resolve(payload || null);
-    };
-    script.onerror = function() {
-      if (finished) return;
-      finished = true; clearTimeout(timer); cleanup();
-      reject(new Error("não foi possível acessar o servidor (JSONP)"));
-    };
-    script.src = SYNC_API_BASE + "?" + query.toString();
-    document.head.appendChild(script);
+function primeiroValor(obj, nomes, padrao) {
+  for (const n of nomes) if (obj && Object.prototype.hasOwnProperty.call(obj,n) && obj[n] != null) return obj[n];
+  return padrao;
+}
+
+function registrarSchema(rows) {
+  (rows || []).forEach(r => Object.keys(r || {}).forEach(k => supabaseSchemaColumns.add(k)));
+}
+
+function colunaExistente(candidatas) {
+  for (const c of candidatas) if (supabaseSchemaColumns.has(c)) return c;
+  return candidatas[0];
+}
+
+function rowToRegistro(row) {
+  return {
+    id: String(primeiroValor(row,["id"],uid())),
+    ordem: String(primeiroValor(row,["ordem"],"") || ""),
+    requisicao: String(primeiroValor(row,["requisicao","requisição"],"") || ""),
+    pedido: String(primeiroValor(row,["pedido"],"") || ""),
+    equipamento: String(primeiroValor(row,["equipamento"],"") || ""),
+    criadoPor: String(primeiroValor(row,["criado_por","criadoPor","criado_por_sap"],"") || ""),
+    statusSap: String(primeiroValor(row,["status_sap","statusSap","status"],"") || ""),
+    custoPlan: Number(primeiroValor(row,["custo_planejado","custo_plan","custoPlan","custo"],0)) || 0,
+    fornecedor: String(primeiroValor(row,["fornecedor"],"") || ""),
+    textoBreve: String(primeiroValor(row,["texto_breve","textoBreve","descricao","descrição"],"") || ""),
+    observacao: String(primeiroValor(row,["observacao","observação","status_observacao","status_observação"],"") || ""),
+    dataPrevista: primeiroValor(row,["data_prevista","dataPrevista"],null) || null,
+    atendida: !!primeiroValor(row,["atendida","recebido"],false)
+  };
+}
+
+function registroToRow(r) {
+  const p = {};
+  const set=(cands,val)=>{ const c=colunaExistente(cands); if(c) p[c]=val; };
+  set(["id"], r.id);
+  set(["ordem"], r.ordem || null);
+  set(["requisicao","requisição"], r.requisicao || null);
+  set(["pedido"], r.pedido || null);
+  set(["equipamento"], r.equipamento || null);
+  set(["criado_por","criadoPor","criado_por_sap"], r.criadoPor || null);
+  set(["status_sap","statusSap","status"], r.statusSap || null);
+  set(["custo_planejado","custo_plan","custoPlan","custo"], Number(r.custoPlan)||0);
+  set(["fornecedor"], r.fornecedor || null);
+  set(["texto_breve","textoBreve","descricao","descrição"], r.textoBreve || null);
+  set(["observacao","observação","status_observacao","status_observação"], r.observacao || null);
+  set(["data_prevista","dataPrevista"], r.dataPrevista || null);
+  set(["atendida","recebido"], !!r.atendida);
+  return p;
+}
+
+async function supabaseBuscarTodos() {
+  const rows = await supabaseRequest(SUPABASE_TABLE + "?select=*&order=ordem.asc");
+  if (!Array.isArray(rows)) throw new Error("resposta inválida do Supabase");
+  registrarSchema(rows);
+  return rows.map(rowToRegistro);
+}
+
+async function supabaseUpsertRegistros(lista) {
+  if (!Array.isArray(lista) || !lista.length) return;
+  // Antes de gravar, garante que conhecemos as colunas reais da tabela.
+  if (!supabaseSchemaColumns.size) await supabaseBuscarTodos();
+  const payload = lista.map(registroToRow);
+  await supabaseRequest(SUPABASE_TABLE + "?on_conflict=id", {
+    method: "POST",
+    headers: supabaseHeaders({"Prefer":"resolution=merge-duplicates,return=minimal"}),
+    body: JSON.stringify(payload)
   });
 }
 
-function syncPost(campos) {
-  return new Promise(function(resolve, reject) {
-    const nomeFrame = "syncPostFrame_" + Date.now() + Math.random().toString(36).slice(2);
-    const iframeEl = document.createElement("iframe");
-    iframeEl.name = nomeFrame;
-    iframeEl.style.display = "none";
-    document.body.appendChild(iframeEl);
-    const formEl = document.createElement("form");
-    formEl.method = "POST";
-    formEl.action = SYNC_API_BASE;
-    formEl.target = nomeFrame;
-    formEl.style.display = "none";
-    Object.keys(campos || {}).forEach(function(k) {
-      const inp = document.createElement("input");
-      inp.type = "hidden"; inp.name = k; inp.value = campos[k] == null ? "" : String(campos[k]);
-      formEl.appendChild(inp);
-    });
-    document.body.appendChild(formEl);
-    let done = false;
-    const timer = setTimeout(function() {
-      if (done) return;
-      done = true;
-      cleanup();
-      // O POST pode ter sido aceito mesmo sem uma resposta legível.
-      resolve(true);
-    }, 1800);
-    function cleanup() {
-      setTimeout(function() {
-        if (iframeEl.parentNode) iframeEl.parentNode.removeChild(iframeEl);
-        if (formEl.parentNode) formEl.parentNode.removeChild(formEl);
-      }, 300);
-    }
-    try { formEl.submit(); }
-    catch(e) { clearTimeout(timer); done = true; cleanup(); reject(e); }
+async function supabaseExcluirId(id) {
+  if (!id) return;
+  await supabaseRequest(SUPABASE_TABLE + "?id=eq." + encodeURIComponent(id), {
+    method: "DELETE",
+    headers: supabaseHeaders({"Prefer":"return=minimal"})
   });
 }
 
@@ -542,7 +596,7 @@ function modalAbertoAlgum() {
 function definirStatusSync(tipo, texto) {
   const el = document.getElementById("syncStatusLine");
   if (!el) return;
-  el.className = "sync-status" + (tipo?(" "+tipo):"");
+  el.className = "sync-status" + (tipo?((" "+tipo)):"");
   el.textContent = texto || "";
 }
 
@@ -561,125 +615,89 @@ function mostrarSyncMsg(texto, tipo) {
 }
 
 async function syncCriar() {
-  if (!syncConfigurado()) { mostrarSyncMsg("Sincronização não configurada.", "err"); return; }
-  syncBusy = true; mostrarSyncMsg("Criando compartilhamento...");
+  if (!syncConfigurado()) { mostrarSyncMsg("Supabase não configurado.", "err"); return; }
+  syncBusy = true; mostrarSyncMsg("Conectando ao Supabase...");
   try {
-    // O código é gerado no navegador. A criação do compartilhamento usa
-    // JSONP/GET, que funciona diretamente no GitHub Pages e não depende de
-    // POST cross-origin por iframe para obter o código.
-    const novoId = syncGerarCodigoLocal();
-    const criado = await syncJsonp({ action:"criar", codigo:novoId, dados:"[]" });
-    if (!criado || criado.ok !== true) {
-      throw new Error((criado && criado.erro) || "o servidor não confirmou a criação");
-    }
+    const novoId = syncCodigoProjeto();
+    const nuvem = await supabaseBuscarTodos();
     syncId = novoId; safeSetItem(SYNC_ID_KEY, novoId);
-    atualizarUiSync();
-
-    // Depois que o compartilhamento existe, envia a base local.
-    // O POST continua sendo usado para dados maiores, evitando estourar
-    // o limite de tamanho de uma URL GET.
-    if (Array.isArray(registros) && registros.length) {
-      await syncPost({ action:"salvar", codigo:novoId, dados:JSON.stringify(registros) });
+    if (nuvem.length) {
+      registros = nuvem; saveRegistros(); refresh(); inicializarDropdowns();
+    } else if (Array.isArray(registros) && registros.length) {
+      await supabaseUpsertRegistros(registros);
     }
-
-    mostrarSyncMsg("Compartilhamento criado! Código: " + novoId, "ok");
-    definirStatusSync("ok", "🟢 Compartilhamento criado e dados enviados");
+    atualizarUiSync();
+    mostrarSyncMsg("Sincronização Supabase ativada! Código: " + novoId, "ok");
+    definirStatusSync("ok", "🟢 Conectado ao Supabase · " + registros.length + " registros");
     iniciarPollingSync();
   } catch(e) {
-    mostrarSyncMsg("Não foi possível criar o compartilhamento (" + e.message + ").", "err");
+    mostrarSyncMsg("Não foi possível conectar ao Supabase (" + e.message + ").", "err");
+    definirStatusSync("err", "🔴 Falha ao acessar o Supabase");
   } finally { syncBusy = false; }
 }
 
 async function syncConectar(codigo) {
   codigo = (codigo||"").trim().toUpperCase();
-  if (!codigo || !syncConfigurado()) { mostrarSyncMsg("Cole um código válido.", "err"); return; }
-  syncBusy = true; mostrarSyncMsg("Conectando...");
+  const codigoProjeto = syncCodigoProjeto();
+  if (!codigo) { mostrarSyncMsg("Cole o código de sincronização.", "err"); return; }
+  if (codigo !== codigoProjeto) { mostrarSyncMsg("Código não corresponde a este projeto Supabase.", "err"); return; }
+  syncBusy = true; mostrarSyncMsg("Conectando ao Supabase...");
   try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:codigo });
-    const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (!dados) throw new Error("código não encontrado");
-    registros = dados;
-    syncId = codigo; safeSetItem(SYNC_ID_KEY, codigo);
+    const dados = await supabaseBuscarTodos();
+    registros = dados; saveRegistros();
+    syncId = codigoProjeto; safeSetItem(SYNC_ID_KEY, codigoProjeto);
     refresh(); inicializarDropdowns(); atualizarUiSync();
-    mostrarSyncMsg("Conectado! Os dados deste dispositivo agora seguem o compartilhamento.", "ok");
-    definirStatusSync("ok", "🟢 Sincronizado agora");
+    mostrarSyncMsg("Conectado ao Supabase! Dados compartilhados carregados.", "ok");
+    definirStatusSync("ok", "🟢 Sincronizado agora · " + registros.length + " registros");
     iniciarPollingSync();
   } catch(e) {
-    mostrarSyncMsg("Código não encontrado ou sem conexão (" + e.message + "). Confira o código e tente novamente.", "err");
+    mostrarSyncMsg("Não foi possível conectar (" + e.message + ").", "err");
   } finally { syncBusy = false; }
 }
 
 function syncDesconectar() {
   syncId = null; safeSetItem(SYNC_ID_KEY, "");
-  atualizarUiSync(); mostrarSyncMsg("Desconectado. Este dispositivo voltou a usar apenas os dados locais.", "ok");
+  atualizarUiSync(); mostrarSyncMsg("Desconectado. Este dispositivo voltou a usar os dados locais.", "ok");
   pararPollingSync();
 }
 
 async function syncEnviar() {
   if (!syncId || !syncConfigurado()) return;
   try {
-    await syncPost({ action:"salvar", codigo:syncId, dados:JSON.stringify(registros) });
-    definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+    await supabaseUpsertRegistros(registros);
+    definirStatusSync("ok", "🟢 Enviado ao Supabase às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
-    definirStatusSync("err", "🔴 Falha ao sincronizar (" + e.message + ")");
+    definirStatusSync("err", "🔴 Falha ao enviar ao Supabase (" + e.message + ")");
   }
 }
 
 async function syncReceber(mostrarStatus) {
   if (!syncId || !syncConfigurado()) return;
-  if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando...");
+  if (mostrarStatus) definirStatusSync("busy", "⏳ Sincronizando com Supabase...");
   try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
-    const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
-
-    // Proteção importante: se o servidor estiver vazio, NÃO apagamos os
-    // registros locais. Isso permite que o computador que já possui a base
-    // seja usado para inicializar um compartilhamento novo/vazio.
-    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
-      await syncEnviar();
-      definirStatusSync("ok", "🟢 Base local enviada para o compartilhamento");
-      return;
-    }
-
+    const dados = await supabaseBuscarTodos();
     registros = dados; saveRegistros();
     if (!modalAbertoAlgum()) { renderTabela(); }
     atualizarDatalistEquipamento();
-    definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+    definirStatusSync("ok", "🟢 Supabase sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})+" · "+dados.length+" registros");
   } catch(e) {
-    definirStatusSync("err", "🔴 Falha ao sincronizar (" + e.message + ")");
+    definirStatusSync("err", "🔴 Falha ao sincronizar com Supabase (" + e.message + ")");
   }
 }
 
 async function syncAgora() {
   if (!syncId || syncBusy) return;
-  syncBusy = true; mostrarSyncMsg("Sincronizando...");
+  syncBusy = true; mostrarSyncMsg("Sincronizando com Supabase...");
   try {
-    const resposta = await syncJsonp({ action:"buscar", codigo:syncId });
-    const dados = resposta && Array.isArray(resposta.dados) ? resposta.dados : null;
-    if (!Array.isArray(dados)) throw new Error("resposta inválida do servidor");
-
-    // Se a nuvem ainda estiver vazia e este computador tiver registros,
-    // preservamos os dados locais e os enviamos para a base compartilhada.
-    // Se a nuvem já tiver dados, eles são considerados a fonte compartilhada.
-    if (dados.length === 0 && Array.isArray(registros) && registros.length > 0) {
-      await syncEnviar();
-      refresh();
-      mostrarSyncMsg("Dados deste computador enviados para o compartilhamento.", "ok");
-    } else {
-      registros = dados;
-      saveRegistros();
-      refresh();
-      atualizarDatalistEquipamento();
-      mostrarSyncMsg("Dados compartilhados carregados.", "ok");
-      definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
-    }
+    const dados = await supabaseBuscarTodos();
+    registros = dados; saveRegistros();
+    refresh(); atualizarDatalistEquipamento();
+    mostrarSyncMsg("Dados do Supabase carregados: " + dados.length + " registros.", "ok");
+    definirStatusSync("ok", "🟢 Sincronizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
   } catch(e) {
-    mostrarSyncMsg("Falha ao sincronizar: " + e.message, "err");
-    definirStatusSync("err", "🔴 Falha ao sincronizar");
-  } finally {
-    syncBusy = false;
-  }
+    mostrarSyncMsg("Falha ao sincronizar com Supabase: " + e.message, "err");
+    definirStatusSync("err", "🔴 Falha ao sincronizar com Supabase");
+  } finally { syncBusy = false; }
 }
 
 function iniciarPollingSync() {
@@ -945,7 +963,15 @@ function abrirConfirmExclusao(id) {
   document.getElementById("confirmOverlay").style.display="flex";
 }
 function fecharConfirmExclusao() { document.getElementById("confirmOverlay").style.display="none"; deleteId=null; }
-function confirmarExclusao() { if(deleteId){registros=registros.filter(x=>x.id!==deleteId);refresh();syncPropagar();} fecharConfirmExclusao(); }
+function confirmarExclusao() {
+  if(deleteId){
+    const idExcluido=deleteId;
+    registros=registros.filter(x=>x.id!==deleteId);
+    refresh();
+    if(syncId) supabaseExcluirId(idExcluido).then(()=>definirStatusSync("ok","🟢 Exclusão sincronizada com Supabase")).catch(e=>definirStatusSync("err","🔴 Falha ao excluir no Supabase ("+e.message+")"));
+  }
+  fecharConfirmExclusao();
+}
 
 function exportarExcel() {
   const lista=aplicarFiltros();
