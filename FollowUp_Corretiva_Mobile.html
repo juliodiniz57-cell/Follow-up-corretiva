@@ -1145,6 +1145,15 @@ function atualizarPeriodoDashboard(janelaDashboard, dataDe, dataAte) {
   gerarDashboardModerno(janelaDashboard);
 }
 
+function detectarDashboardMobile() {
+  const ua = navigator.userAgent || "";
+  const touch = ("ontouchstart" in window) || Number(navigator.maxTouchPoints || 0) > 0;
+  const sw = Number(screen && screen.width) || Number(window.innerWidth) || 0;
+  const sh = Number(screen && screen.height) || Number(window.innerHeight) || 0;
+  const menorLado = Math.min(sw || 99999, sh || 99999);
+  return /Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(ua) || (touch && menorLado <= 1024);
+}
+
 function gerarDashboardModerno(janelaDashboard) {
   const lista = aplicarFiltros();
   const total = lista.length;
@@ -1493,6 +1502,64 @@ function gerarDashboardModerno(janelaDashboard) {
     .dash-main{padding-left:12px!important;padding-right:12px!important}
     .dash-actions,.dash-period{max-width:100%!important}
   }
+  /* Mobile robusto: aplicado por classe via JavaScript, sem depender de max-width/pointer do navegador. */
+  html.dash-device-mobile,html.dash-device-mobile body{width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;padding:0!important;overflow-x:hidden!important;-webkit-text-size-adjust:100%!important;text-size-adjust:100%!important}
+  html.dash-device-mobile body .dash-shell{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important}
+  html.dash-device-mobile body .dash-side{width:100%!important;max-width:100%!important;height:auto!important;position:static!important;padding:10px 10px 8px!important;border-right:0!important;border-bottom:1px solid var(--line)!important}
+  html.dash-device-mobile body .dash-logo{height:auto!important;padding:0 4px 8px!important;justify-content:center!important}
+  html.dash-device-mobile body .dash-logo img{width:145px!important;max-width:52vw!important;max-height:36px!important;height:auto!important}
+  html.dash-device-mobile body .dash-side-bottom{display:none!important}
+  html.dash-device-mobile body .dash-nav{display:flex!important;flex-direction:row!important;gap:6px!important;overflow-x:auto!important;overflow-y:hidden!important;padding-bottom:4px!important;-webkit-overflow-scrolling:touch!important}
+  html.dash-device-mobile body .dash-nav button{flex:0 0 auto!important;min-height:44px!important;padding:9px 12px!important;white-space:nowrap!important;font-size:12px!important}
+  html.dash-device-mobile body .dash-main{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;padding:14px 12px 18px!important;overflow:visible!important}
+  html.dash-device-mobile body .dash-top,html.dash-device-mobile body .dash-actions,html.dash-device-mobile body .dash-period,html.dash-device-mobile body .dash-kpis,html.dash-device-mobile body .dash-exec-grid,html.dash-device-mobile body .dash-grid,html.dash-device-mobile body .dash-distrib,html.dash-device-mobile body .dash-charts-grid,html.dash-device-mobile body .dash-summary{width:100%!important;min-width:0!important;max-width:100%!important}
+  html.dash-device-mobile body .dash-top{display:block!important;margin:0 0 12px!important}
+  html.dash-device-mobile body .dash-kicker{font-size:23px!important;line-height:1.08!important;margin:0!important}
+  html.dash-device-mobile body .dash-title{font-size:13.5px!important;line-height:1.3!important;margin-top:4px!important}
+  html.dash-device-mobile body .dash-sub{font-size:11.5px!important;line-height:1.3!important;margin:5px 0 10px!important}
+  html.dash-device-mobile body .dash-actions{display:block!important}
+  html.dash-device-mobile body .dash-period{padding:10px!important;margin:0!important;border-radius:10px!important}
+  html.dash-device-mobile body .dash-period-row{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;width:100%!important}
+  html.dash-device-mobile body .dash-period-row span{display:none!important}
+  html.dash-device-mobile body .dash-period input{grid-column:1/-1!important;width:100%!important;min-width:0!important;min-height:44px!important;font-size:16px!important}
+  html.dash-device-mobile body .dash-period-row .apply{grid-column:1/2!important;width:100%!important;min-height:44px!important}
+  html.dash-device-mobile body .dash-period-row .clear{grid-column:2/3!important;width:100%!important;min-height:44px!important}
+  html.dash-device-mobile body .dash-period-label{font-size:10.5px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+  html.dash-device-mobile body .dash-export{width:100%!important;min-height:44px!important;margin-top:8px!important;padding:10px 14px!important}
+  html.dash-device-mobile body .dash-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  html.dash-device-mobile body .dash-kpi{min-width:0!important;min-height:92px!important;padding:10px!important}
+  html.dash-device-mobile body .dash-kpi .icon{width:32px!important;height:32px!important;font-size:17px!important}
+  html.dash-device-mobile body .dash-kpi .num{font-size:22px!important;margin-top:-30px!important;margin-left:40px!important}
+  html.dash-device-mobile body .dash-kpi .lab{font-size:11.5px!important;line-height:1.2!important}
+  html.dash-device-mobile body .dash-kpi .pct{font-size:10.5px!important}
+  html.dash-device-mobile body .dash-exec-grid,html.dash-device-mobile body .dash-grid,html.dash-device-mobile body .dash-distrib,html.dash-device-mobile body .dash-charts-grid{grid-template-columns:1fr!important;gap:9px!important}
+  html.dash-device-mobile body .dash-exec-card,html.dash-device-mobile body .dash-card,html.dash-device-mobile body .dash-chart-panel,html.dash-device-mobile body .dash-summary .s{width:100%!important;min-width:0!important;max-width:100%!important}
+  html.dash-device-mobile body .dash-exec-card{padding:12px!important}
+  html.dash-device-mobile body .dash-exec-card .big{font-size:18px!important;overflow-wrap:anywhere!important}
+  html.dash-device-mobile body .dash-card,html.dash-device-mobile body .dash-chart-panel{padding:11px!important}
+  html.dash-device-mobile body .dash-chart{height:185px!important;width:100%!important;overflow:hidden!important}
+  html.dash-device-mobile body .dash-line-svg{width:100%!important;max-width:100%!important;height:100%!important}
+  html.dash-device-mobile body .dash-donut-box{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;width:100%!important}
+  html.dash-device-mobile body .dash-donut{position:relative!important;width:min(245px,76vw)!important;max-width:100%!important;height:auto!important;aspect-ratio:1!important;margin:0 auto!important}
+  html.dash-device-mobile body .dash-donut svg{display:block!important;width:100%!important;height:100%!important}
+  html.dash-device-mobile body .dash-center{left:50%!important;top:50%!important;margin:0!important;transform:translate(-50%,-50%)!important;font-size:24px!important}
+  html.dash-device-mobile body .dash-legend{width:100%!important;min-width:0!important;gap:4px!important}
+  html.dash-device-mobile body .dash-legend-item{grid-template-columns:12px minmax(0,1fr) 32px 40px!important;gap:5px!important;padding:6px 4px!important;font-size:11px!important}
+  html.dash-device-mobile body .dash-distrib>div{width:100%!important;min-width:0!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  html.dash-device-mobile body .dash-table{width:100%!important;min-width:520px!important}
+  html.dash-device-mobile body .dash-table th,html.dash-device-mobile body .dash-table td{font-size:10.5px!important;padding:6px 4px!important}
+  html.dash-device-mobile body .dash-hbar-row{width:100%!important;min-width:0!important;grid-template-columns:minmax(0,1fr) auto auto!important;grid-template-areas:"label value pct" "track track track"!important;gap:5px 7px!important}
+  html.dash-device-mobile body .dash-hbar-label{grid-area:label!important;min-width:0!important;font-size:11px!important}
+  html.dash-device-mobile body .dash-hbar-track{grid-area:track!important;width:100%!important}
+  html.dash-device-mobile body .dash-hbar-value{grid-area:value!important;white-space:nowrap!important;font-size:10.5px!important}
+  html.dash-device-mobile body .dash-hbar-pct{grid-area:pct!important;white-space:nowrap!important;font-size:10.5px!important}
+  html.dash-device-mobile body .dash-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}
+  html.dash-device-mobile body .dash-summary .s{padding:9px!important}
+  html.dash-device-mobile body .dash-summary b{font-size:19px!important}
+  html.dash-device-mobile.dash-device-portrait body .dash-nav{display:none!important}
+  html.dash-device-mobile.dash-device-portrait body .dash-side{padding:10px 12px 7px!important}
+  html.dash-device-mobile.dash-device-landscape body .dash-nav{display:flex!important}
+  html.dash-device-mobile.dash-device-landscape body .dash-main{padding-left:12px!important;padding-right:12px!important}
   .dash-print-logo{display:none}
   @page{size:A4 landscape;margin:8mm}
   @media print{
@@ -1544,19 +1611,47 @@ function gerarDashboardModerno(janelaDashboard) {
   </section>
   <section class="dash-summary">${[["Vencidas",ve,"red"],["Próx. Venc.",pv,"orange"],["No Prazo",np,"green"],["Sem Data",sd,"gray"],["Atendidas",at,"blue"],["Total de OMs",total,"green"]].map(([l,n,c])=>`<div class="s" data-key="${l.replace(/[^a-z]/gi,'').toLowerCase()}"><b style="color:${c==='red'?'#dc2626':c==='orange'?'#d97706':c==='gray'?'#64748b':'#087443'}">${n}</b><small>${pct(n)}%</small><div style="font-size:11px;margin-top:3px">${l}</div></div>`).join('')}</section>
   <div class="dash-footer">Última atualização: ${dataAtual} · Dashboard gerencial integrado ao Follow-up</div>
-  </main></div><div class="dash-tooltip" id="dashTip"></div><script>(function(){const tip=document.getElementById('dashTip');function show(t,e){tip.innerHTML=t;tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px'}function hide(){tip.style.display='none'}document.querySelectorAll('.dash-kpi[data-key],.dash-legend-item').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-arc').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseenter',()=>el.style.boxShadow='0 14px 32px rgba(8,116,67,.16)'));document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseleave',()=>el.style.boxShadow=''));document.querySelectorAll('.dash-hbar-row').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mouseleave',hide)});const btnAplicar=document.getElementById('dashAplicarPeriodo');const btnLimpar=document.getElementById('dashLimparPeriodo');function aplicarPeriodoDashboardInterno(de,ate){if(typeof window.__aplicarPeriodoDashboard==='function'){window.__aplicarPeriodoDashboard(de,ate);return;}if(window.opener && !window.opener.closed && typeof window.opener.atualizarPeriodoDashboard==='function'){window.opener.atualizarPeriodoDashboard(window,de,ate);return;}alert('Não foi possível aplicar o período. Feche e abra o Dashboard novamente.');}if(btnAplicar){btnAplicar.addEventListener('click',()=>{const de=document.getElementById('dashDataDe').value;const ate=document.getElementById('dashDataAte').value;if(de&&ate&&de>ate){alert('A data inicial não pode ser maior que a data final.');return;}aplicarPeriodoDashboardInterno(de,ate);})}if(btnLimpar){btnLimpar.addEventListener('click',()=>{aplicarPeriodoDashboardInterno('','')})}})();<\/script></body></html>`;
-  let alvo = janelaDashboard && !janelaDashboard.closed ? janelaDashboard : window.open('', '_blank');
-  if (!alvo) { alert('O navegador bloqueou a abertura do Dashboard. Permita pop-ups para este site.'); return; }
-  alvo.document.open();
-  alvo.document.write(html);
-  alvo.document.close();
+  </main></div><div class="dash-tooltip" id="dashTip"></div><script>(function(){function aplicarClasseMobile(){const ua=navigator.userAgent||'';const touch=('ontouchstart' in window)||Number(navigator.maxTouchPoints||0)>0;const sw=Number(screen&&screen.width)||Number(innerWidth)||0;const sh=Number(screen&&screen.height)||Number(innerHeight)||0;const menor=Math.min(sw||99999,sh||99999);const mobile=/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(ua)||(touch&&menor<=1024);const tipo=(screen.orientation&&screen.orientation.type)||'';const portrait=tipo.indexOf('portrait')===0||(!tipo&&sh>=sw);document.documentElement.classList.toggle('dash-device-mobile',mobile);document.documentElement.classList.toggle('dash-device-portrait',mobile&&portrait);document.documentElement.classList.toggle('dash-device-landscape',mobile&&!portrait);if(document.body){document.body.classList.toggle('dash-device-mobile',mobile);document.body.classList.toggle('dash-device-portrait',mobile&&portrait);document.body.classList.toggle('dash-device-landscape',mobile&&!portrait);}}aplicarClasseMobile();window.addEventListener('resize',aplicarClasseMobile,{passive:true});if(screen.orientation&&screen.orientation.addEventListener){screen.orientation.addEventListener('change',aplicarClasseMobile);}const tip=document.getElementById('dashTip');function show(t,e){tip.innerHTML=t;tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px'}function hide(){tip.style.display='none'}document.querySelectorAll('.dash-kpi[data-key],.dash-legend-item').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-arc').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseenter',()=>el.style.boxShadow='0 14px 32px rgba(8,116,67,.16)'));document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseleave',()=>el.style.boxShadow=''));document.querySelectorAll('.dash-hbar-row').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mouseleave',hide)});const btnAplicar=document.getElementById('dashAplicarPeriodo');const btnLimpar=document.getElementById('dashLimparPeriodo');function aplicarPeriodoDashboardInterno(de,ate){if(typeof window.__aplicarPeriodoDashboard==='function'){window.__aplicarPeriodoDashboard(de,ate);return;}if(window.opener && !window.opener.closed && typeof window.opener.atualizarPeriodoDashboard==='function'){window.opener.atualizarPeriodoDashboard(window,de,ate);return;}alert('Não foi possível aplicar o período. Feche e abra o Dashboard novamente.');}if(btnAplicar){btnAplicar.addEventListener('click',()=>{const de=document.getElementById('dashDataDe').value;const ate=document.getElementById('dashDataAte').value;if(de&&ate&&de>ate){alert('A data inicial não pode ser maior que a data final.');return;}aplicarPeriodoDashboardInterno(de,ate);})}if(btnLimpar){btnLimpar.addEventListener('click',()=>{aplicarPeriodoDashboardInterno('','')})}})();<\/script></body></html>`;
+  const janelaExistente = janelaDashboard && !janelaDashboard.closed ? janelaDashboard : null;
+  const dashboardMobile = detectarDashboardMobile();
+  let alvo = janelaExistente;
+  let blobUrl = null;
+
+  if (dashboardMobile && window.Blob && window.URL && typeof URL.createObjectURL === "function") {
+    blobUrl = URL.createObjectURL(new Blob([html], {type:"text/html;charset=utf-8"}));
+    if (alvo) {
+      try { alvo.location.replace(blobUrl); } catch(e) { alvo.location.href = blobUrl; }
+    } else {
+      alvo = window.open(blobUrl, '_blank');
+    }
+  } else {
+    if (!alvo) alvo = window.open('', '_blank');
+    if (alvo) {
+      alvo.document.open();
+      alvo.document.write(html);
+      alvo.document.close();
+    }
+  }
+
+  if (!alvo) {
+    if (blobUrl) try { URL.revokeObjectURL(blobUrl); } catch(e) {}
+    alert('O navegador bloqueou a abertura do Dashboard. Permita pop-ups para este site.');
+    return;
+  }
+
+  if (blobUrl) setTimeout(()=>{ try { URL.revokeObjectURL(blobUrl); } catch(e) {} }, 60000);
+
   // Ponte direta entre o Dashboard e a tela principal. Evita depender apenas de window.opener.
-  try {
-    const janelaRef = alvo;
-    alvo.__aplicarPeriodoDashboard = function(dataDe, dataAte) {
-      atualizarPeriodoDashboard(janelaRef, dataDe, dataAte);
-    };
-  } catch(e) {}
+  const vincularDashboard = () => {
+    try {
+      const janelaRef = alvo;
+      alvo.__aplicarPeriodoDashboard = function(dataDe, dataAte) {
+        atualizarPeriodoDashboard(janelaRef, dataDe, dataAte);
+      };
+    } catch(e) {}
+  };
+  vincularDashboard();
+  if (dashboardMobile) setTimeout(vincularDashboard, 250);
 }
 
 function gerarPainelGerencial() {
