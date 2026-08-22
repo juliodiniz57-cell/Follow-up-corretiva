@@ -1163,16 +1163,29 @@ function gerarDashboardModerno(janelaDashboard) {
     ? `${dataDeAtual ? formatDateBR(dataDeAtual) : "Início"} até ${dataAteAtual ? formatDateBR(dataAteAtual) : "Hoje"}`
     : "Todo o período";
 
-  const palette = {"Atendida":"#2563eb","No Prazo":"#16a34a","Prox. Venc.":"#f59e0b","VENCIDA":"#dc2626","Sem Data":"#94a3b8"};
+  const palette = {
+    "No Prazo":"#16a34a",
+    "Atendidas":"#2563eb",
+    "Próx. Venc.":"#f59e0b",
+    "Vencidas":"#dc2626",
+    "Sem Data":"#94a3b8",
+    "Atendida":"#2563eb",
+    "Prox. Venc.":"#f59e0b",
+    "VENCIDA":"#dc2626"
+  };
   const situacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv],["Vencidas",ve],["Sem Data",sd]].filter(x=>x[1]>0 || total===0);
   const mainSituacoes = [["No Prazo",np],["Atendidas",at],["Próx. Venc.",pv]].filter(x=>x[1]>0);
   const radius=92, cx=130, cy=130, circ=2*Math.PI*radius;
-  let offset=0;
-  const arcs = mainSituacoes.map(([label,n])=>{
-    const len=total ? circ*n/total : 0; const o=offset; offset+=len;
-    return `<circle class="dash-arc dash-arc-${label.replace(/[^a-z]/gi,'').toLowerCase()}" cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${palette[label]||'#16a34a'}" stroke-width="38" stroke-linecap="butt" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-o}" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"></circle>`;
-  }).join('');
-  const legend = mainSituacoes.map(([label,n])=>`<div class="dash-legend-item" data-label="${label}"><span class="dash-dot" style="background:${palette[label]}"></span><span>${label}</span><b>${n}</b><strong>${pct(n)}%</strong></div>`).join('');
+  const gerarArcosPizza = (itens) => {
+    let offsetPizza=0;
+    return itens.map(([label,n])=>{
+      const len=total ? circ*n/total : 0; const o=offsetPizza; offsetPizza+=len;
+      return `<circle class="dash-arc dash-arc-${label.replace(/[^a-z]/gi,'').toLowerCase()}" cx="${cx}" cy="${cy}" r="${radius}" fill="none" stroke="${palette[label]}" stroke-width="38" stroke-linecap="butt" stroke-dasharray="${len} ${circ-len}" stroke-dashoffset="${-o}" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"></circle>`;
+    }).join('');
+  };
+  const arcs = gerarArcosPizza(mainSituacoes);
+  const arcsSituacao = gerarArcosPizza(situacoes);
+  const legend = situacoes.map(([label,n])=>`<div class="dash-legend-item" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"><span class="dash-dot" style="background:${palette[label]}"></span><span>${label}</span><b>${n}</b><strong>${pct(n)}%</strong></div>`).join('');
 
   const porFornecedor = agruparContagem(lista,"fornecedor","(Sem fornecedor)").slice(0,8);
   const porStatus = agruparContagem(lista,"statusSap","(Sem status)").slice(0,8);
@@ -1232,7 +1245,7 @@ function gerarDashboardModerno(janelaDashboard) {
   <div class="dash-grid">
     <section class="dash-card" id="custos"><h2>▣ &nbsp; CUSTO TOTAL PLANEJADO</h2><div class="dash-cost">${brl(custo)}</div><div class="dash-chart">${lineSvg}</div></section>
     <section class="dash-card"><h2>◉ &nbsp; % ATENDIMENTO</h2><div class="dash-donut-box"><div class="dash-donut"><div class="dash-center">${pct(at)}%<span>Atendimento</span></div><svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="92" fill="none" stroke="#edf0ee" stroke-width="38"></circle>${arcs}</svg></div><div class="dash-legend">${mainSituacoes.map(([label,n])=>`<div class="dash-legend-item" data-key="${label.replace(/[^a-z]/gi,'').toLowerCase()}" data-label="${label}" data-qtd="${n}" data-pct="${pct(n)}"><span class="dash-dot" style="background:${palette[label]}"></span><span>${label}</span><b>${n}</b><strong>${pct(n)}%</strong></div>`).join('')}</div></div></section>
-    <section class="dash-card" id="situacao"><h2>◔ &nbsp; SITUAÇÃO DAS OMs</h2><div class="dash-donut-box"><div class="dash-donut"><div class="dash-center" style="color:#173a2b">${total}<span>OMs</span></div><svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="92" fill="none" stroke="#edf0ee" stroke-width="38"></circle>${arcs}</svg></div><div class="dash-legend">${legend}</div></div><p style="font-size:11px;color:#667085;margin:8px 0 0">Percentuais calculados sobre as OMs classificadas em Atendidas, No Prazo e Próx. Venc.</p></section>
+    <section class="dash-card" id="situacao"><h2>◔ &nbsp; SITUAÇÃO DAS OMs</h2><div class="dash-donut-box"><div class="dash-donut"><div class="dash-center" style="color:#173a2b">${total}<span>OMs</span></div><svg viewBox="0 0 260 260"><circle cx="130" cy="130" r="92" fill="none" stroke="#edf0ee" stroke-width="38"></circle>${arcsSituacao}</svg></div><div class="dash-legend">${legend}</div></div><p style="font-size:11px;color:#667085;margin:8px 0 0">Percentuais calculados sobre o total de OMs por situação.</p></section>
   </div>
   <section class="dash-card" id="distrib" style="margin-top:14px"><h2 style="font-size:17px;color:#075f39">▥ &nbsp; DISTRIBUIÇÕES</h2><div class="dash-distrib"><div><h3 style="font-size:13px;color:#075f39">POR FORNECEDOR</h3><table class="dash-table"><thead><tr><th>Fornecedor</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porFornecedor,maxF)}</tbody></table></div><div><h3 style="font-size:13px;color:#075f39">POR STATUS SAP</h3><table class="dash-table"><thead><tr><th>Status SAP</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porStatus,maxS)}</tbody></table></div><div><h3 style="font-size:13px;color:#075f39">POR RESPONSÁVEL (CRIADO POR)</h3><table class="dash-table"><thead><tr><th>Responsável</th><th>Qtd</th><th>Custo Plan.</th><th>%</th></tr></thead><tbody>${table(porResp,maxR)}</tbody></table></div></div></section>
   <section class="dash-charts-grid" aria-label="Análises em gráficos de barras">
