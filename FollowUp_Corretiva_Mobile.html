@@ -1045,7 +1045,7 @@ function gerarDonutSituacao(at,np,pv,total){
 }
 
 
-function gerarDashboardModerno() {
+function gerarDashboardModerno(navegarExistente=false) {
   const lista = aplicarFiltros();
   const dashDataDe = document.getElementById("fDataDe")?.value || "";
   const dashDataAte = document.getElementById("fDataAte")?.value || "";
@@ -1145,11 +1145,44 @@ function gerarDashboardModerno() {
   <section class="dash-summary">${[["Vencidas",ve,"red"],["Próx. Venc.",pv,"orange"],["No Prazo",np,"green"],["Sem Data",sd,"gray"],["Atendidas",at,"blue"],["Total de OMs",total,"green"]].map(([l,n,c])=>`<div class="s" data-key="${l.replace(/[^a-z]/gi,'').toLowerCase()}"><b style="color:${c==='red'?'#dc2626':c==='orange'?'#d97706':c==='gray'?'#64748b':'#087443'}">${n}</b><small>${pct(n)}%</small><div style="font-size:11px;margin-top:3px">${l}</div></div>`).join('')}</section>
   <div class="dash-footer">Última atualização: ${dataAtual} · Dashboard gerencial integrado ao Follow-up</div>
   </main></div><div class="dash-tooltip" id="dashTip"></div><scr'+'ipt>(function(){const tip=document.getElementById('dashTip');function show(t,e){tip.innerHTML=t;tip.style.display='block';tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY+14)+'px'}function hide(){tip.style.display='none'}document.querySelectorAll('.dash-kpi[data-key],.dash-legend-item').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-arc').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.qtd+' OMs · '+el.dataset.pct+'% do total',e));el.addEventListener('mouseleave',hide)});document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseenter',()=>el.style.boxShadow='0 14px 32px rgba(8,116,67,.16)'));document.querySelectorAll('.dash-card,.dash-summary .s').forEach(el=>el.addEventListener('mouseleave',()=>el.style.boxShadow=''));document.querySelectorAll('.dash-hbar-row').forEach(el=>{el.addEventListener('mouseenter',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mousemove',e=>show('<b>'+el.dataset.label+'</b><br>'+el.dataset.value+' · '+el.dataset.pct,e));el.addEventListener('mouseleave',hide)});
-  function aplicarPeriodoDashboard(limpar){const de=document.getElementById('dashDataDe').value;const ate=document.getElementById('dashDataAte').value;const erro=document.getElementById('dashFilterError');if(!limpar&&de&&ate&&de>ate){erro.style.display='block';return}erro.style.display='none';if(!window.opener||window.opener.closed){alert('O painel principal não está disponível. Feche este Dashboard e abra-o novamente pelo botão Dashboard.');return}window.opener.document.getElementById('fDataDe').value=limpar?'':de;window.opener.document.getElementById('fDataAte').value=limpar?'':ate;window.opener.renderTabela();window.opener.gerarDashboardModerno();window.close()}
-  document.getElementById('dashAplicarData').addEventListener('click',function(){aplicarPeriodoDashboard(false)});document.getElementById('dashLimparData').addEventListener('click',function(){document.getElementById('dashDataDe').value='';document.getElementById('dashDataAte').value='';aplicarPeriodoDashboard(true)});
+  function aplicarPeriodoDashboard(limpar){
+    const de=document.getElementById('dashDataDe').value;
+    const ate=document.getElementById('dashDataAte').value;
+    const erro=document.getElementById('dashFilterError');
+    if(!limpar&&de&&ate&&de>ate){erro.style.display='block';return}
+    erro.style.display='none';
+
+    if(!window.opener||window.opener.closed){
+      alert('O painel principal não está disponível. Feche este Dashboard e abra-o novamente pelo botão Dashboard.');
+      return;
+    }
+
+    // Mantém o filtro sincronizado no painel principal.
+    window.opener.document.getElementById('fDataDe').value=limpar?'':de;
+    window.opener.document.getElementById('fDataAte').value=limpar?'':ate;
+    window.opener.renderTabela();
+
+    // Gera novamente o Dashboard com os dados filtrados e navega a
+    // própria janela para a nova versão. Assim os KPIs, gráficos,
+    // fornecedores, Status SAP, equipamentos e custos são recalculados.
+    const novaUrl=window.opener.gerarDashboardModerno(true);
+    if(novaUrl){
+      window.location.replace(novaUrl);
+    }
+  }
+
+  document.getElementById('dashAplicarData').addEventListener('click',function(){aplicarPeriodoDashboard(false)});
+  document.getElementById('dashLimparData').addEventListener('click',function(){
+    document.getElementById('dashDataDe').value='';
+    document.getElementById('dashDataAte').value='';
+    aplicarPeriodoDashboard(true);
+  });
   document.getElementById('dashDataDe').addEventListener('change',function(){document.getElementById('dashFilterError').style.display='none'});document.getElementById('dashDataAte').addEventListener('change',function(){document.getElementById('dashFilterError').style.display='none'});
   })();</scr'+'ipt></body></html>`;
-  const blob=new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob); window.open(url,'_blank');
+  const blob=new Blob([html],{type:'text/html'}); const url=URL.createObjectURL(blob);
+  if(navegarExistente) return url;
+  window.open(url,'_blank');
+  return url;
 }
 
 function gerarPainelGerencial() {
