@@ -78,6 +78,7 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .input-search { flex: 1 1 260px; min-width: 200px; }
 .filters select { min-width: 150px; }
 .filter-date-group { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--color-text-muted); }
+.filter-date-group small { color:#1e7d38; font-size:10px; font-weight:700; }
 .filter-date-group input[type="date"] { padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
 .table-wrap { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; min-width: 1200px; }
@@ -1186,8 +1187,40 @@ function gerarPainelGerencial() {
   const logoSrc = document.querySelector(".topbar-title img").src;
   const agora = new Date();
   const dataGeracao = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-  const de10dias = new Date(agora); de10dias.setDate(de10dias.getDate()-10);
-  const periodoRef = de10dias.toLocaleDateString("pt-BR") + " a " + agora.toLocaleDateString("pt-BR");
+
+  // O relatório não deve exibir um "período de referência" fictício quando
+  // nenhum filtro foi aplicado. Quando houver filtros, mostramos exatamente
+  // o que foi usado para gerar o relatório.
+  const fSearch = document.getElementById("fSearch").value.trim();
+  const fSituacao = document.getElementById("fSituacao").value;
+  const fStatusSap = document.getElementById("fStatusSap").value;
+  const fFornecedor = document.getElementById("fFornecedor").value;
+  const fCriadoPor = document.getElementById("fCriadoPor").value;
+  const fDataDe = document.getElementById("fDataDe").value;
+  const fDataAte = document.getElementById("fDataAte").value;
+
+  const formatDateInput = v => {
+    if(!v) return "";
+    const p = v.split("-");
+    return p.length===3 ? `${p[2]}/${p[1]}/${p[0]}` : v;
+  };
+
+  const filtrosResumo = [];
+  if(fSearch) filtrosResumo.push(`Busca: "${escapeHtml(fSearch)}"`);
+  if(fSituacao) filtrosResumo.push(`Situação: ${escapeHtml(fSituacao)}`);
+  if(fStatusSap) filtrosResumo.push(`Status SAP: ${escapeHtml(fStatusSap)}`);
+  if(fFornecedor) filtrosResumo.push(`Fornecedor: ${escapeHtml(fFornecedor)}`);
+  if(fCriadoPor) filtrosResumo.push(`Criado por: ${escapeHtml(fCriadoPor)}`);
+
+  if(fDataDe || fDataAte){
+    const deTxt = formatDateInput(fDataDe) || "início";
+    const ateTxt = formatDateInput(fDataAte) || "fim";
+    filtrosResumo.push(`Data prevista: ${deTxt} a ${ateTxt}`);
+  }
+
+  const cabecalhoFiltro = filtrosResumo.length
+    ? `<div class="pg-filter-summary"><strong>Filtros do relatório:</strong> ${filtrosResumo.join(" · ")}</div>`
+    : "";
 
   const html = `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -1329,6 +1362,9 @@ function gerarPainelGerencial() {
   @media(max-width:1100px){.pg-extra-grid{grid-template-columns:repeat(2,1fr)}.pg-bars-grid{grid-template-columns:1fr}}
   @media(max-width:650px){.pg-extra-grid{grid-template-columns:1fr}.pg-hbar{grid-template-columns:105px 1fr 78px 38px;gap:6px}}
   .pg-footer{text-align:center;color:var(--pg-text-muted);font-size:11.5px;padding:30px 0 10px;}
+  .pg-header-right{font-size:12px;text-align:right;color:#dce6f2;line-height:1.5;}
+  .pg-filter-summary{margin-top:5px;max-width:760px;font-size:12px;color:#fff;line-height:1.45;}
+  .pg-filter-summary strong{font-weight:800;}
   @media print{
     .pg-toolbar{display:none;}
     body{background:#fff;}
@@ -1355,8 +1391,8 @@ function gerarPainelGerencial() {
     </div>
   </div>
   <div class="pg-header-right">
-    Gerado em ${dataGeracao}<br>
-    Período de referência: últimos 10 dias (${periodoRef})${filtrosAtivos?"<br><strong>Filtros ativos aplicados</strong>":""}
+    Gerado em ${dataGeracao}
+    ${cabecalhoFiltro}
   </div>
 </div>
 <div class="pg-toolbar">
