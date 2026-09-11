@@ -71,7 +71,8 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .card-proxvenc { border-left-color: var(--color-proxvenc-text); }
 .card-vencida { border-left-color: var(--color-vencida-text); }
 .card-semdata { border-left-color: var(--color-semdata-text); }
-.card-custo { border-left-color: var(--color-accent); }
+.card-custo { border-left-color: var(--color-accent); overflow:hidden; }
+.card-custo .card-value { display:block; width:100%; white-space:nowrap; line-height:1.08; letter-spacing:-0.35px; font-size:clamp(14px,1.25vw,22px); }
 .card-pct { border-left-color: #7c3aed; }
 .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; background: var(--color-surface); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .filters select, .filters .input-search { padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
@@ -974,6 +975,18 @@ function situacaoBadgeClass(s) { return s==="Atendida"?"badge-atendida":s==="No 
 function situacaoRowClass(s) { return s==="Atendida"?"row-atendida":s==="No Prazo"?"row-noprazo":s==="Prox. Venc."?"row-proxvenc":s==="VENCIDA"?"row-vencida":"row-semdata"; }
 function formatCurrency(v) { return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
 function formatDateBR(iso) { if(!iso) return ""; const [y,m,d]=iso.split("-"); return d+"/"+m+"/"+y; }
+function ajustarCardCustoPlanejado() {
+  const el = document.getElementById("kpiCusto");
+  if (!el) return;
+  const txt = (el.textContent || "").trim();
+  let size = 22;
+  if (txt.length >= 14) size = 20;
+  if (txt.length >= 16) size = 18;
+  if (txt.length >= 18) size = 16;
+  if (txt.length >= 20) size = 14;
+  el.style.fontSize = size + "px";
+  el.style.whiteSpace = "nowrap";
+}
 function uid() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,c=>{const r=Math.random()*16|0,v=c==="x"?r:(r&3|8);return v.toString(16);});
@@ -1475,6 +1488,7 @@ function atualizarDashboard(lista) {
   document.getElementById("kpiVencida").textContent=ve;
   document.getElementById("kpiSemData").textContent=sd;
   document.getElementById("kpiCusto").textContent=formatCurrency(ct);
+  ajustarCardCustoPlanejado();
   document.getElementById("kpiPct").textContent=lista.length?Math.round((at/lista.length)*100)+"%":"0%";
 }
 
