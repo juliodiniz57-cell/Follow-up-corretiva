@@ -185,6 +185,7 @@ th.col-actions { background: #eef1f6; }
 .badge-proxvenc { background: var(--color-proxvenc-bg); color: var(--color-proxvenc-text); }
 .badge-vencida { background: var(--color-vencida-bg); color: var(--color-vencida-text); }
 .badge-semdata { background: var(--color-semdata-bg); color: var(--color-semdata-text); }
+.dias-atendida-icon { display:inline-block; color:#16a34a; font-weight:900; font-size:18px; line-height:1; }
 tr.row-atendida { background: #f7faff; }
 tr.row-noprazo { background: #f6fdf8; }
 tr.row-proxvenc { background: #fffaf3; }
@@ -773,9 +774,13 @@ function calcularSituacao(registro) {
 }
 
 function calcularDiasLabel(registro) {
-  if (registro.atendida) return "Atendida";
-  if (!registro.dataPrevista) return "\u2014";
+  if (registro.atendida) return "✓";
+  if (!registro.dataPrevista) return "—";
   return String(diffDias(registro.dataPrevista));
+}
+function renderDiasHTML(registro) {
+  if (registro && registro.atendida) return '<span class="dias-atendida-icon" title="Atendida">✓</span>';
+  return escapeHtml(calcularDiasLabel(registro));
 }
 
 function situacaoBadgeClass(s) { return s==="Atendida"?"badge-atendida":s==="No Prazo"?"badge-noprazo":s==="Prox. Venc."?"badge-proxvenc":s==="VENCIDA"?"badge-vencida":"badge-semdata"; }
@@ -1207,7 +1212,7 @@ function renderTabela() {
     const sit=calcularSituacao(r); const dias=calcularDiasLabel(r); const rowClass=situacaoRowClass(sit);
 
     const tr=document.createElement("tr"); tr.className=rowClass;
-    tr.innerHTML=`<td>${escapeHtml(r.ordem)}</td><td>${escapeHtml(r.requisicao)}</td><td>${escapeHtml(r.pedido)}</td><td>${escapeHtml(r.equipamento)}</td><td>${escapeHtml(r.criadoPor)}</td><td class="col-texto">${escapeHtml(r.textoBreve)}</td><td>${escapeHtml(r.statusSap)}</td><td>${formatCurrency(r.custoPlan)}</td><td>${escapeHtml(r.fornecedor)}</td><td class="col-obs">${escapeHtml(r.observacao)}</td><td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td><td>${escapeHtml(dias)}</td><td class="col-situacao"><span class="badge ${situacaoBadgeClass(sit)}">${sit}</span></td><td class="col-actions"><button class="icon-btn edit" data-id="${r.id}" title="Editar">✎</button> <button class="icon-btn delete" data-id="${r.id}" title="Excluir">🗑</button></td>`;
+    tr.innerHTML=`<td>${escapeHtml(r.ordem)}</td><td>${escapeHtml(r.requisicao)}</td><td>${escapeHtml(r.pedido)}</td><td>${escapeHtml(r.equipamento)}</td><td>${escapeHtml(r.criadoPor)}</td><td class="col-texto">${escapeHtml(r.textoBreve)}</td><td>${escapeHtml(r.statusSap)}</td><td>${formatCurrency(r.custoPlan)}</td><td>${escapeHtml(r.fornecedor)}</td><td class="col-obs">${escapeHtml(r.observacao)}</td><td>${r.atendida?"—":formatDateBR(r.dataPrevista)}</td><td>${renderDiasHTML(r)}</td><td class="col-situacao"><span class="badge ${situacaoBadgeClass(sit)}">${sit}</span></td><td class="col-actions"><button class="icon-btn edit" data-id="${r.id}" title="Editar">✎</button> <button class="icon-btn delete" data-id="${r.id}" title="Excluir">🗑</button></td>`;
     tbody.appendChild(tr);
 
     const card=document.createElement("div"); card.className="record-card "+rowClass;
@@ -1224,8 +1229,8 @@ function renderTabela() {
         <div class="record-card-field"><label>Status SAP</label><span>${escapeHtml(r.statusSap)||"—"}</span></div>
         <div class="record-card-field"><label>Fornecedor</label><span>${escapeHtml(r.fornecedor)||"—"}</span></div>
         <div class="record-card-field"><label>Custo Plan.</label><span>${formatCurrency(r.custoPlan)}</span></div>
-        <div class="record-card-field"><label>Data Prevista</label><span>${r.atendida?"Atendida":(formatDateBR(r.dataPrevista)||"—")}</span></div>
-        <div class="record-card-field"><label>Dias</label><span>${escapeHtml(dias)}</span></div>
+        <div class="record-card-field"><label>Data Prevista</label><span>${r.atendida?"—":(formatDateBR(r.dataPrevista)||"—")}</span></div>
+        <div class="record-card-field"><label>Dias</label><span>${r.atendida?"<span class=\"dias-atendida-icon\" title=\"Atendida\">✓</span>":escapeHtml(dias)}</span></div>
         <div class="record-card-field"><label>Requisição</label><span>${escapeHtml(r.requisicao)||"—"}</span></div>
         <div class="record-card-field"><label>Pedido</label><span>${escapeHtml(r.pedido)||"—"}</span></div>
       </div>
@@ -1308,7 +1313,7 @@ function atualizarPreviewSituacao() {
   const at=document.getElementById("fAtendida").checked; const dp=document.getElementById("fDataPrevista").value||null;
   const temp={atendida:at,dataPrevista:dp}; const sit=calcularSituacao(temp); const dias=calcularDiasLabel(temp);
   const b=document.getElementById("previewSituacao"); b.textContent=sit; b.className="badge "+situacaoBadgeClass(sit);
-  document.getElementById("previewDias").textContent=dias; document.getElementById("fDataPrevista").disabled=at;
+  document.getElementById("previewDias").innerHTML = at ? '<span class="dias-atendida-icon" title="Atendida">✓</span>' : escapeHtml(dias); document.getElementById("fDataPrevista").disabled=at;
 }
 
 function ordemDuplicada(valor) {
@@ -1449,7 +1454,7 @@ function linhaTabelaDetalhe(r) {
     <td>${escapeHtml(r.observacao)}</td>
     <td style="text-align:right;">${formatCurrency(r.custoPlan)}</td>
     <td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td>
-    <td style="text-align:right;">${calcularDiasLabel(r)}</td>
+    <td style="text-align:right;">${r.atendida?"✓":calcularDiasLabel(r)}</td>
     <td><span class="pg-badge pg-badge-${sit==="VENCIDA"?"vencida":sit==="Prox. Venc."?"proxvenc":sit==="Atendida"?"atendida":sit==="No Prazo"?"noprazo":"semdata"}">${sit}</span></td>
   </tr>`;
 }
