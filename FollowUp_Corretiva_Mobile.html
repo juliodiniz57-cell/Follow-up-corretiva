@@ -50,7 +50,7 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .btn-danger:hover { background: #b62f2f; }
 .btn-close { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--color-text-muted); }
 .btn-close:hover { color: var(--color-text); }
-.dashboard { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+.dashboard { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)) minmax(190px, 1.28fr) minmax(175px, 1.12fr); gap: 12px; margin-bottom: 22px; }
 .card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); position: relative; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease; }
 .card.kpi-interactive { cursor: pointer; }
 .card.kpi-interactive:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,58,95,.16); }
@@ -71,8 +71,11 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .card-proxvenc { border-left-color: var(--color-proxvenc-text); }
 .card-vencida { border-left-color: var(--color-vencida-text); }
 .card-semdata { border-left-color: var(--color-semdata-text); }
+.card-atendida .atendida-value-row { display:flex; align-items:baseline; gap:10px; width:100%; }
+.card-atendida .atendida-pct { font-size:15px; font-weight:700; color:#7c3aed; white-space:nowrap; }
+.card-atendida .atendida-pct-label { font-size:9.5px; font-weight:600; color:var(--color-text-muted); margin-left:3px; }
 .card-custo { border-left-color: var(--color-accent); overflow:hidden; }
-.card-custo .card-value { display:block; width:100%; max-width:100%; white-space:nowrap; line-height:1.05; letter-spacing:-0.55px; font-size:22px; overflow:visible; }
+.card-custo .card-value { display:block; width:100%; max-width:100%; white-space:nowrap; line-height:1.08; letter-spacing:-0.35px; font-size:22px; overflow:visible; }
 .card-pct { border-left-color: #7c3aed; }
 .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; background: var(--color-surface); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .filters select, .filters .input-search { padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
@@ -495,7 +498,7 @@ tr.row-semdata { background: #fafbfc; }
       <span class="card-value" id="kpiTotal">0</span><span class="card-label">Total de OMs</span><span class="kpi-hint">Clique para ver todas</span>
     </div>
     <div class="card card-atendida kpi-interactive" data-kpi-filter="Atendida" tabindex="0" title="Clique para filtrar somente OMs atendidas">
-      <span class="card-value" id="kpiAtendida">0</span><span class="card-label">Atendidas</span><span class="kpi-hint">Clique para filtrar</span>
+      <div class="atendida-value-row"><span class="card-value" id="kpiAtendida">0</span><span class="atendida-pct"><span id="kpiPct">0%</span><span class="atendida-pct-label">atendimento</span></span></div><span class="card-label">Atendidas</span><span class="kpi-hint">Clique para filtrar</span>
     </div>
     <div class="card card-noprazo kpi-interactive" data-kpi-filter="No Prazo" tabindex="0" title="Clique para filtrar somente OMs no prazo">
       <span class="card-value" id="kpiNoPrazo">0</span><span class="card-label">No Prazo</span><span class="kpi-hint">Clique para filtrar</span>
@@ -514,9 +517,6 @@ tr.row-semdata { background: #fafbfc; }
     </div>
     <div class="card card-empenhado-fat" id="cardEmpenhadoFaturar" tabindex="0" role="button" title="Clique para ver os pedidos autorizados para faturamento no mês">
       <span class="card-value" id="kpiEmpenhadoFaturar">R$ 0</span><span class="card-label">Empenhado p/ faturar</span><span class="kpi-hint" id="kpiEmpenhadoFaturarHint">Carregando pedidos…</span>
-    </div>
-    <div class="card card-pct" title="Percentual de OMs atendidas dentro do conjunto atualmente exibido">
-      <span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span><span class="kpi-hint">Atualiza com os filtros</span>
     </div>
   </section>
   <div id="kpiFilterStatus" class="kpi-filter-status">
@@ -978,20 +978,8 @@ function formatDateBR(iso) { if(!iso) return ""; const [y,m,d]=iso.split("-"); r
 function ajustarCardCustoPlanejado() {
   const el = document.getElementById("kpiCusto");
   if (!el) return;
-  const parent = el.closest('.card-custo') || el.parentElement;
-  if (!parent) return;
+  el.style.fontSize = "22px";
   el.style.whiteSpace = "nowrap";
-  el.style.display = "block";
-  el.style.maxWidth = "100%";
-  el.style.letterSpacing = "-0.55px";
-  let size = 22;
-  const minSize = 10;
-  el.style.fontSize = size + "px";
-  const available = Math.max(60, parent.clientWidth - 28);
-  while (size > minSize && el.scrollWidth > available) {
-    size -= 1;
-    el.style.fontSize = size + "px";
-  }
 }
 function uid() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
