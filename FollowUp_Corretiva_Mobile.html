@@ -80,38 +80,30 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .filter-date-group { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--color-text-muted); }
 .filter-date-group input[type="date"] { padding: 8px 10px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
 .table-wrap { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+table { width: 100%; border-collapse: collapse; min-width: 1280px; }
 thead th { position: sticky; top: 0; background: #eef1f6; color: var(--color-text); text-align: left; padding: 10px 12px; font-size: 12px; font-weight: 700; border-bottom: 2px solid var(--color-border); white-space: nowrap; }
 tbody td { padding: 9px 12px; border-bottom: 1px solid var(--color-border); font-size: 13px; vertical-align: top; max-width: 280px; }
 tbody tr:hover { background: #f8fafc; }
 td.col-obs, td.col-texto { white-space: normal; word-break: break-word; }
-/* Ajuste pontual: mantém os botões de editar/excluir totalmente visíveis */
+/* Ajuste pontual: Situação e Ações têm espaço próprio, sem sobreposição */
+th.col-situacao, td.col-situacao {
+  white-space: nowrap;
+  min-width: 112px;
+  width: 112px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 th.col-actions, td.col-actions {
   white-space: nowrap;
   text-align: center;
-  width: 86px;
-  min-width: 86px;
-  max-width: 86px;
-  padding-left: 8px;
-  padding-right: 8px;
-  position: sticky;
-  right: 0;
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  padding-left: 6px;
+  padding-right: 6px;
+  position: static;
 }
-th.col-actions {
-  z-index: 5;
-  background: #eef1f6;
-  box-shadow: -5px 0 8px rgba(15, 23, 42, .06);
-}
-td.col-actions {
-  z-index: 2;
-  background: #fff;
-  box-shadow: -5px 0 8px rgba(15, 23, 42, .04);
-}
-tr.row-atendida td.col-actions { background: #f7faff; }
-tr.row-noprazo td.col-actions { background: #f6fdf8; }
-tr.row-proxvenc td.col-actions { background: #fffaf3; }
-tr.row-vencida td.col-actions { background: #fef6f6; }
-tr.row-semdata td.col-actions { background: #fafbfc; }
+th.col-actions { background: #eef1f6; }
 .icon-btn { border: none; background: transparent; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; color: var(--color-text-muted); }
 .icon-btn:hover { background: #eef1f5; color: var(--color-text); }
 .icon-btn.delete:hover { color: #d33d3d; background: #fde3e3; }
@@ -389,7 +381,7 @@ tr.row-semdata { background: #fafbfc; }
         <tr>
           <th>Ordem</th><th>Requisição</th><th>Pedido</th><th>Equipamento</th><th>Criado por</th>
           <th>Texto Breve</th><th>Status SAP</th><th>Custo Plan. (R$)</th><th>Fornecedor</th>
-          <th>Status / Observação</th><th>Data Prevista</th><th>Dias</th><th>Situação</th>
+          <th>Status / Observação</th><th>Data Prevista</th><th>Dias</th><th class="col-situacao">Situação</th>
           <th class="col-actions">Ações</th>
         </tr>
       </thead>
@@ -1143,7 +1135,7 @@ function renderTabela() {
     const sit=calcularSituacao(r); const dias=calcularDiasLabel(r); const rowClass=situacaoRowClass(sit);
 
     const tr=document.createElement("tr"); tr.className=rowClass;
-    tr.innerHTML=`<td>${escapeHtml(r.ordem)}</td><td>${escapeHtml(r.requisicao)}</td><td>${escapeHtml(r.pedido)}</td><td>${escapeHtml(r.equipamento)}</td><td>${escapeHtml(r.criadoPor)}</td><td class="col-texto">${escapeHtml(r.textoBreve)}</td><td>${escapeHtml(r.statusSap)}</td><td>${formatCurrency(r.custoPlan)}</td><td>${escapeHtml(r.fornecedor)}</td><td class="col-obs">${escapeHtml(r.observacao)}</td><td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td><td>${escapeHtml(dias)}</td><td><span class="badge ${situacaoBadgeClass(sit)}">${sit}</span></td><td class="col-actions"><button class="icon-btn edit" data-id="${r.id}" title="Editar">✎</button> <button class="icon-btn delete" data-id="${r.id}" title="Excluir">🗑</button></td>`;
+    tr.innerHTML=`<td>${escapeHtml(r.ordem)}</td><td>${escapeHtml(r.requisicao)}</td><td>${escapeHtml(r.pedido)}</td><td>${escapeHtml(r.equipamento)}</td><td>${escapeHtml(r.criadoPor)}</td><td class="col-texto">${escapeHtml(r.textoBreve)}</td><td>${escapeHtml(r.statusSap)}</td><td>${formatCurrency(r.custoPlan)}</td><td>${escapeHtml(r.fornecedor)}</td><td class="col-obs">${escapeHtml(r.observacao)}</td><td>${r.atendida?"Atendida":formatDateBR(r.dataPrevista)}</td><td>${escapeHtml(dias)}</td><td class="col-situacao"><span class="badge ${situacaoBadgeClass(sit)}">${sit}</span></td><td class="col-actions"><button class="icon-btn edit" data-id="${r.id}" title="Editar">✎</button> <button class="icon-btn delete" data-id="${r.id}" title="Excluir">🗑</button></td>`;
     tbody.appendChild(tr);
 
     const card=document.createElement("div"); card.className="record-card "+rowClass;
