@@ -107,6 +107,78 @@ th.col-actions { background: #eef1f6; }
 .icon-btn { border: none; background: transparent; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 6px; color: var(--color-text-muted); }
 .icon-btn:hover { background: #eef1f5; color: var(--color-text); }
 .icon-btn.delete:hover { color: #d33d3d; background: #fde3e3; }
+
+/* CORREÇÃO FINAL DA TABELA PRINCIPAL: todas as colunas visíveis, inclusive Situação e Ações */
+#tblFollowUp {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+#tblFollowUp th,
+#tblFollowUp td {
+  box-sizing: border-box;
+}
+#tblFollowUp thead th {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: normal;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+#tblFollowUp tbody td {
+  max-width: none;
+  overflow-wrap: break-word;
+  word-break: normal;
+  padding-left: 7px;
+  padding-right: 7px;
+}
+/* Distribuição de largura das 14 colunas = 100% */
+#tblFollowUp th:nth-child(1),  #tblFollowUp td:nth-child(1)  { width: 6%; }
+#tblFollowUp th:nth-child(2),  #tblFollowUp td:nth-child(2)  { width: 6%; }
+#tblFollowUp th:nth-child(3),  #tblFollowUp td:nth-child(3)  { width: 7%; }
+#tblFollowUp th:nth-child(4),  #tblFollowUp td:nth-child(4)  { width: 7%; }
+#tblFollowUp th:nth-child(5),  #tblFollowUp td:nth-child(5)  { width: 6%; }
+#tblFollowUp th:nth-child(6),  #tblFollowUp td:nth-child(6)  { width: 8%; }
+#tblFollowUp th:nth-child(7),  #tblFollowUp td:nth-child(7)  { width: 5%; }
+#tblFollowUp th:nth-child(8),  #tblFollowUp td:nth-child(8)  { width: 7.5%; }
+#tblFollowUp th:nth-child(9),  #tblFollowUp td:nth-child(9)  { width: 7.5%; }
+#tblFollowUp th:nth-child(10), #tblFollowUp td:nth-child(10) { width: 15.5%; }
+#tblFollowUp th:nth-child(11), #tblFollowUp td:nth-child(11) { width: 7%; }
+#tblFollowUp th:nth-child(12), #tblFollowUp td:nth-child(12) { width: 3.5%; }
+#tblFollowUp th:nth-child(13), #tblFollowUp td:nth-child(13) { width: 8%; }
+#tblFollowUp th:nth-child(14), #tblFollowUp td:nth-child(14) { width: 6%; }
+
+#tblFollowUp th.col-situacao,
+#tblFollowUp td.col-situacao {
+  min-width: 0;
+  width: 8%;
+  max-width: none;
+  white-space: nowrap;
+  text-align: left;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+#tblFollowUp th.col-actions,
+#tblFollowUp td.col-actions {
+  min-width: 0;
+  width: 6%;
+  max-width: none;
+  white-space: nowrap;
+  text-align: center;
+  padding-left: 3px;
+  padding-right: 3px;
+  overflow: visible;
+}
+#tblFollowUp td.col-actions .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0 1px;
+  vertical-align: middle;
+}
 .badge { display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
 .badge-atendida { background: var(--color-atendida-bg); color: var(--color-atendida-text); }
 .badge-noprazo { background: var(--color-noprazo-bg); color: var(--color-noprazo-text); }
