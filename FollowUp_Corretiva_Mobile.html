@@ -50,7 +50,7 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .btn-danger:hover { background: #b62f2f; }
 .btn-close { background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--color-text-muted); }
 .btn-close:hover { color: var(--color-text); }
-.dashboard { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; margin-bottom: 22px; }
+.dashboard { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
 .card { background: var(--color-surface); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 14px 12px; display: flex; flex-direction: column; align-items: flex-start; border-left: 4px solid var(--color-border); position: relative; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, opacity .18s ease; }
 .card.kpi-interactive { cursor: pointer; }
 .card.kpi-interactive:hover { transform: translateY(-4px); box-shadow: 0 10px 24px rgba(30,58,95,.16); }
@@ -263,6 +263,48 @@ tr.row-semdata { background: #fafbfc; }
   .card-value { font-size: 19px; }
 }
 
+
+/* ===================== EMPENHADO PARA FATURAR (somente painel principal) ===================== */
+.card-empenhado-fat { border-left-color:#d97706; cursor:pointer; }
+.card-empenhado-fat:hover { transform:translateY(-4px); box-shadow:0 10px 24px rgba(217,119,6,.16); }
+.card-empenhado-fat .card-value { font-size:18px; white-space:nowrap; }
+.empfat-overlay { position:fixed; inset:0; z-index:390; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.58); }
+.empfat-modal { width:min(1180px,100%); max-height:92vh; overflow:auto; background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.28); }
+.empfat-top { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding:16px 18px; border-bottom:1px solid var(--color-border); position:sticky; top:0; background:#fff; z-index:3; }
+.empfat-top h2 { margin:0; font-size:18px; }
+.empfat-top p { margin:4px 0 0; color:var(--color-text-muted); font-size:12px; }
+.empfat-body { padding:16px 18px 20px; }
+.empfat-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+.empfat-toolbar-left { display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap; }
+.empfat-field { display:flex; flex-direction:column; gap:5px; min-width:150px; }
+.empfat-field label { font-size:11.5px; font-weight:700; color:var(--color-text-muted); }
+.empfat-field input,.empfat-field textarea { border:1px solid var(--color-border); border-radius:8px; padding:9px 10px; font-size:13px; background:#fff; color:var(--color-text); }
+.empfat-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px; }
+.empfat-summary-card { border:1px solid #eadfce; border-left:4px solid #d97706; background:#fffdf9; border-radius:10px; padding:12px 14px; }
+.empfat-summary-card span { display:block; font-size:11px; color:var(--color-text-muted); margin-bottom:4px; }
+.empfat-summary-card strong { font-size:19px; color:var(--color-text); }
+.empfat-status { margin-bottom:12px; padding:9px 11px; border-radius:8px; background:#f8fafc; color:var(--color-text-muted); font-size:12px; }
+.empfat-status.ok { background:#ecfdf3; color:#176544; }
+.empfat-status.warn { background:#fff7ed; color:#9a5a0a; }
+.empfat-form-box { display:none; margin-bottom:14px; border:1px solid #eadfce; background:#fffdf9; border-radius:12px; padding:14px; }
+.empfat-form-box.show { display:block; }
+.empfat-form-title { font-size:14px; font-weight:800; margin:0 0 12px; color:var(--color-text); }
+.empfat-form-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; }
+.empfat-form-grid .wide { grid-column:span 2; }
+.empfat-form-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+.empfat-table-wrap { overflow-x:auto; border:1px solid var(--color-border); border-radius:10px; }
+.empfat-table { width:100%; min-width:1000px; border-collapse:collapse; }
+.empfat-table th { position:static; background:#f8f4ee; padding:9px 10px; font-size:11.5px; white-space:nowrap; }
+.empfat-table td { padding:9px 10px; font-size:12.5px; max-width:240px; }
+.empfat-money { text-align:right; font-weight:800; white-space:nowrap; }
+.empfat-date { white-space:nowrap; }
+.empfat-actions { display:flex; justify-content:flex-end; gap:6px; }
+.empfat-actions button { border:1px solid var(--color-border); background:#fff; border-radius:7px; padding:6px 8px; cursor:pointer; }
+.empfat-actions button.danger { color:#b42332; border-color:#f2c7cb; }
+.empfat-empty { text-align:center; color:var(--color-text-muted); padding:22px!important; }
+@media(max-width:900px){ .empfat-form-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.empfat-summary{grid-template-columns:1fr 1fr 1fr;} }
+@media(max-width:600px){ .empfat-overlay{padding:0;align-items:stretch}.empfat-modal{max-height:none;border-radius:0}.empfat-summary{grid-template-columns:1fr}.empfat-form-grid{grid-template-columns:1fr}.empfat-form-grid .wide{grid-column:auto}.empfat-toolbar,.empfat-toolbar-left{align-items:stretch}.empfat-field{width:100%}.empfat-toolbar .btn{width:100%;} }
+
 /* ===================== ITENS DA OM (adição isolada) ===================== */
 .om-cell { display:flex; align-items:center; gap:6px; flex-wrap:wrap; min-width:0; }
 .om-items-quick { border:1px solid #b9d7ca; background:#f1faf6; color:#176544; border-radius:999px; padding:3px 7px; font-size:10.5px; font-weight:700; cursor:pointer; white-space:nowrap; line-height:1.2; }
@@ -468,6 +510,9 @@ tr.row-semdata { background: #fafbfc; }
     </div>
     <div class="card card-custo" title="Custo total planejado das OMs atualmente exibidas">
       <span class="card-value" id="kpiCusto">R$ 0</span><span class="card-label">Custo Total Planejado</span><span class="kpi-hint">Atualiza com os filtros</span>
+    </div>
+    <div class="card card-empenhado-fat" id="cardEmpenhadoFaturar" tabindex="0" role="button" title="Clique para ver os pedidos autorizados para faturamento no mês">
+      <span class="card-value" id="kpiEmpenhadoFaturar">R$ 0</span><span class="card-label">Empenhado p/ faturar</span><span class="kpi-hint" id="kpiEmpenhadoFaturarHint">Carregando pedidos…</span>
     </div>
     <div class="card card-pct" title="Percentual de OMs atendidas dentro do conjunto atualmente exibido">
       <span class="card-value" id="kpiPct">0%</span><span class="card-label">% Atendimento</span><span class="kpi-hint">Atualiza com os filtros</span>
@@ -677,6 +722,57 @@ tr.row-semdata { background: #fafbfc; }
   </div>
 </div>
 
+
+
+<!-- ===================== EMPENHADO PARA FATURAR (somente painel principal) ===================== -->
+<div id="empenhadoFatOverlay" class="empfat-overlay" aria-hidden="true">
+  <div class="empfat-modal">
+    <div class="empfat-top">
+      <div><h2>Empenhado — Autorizações para faturamento</h2><p>Controle separado dos pedidos que foram autorizados para faturar no mês. Não faz parte do painel de Custos.</p></div>
+      <button type="button" class="btn-close" id="btnEmpenhadoFatFechar">×</button>
+    </div>
+    <div class="empfat-body">
+      <div class="empfat-toolbar">
+        <div class="empfat-toolbar-left">
+          <div class="empfat-field"><label>Mês de faturamento</label><input type="month" id="empenhadoFatMesFiltro"></div>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnEmpenhadoFatNovo">+ Adicionar Pedido</button>
+      </div>
+      <div class="empfat-summary">
+        <div class="empfat-summary-card"><span>Total autorizado para faturar</span><strong id="empenhadoFatTotal">R$ 0</strong></div>
+        <div class="empfat-summary-card"><span>Pedidos autorizados</span><strong id="empenhadoFatQtd">0</strong></div>
+        <div class="empfat-summary-card"><span>Próximo faturamento</span><strong id="empenhadoFatProximaData">—</strong></div>
+      </div>
+      <div id="empenhadoFatStatus" class="empfat-status">Carregando pedidos autorizados…</div>
+      <div id="empenhadoFatFormBox" class="empfat-form-box">
+        <h3 class="empfat-form-title" id="empenhadoFatFormTitulo">Adicionar pedido autorizado</h3>
+        <form id="empenhadoFatForm">
+          <div class="empfat-form-grid">
+            <div class="empfat-field"><label>Pedido *</label><input id="empenhadoFatPedido" required placeholder="Ex.: 4500341886"></div>
+            <div class="empfat-field"><label>Valor autorizado (R$) *</label><input id="empenhadoFatValor" type="number" min="0.01" step="0.01" required></div>
+            <div class="empfat-field"><label>Data de faturamento *</label><input id="empenhadoFatData" type="date" required></div>
+            <div class="empfat-field"><label>Equipamento</label><input id="empenhadoFatEquipamento" placeholder="Ex.: 7040EM"></div>
+            <div class="empfat-field"><label>OM</label><input id="empenhadoFatOrdem" placeholder="Ex.: 92075826"></div>
+            <div class="empfat-field"><label>Fornecedor</label><input id="empenhadoFatFornecedor" list="empenhadoFatFornecedores"></div>
+            <div class="empfat-field wide"><label>Descrição</label><input id="empenhadoFatDescricao" placeholder="Material / serviço autorizado"></div>
+            <div class="empfat-field wide"><label>Observação</label><textarea id="empenhadoFatObservacao" rows="2" placeholder="Informações adicionais"></textarea></div>
+          </div>
+          <datalist id="empenhadoFatFornecedores"></datalist>
+          <div class="empfat-form-actions">
+            <button type="button" class="btn btn-ghost" id="btnEmpenhadoFatCancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Pedido</button>
+          </div>
+        </form>
+      </div>
+      <div class="empfat-table-wrap">
+        <table class="empfat-table">
+          <thead><tr><th>Pedido</th><th style="text-align:right">Valor</th><th>Data de faturamento</th><th>Equipamento</th><th>OM</th><th>Fornecedor</th><th>Descrição</th><th style="text-align:right">Ações</th></tr></thead>
+          <tbody id="empenhadoFatBody"><tr><td colspan="8" class="empfat-empty">Carregando…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ===================== MÓDULO CUSTOS (adição isolada) ===================== -->
 <div id="custosOverlay" class="costos-overlay" aria-hidden="true">
@@ -2967,6 +3063,110 @@ function custosImportAplicarLocal(origem,rows,competencia){ custosMensais=custos
 async function custosConfirmarImportacao(){ if(custosImportBusy||!custosImportAnalise)return; const a=custosImportAnalise; const ord=["BUDGET","GR55","ME2K","ME5A"].filter(x=>a.detectadas.has(x)); if(!ord.length){custosImportMsg("Nenhuma fonte financeira foi reconhecida para importação.","warn");return;} custosImportBusy=true; const btn=document.getElementById("custosImportConfirmar"), cancelar=document.getElementById("custosImportCancelar"), analisar=document.getElementById("custosImportAnalisar"); btn.disabled=true;cancelar.disabled=true;analisar.disabled=true; let total=ord.reduce((n,o)=>n+a.fontes[o].length,0), feito=0; try{ for(const origem of ord){ const snapshot=["ME2K","ME5A"].includes(origem)?a.competencia:""; custosImportMsg(`Atualizando ${origem}…`,"warn"); if(custosOnline){ await custosImportApagarOnline(origem,snapshot); await custosImportInserirOnline(a.fontes[origem],(n,t)=>{const base=feito,totalFonte=t||1;custosImportProgress(total?((base+n)/total)*100:100);}); } custosImportAplicarLocal(origem,a.fontes[origem],snapshot); feito+=a.fontes[origem].length; custosImportProgress(total?(feito/total)*100:100); } custosAtualizarFiltros(); const [y,m]=a.competencia.slice(0,7).split("-"); if(document.getElementById("custosAno"))document.getElementById("custosAno").value=y; if(document.getElementById("custosMes"))document.getElementById("custosMes").value=String(Number(m)); if(document.getElementById("custosArea"))document.getElementById("custosArea").value=""; if(document.getElementById("custosCategoria"))document.getElementById("custosCategoria").value=""; custosRender(); const c=custosCalcular(Number(y),Number(m),"",""); custosImportMsg(`Importação concluída. Painel atualizado para ${String(m).padStart(2,"0")}/${y}: Budget ${custosMoney(c.budget)} · Realizado ${custosMoney(c.realizado)} · c/ pedido ${custosMoney(c.pedido)} · s/ pedido ${custosMoney(c.semPedido)}.`,"ok"); custosSetStatus(custosOnline?"🟢 Planilhas importadas e sincronizadas com o Supabase.":"🟠 Planilhas importadas localmente; Supabase não está conectado.",custosOnline?"ok":"warn"); custosImportProgress(100); setTimeout(()=>{if(!custosImportBusy)custosFecharImportacao();},1800); }catch(e){custosImportMsg("A importação foi interrompida: "+e.message+". Você pode tentar novamente; a carga da mesma origem será substituída, sem duplicar.","err"); custosImportProgress(0); } finally{custosImportBusy=false;btn.disabled=false;cancelar.disabled=false;analisar.disabled=false;} }
 
 function custosExportarExcel(){ if(typeof XLSX==="undefined"){alert("Biblioteca de exportação não carregada.");return;} const s=custosSelecionados(),c=custosCalcular(s.ano,s.mes,s.area,s.categoria); const wb=XLSX.utils.book_new(); const resumo=[{"Indicador":"Budget","Valor":c.budget},{"Indicador":"Realizado","Valor":c.realizado},{"Indicador":"Empenhado com pedido","Valor":c.pedido},{"Indicador":"Empenhado sem pedido","Valor":c.semPedido},{"Indicador":"Custos permanentes","Valor":c.permanentes},{"Indicador":"Exposição total","Valor":c.exposicao},{"Indicador":"Saldo projetado","Valor":c.saldo},{"Indicador":"% Budget comprometido","Valor":c.pct/100}]; const wsR=XLSX.utils.json_to_sheet(resumo); XLSX.utils.book_append_sheet(wb,wsR,"Resumo"); const det=s.lanc.map(r=>({"Tipo":custosTipoLabel(r.tipo),"Competência":String(r.competencia).slice(0,7),"Documento":r.documento,"OM":r.ordem,"Equipamento":r.equipamento,"Fornecedor":r.fornecedor,"Categoria":r.categoria,"Centro de Custo":r.centroCusto,"Descrição":r.descricao,"Valor":r.valor,"Observação":r.observacao})); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(det),"Lançamentos"); const per=custosPermanentes.map(r=>({"Descrição":r.descricao,"Fornecedor":r.fornecedor,"Categoria":r.categoria,"Centro de Custo":r.centroCusto,"Valor Mensal":r.valorMensal,"Início":r.dataInicio,"Término":r.dataFim,"Ativo":r.ativo?"Sim":"Não","Observação":r.observacao})); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(per),"Custos Permanentes"); XLSX.writeFile(wb,`CUSTOS_FOLLOWUP_${s.ano}_${String(s.mes).padStart(2,"0")}.xlsx`); }
+
+
+// ===================== EMPENHADO PARA FATURAR (somente painel principal) =====================
+const EMPENHADO_FAT_TABLE = "followup_empenhado_faturamento";
+const EMPENHADO_FAT_STORAGE = "followup_empenhado_faturamento_v1";
+let empenhadoFatPedidos = [];
+let empenhadoFatOnline = true;
+let empenhadoFatEditId = null;
+
+function empenhadoFatNormalizar(r){
+  return {
+    id:String(r?.id||uid()), pedido:String(r?.pedido||""), valor:Number(r?.valor)||0,
+    data_faturamento:r?.data_faturamento||r?.dataFaturamento||null, equipamento:String(r?.equipamento||""),
+    ordem:String(r?.ordem||""), fornecedor:String(r?.fornecedor||""), descricao:String(r?.descricao||""), observacao:String(r?.observacao||"")
+  };
+}
+function empenhadoFatSalvarLocal(){ safeSetItem(EMPENHADO_FAT_STORAGE,JSON.stringify(empenhadoFatPedidos)); }
+function empenhadoFatCarregarLocal(){
+  try{ const raw=safeGetItem(EMPENHADO_FAT_STORAGE); const arr=raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr.map(empenhadoFatNormalizar):[]; }catch(e){ return []; }
+}
+function empenhadoFatMesAtual(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; }
+function empenhadoFatMesSelecionado(){ return document.getElementById("empenhadoFatMesFiltro")?.value || empenhadoFatMesAtual(); }
+function empenhadoFatDoMes(mes){ return empenhadoFatPedidos.filter(r=>r.data_faturamento && String(r.data_faturamento).slice(0,7)===mes); }
+function empenhadoFatSetStatus(txt,tipo){ const el=document.getElementById("empenhadoFatStatus"); if(!el)return; el.textContent=txt||""; el.className="empfat-status"+(tipo?" "+tipo:""); }
+function empenhadoFatFornecedores(){
+  const vals=[...registros.map(r=>r.fornecedor),...empenhadoFatPedidos.map(r=>r.fornecedor)].map(x=>String(x||"").trim()).filter(Boolean);
+  return [...new Set(vals)].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+}
+function empenhadoFatAtualizarDatalist(){ const dl=document.getElementById("empenhadoFatFornecedores"); if(dl)dl.innerHTML=empenhadoFatFornecedores().map(x=>`<option value="${escapeHtml(x)}"></option>`).join(""); }
+function empenhadoFatAtualizarCard(){
+  const mes=empenhadoFatMesAtual(), arr=empenhadoFatDoMes(mes), total=arr.reduce((s,r)=>s+(Number(r.valor)||0),0);
+  const v=document.getElementById("kpiEmpenhadoFaturar"), h=document.getElementById("kpiEmpenhadoFaturarHint");
+  if(v)v.textContent=formatCurrency(total);
+  if(h){ const [a,m]=mes.split("-"); const nome=new Intl.DateTimeFormat("pt-BR",{month:"short"}).format(new Date(Number(a),Number(m)-1,1)).replace(".",""); h.textContent=`${nome.charAt(0).toUpperCase()+nome.slice(1)}/${a} · ${arr.length} pedido${arr.length===1?"":"s"} · clique para detalhar`; }
+}
+function empenhadoFatRender(){
+  const mes=empenhadoFatMesSelecionado();
+  const arr=empenhadoFatDoMes(mes).slice().sort((a,b)=>String(a.data_faturamento||"").localeCompare(String(b.data_faturamento||"")) || (Number(b.valor)||0)-(Number(a.valor)||0));
+  const total=arr.reduce((s,r)=>s+(Number(r.valor)||0),0), hoje=new Date(); hoje.setHours(0,0,0,0);
+  const futuras=arr.map(r=>r.data_faturamento).filter(Boolean).map(d=>({d,x:parseISO(d)})).filter(o=>o.x&&o.x>=hoje).sort((a,b)=>a.x-b.x);
+  const totalEl=document.getElementById("empenhadoFatTotal"), qtdEl=document.getElementById("empenhadoFatQtd"), proxEl=document.getElementById("empenhadoFatProximaData");
+  if(totalEl)totalEl.textContent=formatCurrency(total); if(qtdEl)qtdEl.textContent=String(arr.length); if(proxEl)proxEl.textContent=futuras.length?formatDateBR(futuras[0].d):"—";
+  const body=document.getElementById("empenhadoFatBody"); if(body){
+    if(!arr.length) body.innerHTML='<tr><td colspan="8" class="empfat-empty">Nenhum pedido autorizado para faturamento neste mês.</td></tr>';
+    else body.innerHTML=arr.map(r=>`<tr><td><strong>${escapeHtml(r.pedido||"—")}</strong></td><td class="empfat-money">${formatCurrency(r.valor)}</td><td class="empfat-date">${formatDateBR(r.data_faturamento)||"—"}</td><td>${escapeHtml(r.equipamento||"—")}</td><td>${escapeHtml(r.ordem||"—")}</td><td>${escapeHtml(r.fornecedor||"—")}</td><td>${escapeHtml(r.descricao||"—")}</td><td><div class="empfat-actions"><button type="button" data-empfat-edit="${r.id}" title="Editar">✎</button><button type="button" class="danger" data-empfat-del="${r.id}" title="Excluir">🗑</button></div></td></tr>`).join("");
+  }
+  empenhadoFatAtualizarDatalist();
+  empenhadoFatSetStatus(empenhadoFatOnline?"🟢 Autorizações sincronizadas em base própria no Supabase.":"🟠 A tabela de autorizações para faturamento ainda não está disponível no Supabase. Execute o SQL fornecido.",empenhadoFatOnline?"ok":"warn");
+}
+async function empenhadoFatCarregar(silencioso=true){
+  try{
+    const rows=await supabaseRequest(EMPENHADO_FAT_TABLE+"?select=*&order=data_faturamento.asc,pedido.asc");
+    if(!Array.isArray(rows))throw new Error("resposta inválida");
+    empenhadoFatPedidos=rows.map(empenhadoFatNormalizar); empenhadoFatOnline=true; empenhadoFatSalvarLocal();
+  }catch(e){
+    empenhadoFatPedidos=empenhadoFatCarregarLocal(); empenhadoFatOnline=false;
+    if(!silencioso) empenhadoFatSetStatus("A tabela followup_empenhado_faturamento ainda não está disponível no Supabase. Execute o SQL fornecido para ativar o controle compartilhado.","warn");
+  }
+  empenhadoFatAtualizarCard();
+  if(document.getElementById("empenhadoFatOverlay")?.style.display==="flex") empenhadoFatRender();
+}
+async function empenhadoFatAbrir(){
+  const ov=document.getElementById("empenhadoFatOverlay"); if(!ov)return; ov.style.display="flex"; ov.setAttribute("aria-hidden","false"); document.body.style.overflow="hidden";
+  const m=document.getElementById("empenhadoFatMesFiltro"); if(m&&!m.value)m.value=empenhadoFatMesAtual();
+  empenhadoFatSetStatus("Carregando pedidos autorizados…",""); await empenhadoFatCarregar(false); empenhadoFatRender();
+}
+function empenhadoFatFechar(){ const ov=document.getElementById("empenhadoFatOverlay"); if(!ov)return; ov.style.display="none"; ov.setAttribute("aria-hidden","true"); document.body.style.overflow=""; empenhadoFatCancelarForm(); }
+function empenhadoFatAbrirForm(id){
+  if(!empenhadoFatOnline){ alert("Primeiro execute o SQL da tabela followup_empenhado_faturamento no Supabase para cadastrar pedidos compartilhados."); return; }
+  empenhadoFatEditId=id||null; const r=id?empenhadoFatPedidos.find(x=>x.id===id):null, box=document.getElementById("empenhadoFatFormBox"); if(!box)return;
+  document.getElementById("empenhadoFatFormTitulo").textContent=r?"Editar pedido autorizado":"Adicionar pedido autorizado";
+  const mes=empenhadoFatMesSelecionado();
+  document.getElementById("empenhadoFatPedido").value=r?.pedido||""; document.getElementById("empenhadoFatValor").value=r?.valor??""; document.getElementById("empenhadoFatData").value=r?.data_faturamento||(mes+"-01");
+  document.getElementById("empenhadoFatEquipamento").value=r?.equipamento||""; document.getElementById("empenhadoFatOrdem").value=r?.ordem||""; document.getElementById("empenhadoFatFornecedor").value=r?.fornecedor||""; document.getElementById("empenhadoFatDescricao").value=r?.descricao||""; document.getElementById("empenhadoFatObservacao").value=r?.observacao||"";
+  box.classList.add("show"); document.getElementById("empenhadoFatPedido")?.focus();
+}
+function empenhadoFatCancelarForm(){ empenhadoFatEditId=null; document.getElementById("empenhadoFatFormBox")?.classList.remove("show"); document.getElementById("empenhadoFatForm")?.reset(); }
+async function empenhadoFatSalvar(e){
+  e.preventDefault(); if(!empenhadoFatOnline){alert("A tabela de autorizações ainda não está ativa no Supabase.");return;}
+  const pedido=document.getElementById("empenhadoFatPedido").value.trim(), valor=Number(document.getElementById("empenhadoFatValor").value)||0, data=document.getElementById("empenhadoFatData").value;
+  if(!pedido||valor<=0||!data){alert("Informe Pedido, Valor e Data de faturamento.");return;}
+  const r={id:empenhadoFatEditId||uid(),pedido,valor,data_faturamento:data,equipamento:document.getElementById("empenhadoFatEquipamento").value.trim(),ordem:document.getElementById("empenhadoFatOrdem").value.trim(),fornecedor:document.getElementById("empenhadoFatFornecedor").value.trim(),descricao:document.getElementById("empenhadoFatDescricao").value.trim(),observacao:document.getElementById("empenhadoFatObservacao").value.trim()};
+  try{
+    const existe=!!empenhadoFatEditId, path=EMPENHADO_FAT_TABLE+(existe?"?id=eq."+encodeURIComponent(r.id)+"&select=*":"?select=*");
+    const rows=await supabaseRequest(path,{method:existe?"PATCH":"POST",headers:supabaseHeaders({"Prefer":"return=representation"}),body:JSON.stringify(r)});
+    if(!Array.isArray(rows)||!rows.length)throw new Error("o Supabase não confirmou a gravação");
+    const salvo=empenhadoFatNormalizar(rows[0]), idx=empenhadoFatPedidos.findIndex(x=>x.id===salvo.id); if(idx>=0)empenhadoFatPedidos[idx]=salvo; else empenhadoFatPedidos.push(salvo);
+    empenhadoFatSalvarLocal(); empenhadoFatCancelarForm(); empenhadoFatAtualizarCard(); empenhadoFatRender();
+  }catch(err){ alert("Não foi possível salvar o pedido autorizado no Supabase.\n\n"+err.message); }
+}
+async function empenhadoFatExcluir(id){
+  const r=empenhadoFatPedidos.find(x=>x.id===id); if(!r)return; if(!confirm(`Excluir a autorização do pedido ${r.pedido||"selecionado"} no valor de ${formatCurrency(r.valor)}?`))return;
+  try{ await supabaseRequest(EMPENHADO_FAT_TABLE+"?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:supabaseHeaders({"Prefer":"return=minimal"})}); empenhadoFatPedidos=empenhadoFatPedidos.filter(x=>x.id!==id); empenhadoFatSalvarLocal(); empenhadoFatAtualizarCard(); empenhadoFatRender(); }
+  catch(err){ alert("Não foi possível excluir o pedido autorizado no Supabase.\n\n"+err.message); }
+}
+function empenhadoFatInit(){
+  const card=document.getElementById("cardEmpenhadoFaturar"); card?.addEventListener("click",empenhadoFatAbrir); card?.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();empenhadoFatAbrir();}});
+  document.getElementById("btnEmpenhadoFatFechar")?.addEventListener("click",empenhadoFatFechar); document.getElementById("empenhadoFatOverlay")?.addEventListener("click",e=>{if(e.target.id==="empenhadoFatOverlay")empenhadoFatFechar();}); document.getElementById("empenhadoFatMesFiltro")?.addEventListener("change",empenhadoFatRender);
+  document.getElementById("btnEmpenhadoFatNovo")?.addEventListener("click",()=>solicitarSenha(()=>empenhadoFatAbrirForm())); document.getElementById("btnEmpenhadoFatCancelar")?.addEventListener("click",empenhadoFatCancelarForm); document.getElementById("empenhadoFatForm")?.addEventListener("submit",empenhadoFatSalvar);
+  document.getElementById("empenhadoFatBody")?.addEventListener("click",e=>{const eb=e.target.closest("[data-empfat-edit]"), db=e.target.closest("[data-empfat-del]"); if(eb)solicitarSenha(()=>empenhadoFatAbrirForm(eb.dataset.empfatEdit)); if(db)solicitarSenha(()=>empenhadoFatExcluir(db.dataset.empfatDel));});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("empenhadoFatOverlay")?.style.display==="flex")empenhadoFatFechar();});
+  empenhadoFatCarregar(true);
+}
+document.addEventListener("DOMContentLoaded",empenhadoFatInit);
 
 function custosInit(){
   document.getElementById("btnCustos")?.addEventListener("click",custosAbrir); document.getElementById("custosFechar")?.addEventListener("click",custosFechar); document.getElementById("custosExportar")?.addEventListener("click",custosExportarExcel);
