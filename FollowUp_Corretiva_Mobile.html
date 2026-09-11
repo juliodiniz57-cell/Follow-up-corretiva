@@ -72,7 +72,7 @@ body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; background
 .card-vencida { border-left-color: var(--color-vencida-text); }
 .card-semdata { border-left-color: var(--color-semdata-text); }
 .card-custo { border-left-color: var(--color-accent); overflow:hidden; }
-.card-custo .card-value { display:block; width:100%; white-space:nowrap; line-height:1.08; letter-spacing:-0.35px; font-size:clamp(14px,1.25vw,22px); }
+.card-custo .card-value { display:block; width:100%; max-width:100%; white-space:nowrap; line-height:1.05; letter-spacing:-0.55px; font-size:22px; overflow:visible; }
 .card-pct { border-left-color: #7c3aed; }
 .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; background: var(--color-surface); padding: 14px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
 .filters select, .filters .input-search { padding: 9px 12px; border: 1px solid var(--color-border); border-radius: 8px; font-size: 13px; background: #fff; color: var(--color-text); }
@@ -978,14 +978,20 @@ function formatDateBR(iso) { if(!iso) return ""; const [y,m,d]=iso.split("-"); r
 function ajustarCardCustoPlanejado() {
   const el = document.getElementById("kpiCusto");
   if (!el) return;
-  const txt = (el.textContent || "").trim();
-  let size = 22;
-  if (txt.length >= 14) size = 20;
-  if (txt.length >= 16) size = 18;
-  if (txt.length >= 18) size = 16;
-  if (txt.length >= 20) size = 14;
-  el.style.fontSize = size + "px";
+  const parent = el.closest('.card-custo') || el.parentElement;
+  if (!parent) return;
   el.style.whiteSpace = "nowrap";
+  el.style.display = "block";
+  el.style.maxWidth = "100%";
+  el.style.letterSpacing = "-0.55px";
+  let size = 22;
+  const minSize = 10;
+  el.style.fontSize = size + "px";
+  const available = Math.max(60, parent.clientWidth - 28);
+  while (size > minSize && el.scrollWidth > available) {
+    size -= 1;
+    el.style.fontSize = size + "px";
+  }
 }
 function uid() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") return window.crypto.randomUUID();
@@ -1489,6 +1495,7 @@ function atualizarDashboard(lista) {
   document.getElementById("kpiSemData").textContent=sd;
   document.getElementById("kpiCusto").textContent=formatCurrency(ct);
   ajustarCardCustoPlanejado();
+  setTimeout(ajustarCardCustoPlanejado, 0);
   document.getElementById("kpiPct").textContent=lista.length?Math.round((at/lista.length)*100)+"%":"0%";
 }
 
@@ -1714,6 +1721,7 @@ function confirmarExclusao() {
     registros=registros.filter(x=>x.id!==deleteId);
     omItensExcluirDaOm(idExcluido);
     refresh();
+  setTimeout(ajustarCardCustoPlanejado, 80);
     if(syncId) supabaseExcluirId(idExcluido).then(()=>definirStatusSync("ok","🟢 Exclusão sincronizada com Supabase")).catch(e=>definirStatusSync("err","🔴 Falha ao excluir no Supabase ("+e.message+")"));
   }
   fecharConfirmExclusao();
@@ -3333,6 +3341,7 @@ document.getElementById("fSearch").addEventListener("input",renderTabela);
   document.getElementById("btnPainelGerencial").addEventListener("click",gerarPainelGerencial);
   document.getElementById("btnDashboard").addEventListener("click",()=>gerarDashboardModerno());
   document.addEventListener("keydown",e=>{if(e.key==="Escape"){omItensFechar();fecharModal();fecharConfirmExclusao();fecharModalSenha();document.getElementById("syncOverlay").style.display="none";}});
+  window.addEventListener("resize", ajustarCardCustoPlanejado);
 });
 </script>
 </body>
