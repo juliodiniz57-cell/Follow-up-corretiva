@@ -178,6 +178,9 @@ tr.row-semdata { background: #fafbfc; }
 .btn-custos { background:#12805c; color:#fff; border-color:#12805c; }
 .btn-custos:hover { background:#0d6b4c; border-color:#0d6b4c; transform:translateY(-1px); }
 .costos-overlay { position:fixed; inset:0; z-index:240; display:none; flex-direction:column; background:#f3f7f5; color:#17312a; overflow:auto; }
+/* Correção isolada: mantém o modal de senha acima da aba CUSTOS */
+#passwordOverlay { z-index: 400 !important; }
+
 .costos-shell { min-height:100%; display:flex; flex-direction:column; }
 .costos-top { position:sticky; top:0; z-index:5; background:linear-gradient(135deg,#0f5139,#0b6f4d); color:#fff; box-shadow:0 5px 18px rgba(15,81,57,.18); }
 .costos-top-inner { max-width:1540px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
@@ -627,14 +630,14 @@ tr.row-semdata { background: #fafbfc; }
       <div class="costos-import-box">
         <label class="costos-import-drop">
           <input id="custosImportFiles" type="file" accept=".xlsx,.xls" multiple>
-          <div><strong>Selecione as planilhas</strong><span>Budget, GR55, KOB1, ME2K, ME5A e IW38 — pode selecionar todas de uma vez.</span></div>
+          <div><strong>Selecione as planilhas</strong><span>Budget, GR55, KOB1, ME2K, ME5A e IW38 — pode selecionar todas de uma vez. A análise começa automaticamente.</span></div>
         </label>
         <div class="costos-import-meta">
           <div class="costos-field"><label>Competência dos snapshots ME2K / ME5A</label><input id="custosImportCompetencia" type="month"></div>
           <div class="costos-import-help"><strong>Como funciona:</strong> Budget e GR55 usam a competência contida nas próprias planilhas. ME2K e ME5A representam a posição atual de compromissos e serão lançados na competência escolhida ao lado. KOB1 e IW38 são usados para enriquecer OM, equipamento, centro de custo e área, sem somar o realizado novamente.</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-          <button type="button" class="btn btn-secondary" id="custosImportAnalisar">🔎 Analisar arquivos</button>
+          <button type="button" class="btn btn-secondary" id="custosImportAnalisar">🔄 Analisar novamente</button>
           <span id="custosImportFileCount" style="align-self:center;font-size:11.5px;color:#71847c;">Nenhum arquivo selecionado.</span>
         </div>
       </div>
@@ -647,7 +650,7 @@ tr.row-semdata { background: #fafbfc; }
   </div>
 </div>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
 // ===================== DADOS INICIAIS (98 registros da planilha) =====================
 const SEED_DATA = [];
@@ -2606,13 +2609,13 @@ function custosImportDetectar(wb){
   if(has("Valor/moeda objeto")&&has("Ordem")&&has("Equipamento")&&has("Documento de compras"))return "KOB1";
   if(has("a ser fornecido (valor")&&has("Documento de compras")&&has("Valor líquido pedido"))return "ME2K";
   if(has("Requisição de compra")&&has("Valor total")&&has("Pedido")&&has("Qtd.solicitada"))return "ME5A";
-  if(has("Custos totais plan.")&&has("Custos tot.reais")&&has("Local de instalação"))return "IW38";
+  if((has("Nota")&&has("Ordem")&&has("Equipamento")&&has("Texto breve")&&has("Status do sistema")) || (has("Custos totais plan.")&&has("Custos tot.reais")&&has("Local de instalação")))return "IW38";
   return "DESCONHECIDO";
 }
 function custosImportLerArquivo(file){ return new Promise((resolve,reject)=>{ const rd=new FileReader(); rd.onload=()=>{try{ const wb=XLSX.read(rd.result,{type:"array",cellDates:false}); resolve({file,wb,tipo:custosImportDetectar(wb)});}catch(e){reject(new Error(file.name+": "+e.message));}}; rd.onerror=()=>reject(new Error("Falha ao ler "+file.name)); rd.readAsArrayBuffer(file); }); }
 function custosImportContexto(lidos){
   const ctx={iwOrdem:new Map(),iwEquip:new Map(),centroCont:new Map(),centroArea:new Map(),kobExact:new Map(),kobOrdem:new Map()};
-  lidos.filter(x=>x.tipo==="IW38").forEach(x=>{x.wb.SheetNames.forEach(sn=>custosImportSheetRows(x.wb,sn).forEach(r=>{ const ordem=String(custosImportGet(r,"Ordem")||"").trim(), equip=String(custosImportGet(r,"Equipamento")||"").trim(), cc=String(custosImportGet(r,"Centro custo")||"").trim(), local=String(custosImportGet(r,"Local de instalação")||"").trim(), area=custosImportAreaLocal(local); const info={ordem,equipamento:equip,centro:cc,area,descricao:String(custosImportGet(r,"Texto breve")||"").trim()}; if(ordem)ctx.iwOrdem.set(ordem,info); if(equip){ctx.iwEquip.set(equip,area);} if(cc){if(!ctx.centroCont.has(cc))ctx.centroCont.set(cc,{MINA:0,UBM:0,METALURGIA:0});ctx.centroCont.get(cc)[area]=(ctx.centroCont.get(cc)[area]||0)+1;} }));});
+  lidos.filter(x=>x.tipo==="IW38").forEach(x=>{x.wb.SheetNames.forEach(sn=>custosImportSheetRows(x.wb,sn).forEach(r=>{ const ordem=String(custosImportGet(r,"Ordem")||"").trim(), equip=String(custosImportGet(r,"Equipamento")||"").trim(), cc=String(custosImportGet(r,"Centro custo","Centro de custo")||"").trim(), local=String(custosImportGet(r,"Local de instalação","CenTrabalho princ.","Denominação do loc.instalação")||"").trim(), area=custosImportAreaLocal(local); const info={ordem,equipamento:equip,centro:cc,area,descricao:String(custosImportGet(r,"Texto breve")||"").trim()}; if(ordem)ctx.iwOrdem.set(ordem,info); if(equip){ctx.iwEquip.set(equip,area);} if(cc){if(!ctx.centroCont.has(cc))ctx.centroCont.set(cc,{MINA:0,UBM:0,METALURGIA:0});ctx.centroCont.get(cc)[area]=(ctx.centroCont.get(cc)[area]||0)+1;} }));});
   ctx.centroCont.forEach((v,k)=>{let best="MINA",n=-1;Object.entries(v).forEach(([a,c])=>{if(c>n){best=a;n=c;}});ctx.centroArea.set(k,best);});
   lidos.filter(x=>x.tipo==="KOB1").forEach(x=>{ const sn=x.wb.SheetNames.find(n=>custosImportHeaders(x.wb,n).some(h=>custosImportNorm(h)===custosImportNorm("Valor/moeda objeto"))); if(!sn)return; custosImportSheetRows(x.wb,sn).forEach(r=>{ const ordem=String(custosImportGet(r,"Ordem")||"").trim(), doc=String(custosImportGet(r,"Documento de compras")||"").trim(), equip=String(custosImportGet(r,"Equipamento")||"").trim(), cc=String(custosImportGet(r,"Centro custo")||"").trim(); const iw=ctx.iwOrdem.get(ordem)||{}; const area=iw.area||ctx.iwEquip.get(equip)||ctx.centroArea.get(cc)||"MINA"; const info={ordem,documento:doc,equipamento:equip||iw.equipamento||"",centro:cc||iw.centro||"",area,fornecedor:String(custosImportGet(r,"Fornecedor")||"").trim(),descricao:String(custosImportGet(r,"Texto breve material","Texto do pedido","Denominação de objeto")||"").trim(),categoria:String(custosImportGet(r,"Denom.classe custo")||"").trim()}; if(ordem&&doc)ctx.kobExact.set(ordem+"|"+doc,info); if(ordem&&!ctx.kobOrdem.has(ordem))ctx.kobOrdem.set(ordem,info); });});
   return ctx;
@@ -2637,6 +2640,23 @@ function custosImportProcessar(lidos,competenciaSnapshot){
   return {fontes,detectadas,resumo,competencia:sel,lidos};
 }
 function custosImportRenderResumo(a){ const box=document.getElementById("custosImportSummary"); if(!box)return; const rows=a.resumo.map(r=>`<tr><td>${custosEscape(r.arquivo)}</td><td><span class="costos-import-tag ${r.tipo==="DESCONHECIDO"?'warn':(["KOB1","IW38"].includes(r.tipo)?'info':'')}">${custosEscape(r.tipo)}</span></td><td>${r.qtd?r.qtd.toLocaleString("pt-BR"):"—"}</td><td>${["KOB1","IW38","DESCONHECIDO"].includes(r.tipo)?"—":custosMoney(r.valor)}</td><td>${custosEscape(r.uso)}</td></tr>`).join(""); box.innerHTML=`<table><thead><tr><th>Arquivo</th><th>Identificado como</th><th>Registros</th><th>Valor na competência</th><th>Uso no painel</th></tr></thead><tbody>${rows}</tbody></table>`; box.style.display="block"; const btn=document.getElementById("custosImportConfirmar"); if(btn)btn.disabled=a.detectadas.size===0; }
+async function custosImportSelecionouArquivos(e){
+  const input=e?.target||document.getElementById("custosImportFiles");
+  const files=[...(input?.files||[])];
+  const count=document.getElementById("custosImportFileCount");
+  if(count){
+    count.textContent=files.length ? `${files.length} arquivo(s) selecionado(s): ${files.map(f=>f.name).join(" · ")}` : "Nenhum arquivo selecionado.";
+  }
+  custosImportAnalise=null;
+  const confirmar=document.getElementById("custosImportConfirmar"); if(confirmar) confirmar.disabled=true;
+  const resumo=document.getElementById("custosImportSummary"); if(resumo) resumo.style.display="none";
+  custosImportProgress(0);
+  if(!files.length){ custosImportMsg(""," "); return; }
+  custosImportMsg(`Arquivos selecionados. Iniciando leitura automática de ${files.length} planilha(s)…`,"warn");
+  // Dá tempo para o navegador atualizar a mensagem antes de processar arquivos grandes.
+  await new Promise(r=>setTimeout(r,80));
+  await custosAnalisarImportacao();
+}
 function custosAbrirImportacao(){ const m=document.getElementById("custosImportModal"); if(!m)return; const s=custosSelecionados(); document.getElementById("custosImportCompetencia").value=`${s.ano}-${String(s.mes).padStart(2,"0")}`; document.getElementById("custosImportFiles").value=""; document.getElementById("custosImportFileCount").textContent="Nenhum arquivo selecionado."; document.getElementById("custosImportSummary").style.display="none"; document.getElementById("custosImportConfirmar").disabled=true; custosImportAnalise=null; custosImportMsg("",""); custosImportProgress(0); m.style.display="flex"; m.setAttribute("aria-hidden","false"); }
 function custosFecharImportacao(){ if(custosImportBusy)return; const m=document.getElementById("custosImportModal"); if(m){m.style.display="none";m.setAttribute("aria-hidden","true");} custosImportAnalise=null; }
 async function custosAnalisarImportacao(){ if(custosImportBusy)return; if(typeof XLSX==="undefined"){custosImportMsg("A biblioteca de leitura das planilhas não carregou. Atualize a página com internet e tente novamente.","err");return;} const files=[...(document.getElementById("custosImportFiles")?.files||[])]; if(!files.length){custosImportMsg("Selecione pelo menos uma planilha.","warn");return;} const comp=document.getElementById("custosImportCompetencia")?.value; if(!comp){custosImportMsg("Informe a competência para ME2K e ME5A.","warn");return;} custosImportBusy=true; custosImportMsg("Lendo e analisando as planilhas…","warn"); document.getElementById("custosImportAnalisar").disabled=true; try{ const lidos=[]; for(let i=0;i<files.length;i++){custosImportProgress((i/files.length)*55); lidos.push(await custosImportLerArquivo(files[i]));} custosImportProgress(65); custosImportAnalise=custosImportProcessar(lidos,comp); custosImportRenderResumo(custosImportAnalise); const reconhecidos=custosImportAnalise.resumo.filter(x=>x.tipo!=="DESCONHECIDO").length; custosImportMsg(`Análise concluída: ${reconhecidos} arquivo(s) reconhecido(s). Confira a prévia e clique em “Importar e Atualizar Painel”.`,"ok"); custosImportProgress(100); }catch(e){custosImportAnalise=null;document.getElementById("custosImportConfirmar").disabled=true;custosImportMsg("Não foi possível analisar: "+e.message,"err");custosImportProgress(0);} finally{custosImportBusy=false;document.getElementById("custosImportAnalisar").disabled=false;} }
@@ -2651,7 +2671,7 @@ function custosExportarExcel(){ if(typeof XLSX==="undefined"){alert("Biblioteca 
 function custosInit(){
   document.getElementById("btnCustos")?.addEventListener("click",custosAbrir); document.getElementById("custosFechar")?.addEventListener("click",custosFechar); document.getElementById("custosExportar")?.addEventListener("click",custosExportarExcel);
   document.getElementById("custosImportar")?.addEventListener("click",()=>solicitarSenha(custosAbrirImportacao)); document.getElementById("custosImportFechar")?.addEventListener("click",custosFecharImportacao); document.getElementById("custosImportCancelar")?.addEventListener("click",custosFecharImportacao); document.getElementById("custosImportAnalisar")?.addEventListener("click",custosAnalisarImportacao); document.getElementById("custosImportConfirmar")?.addEventListener("click",custosConfirmarImportacao);
-  document.getElementById("custosImportFiles")?.addEventListener("change",e=>{const n=e.target.files?.length||0;document.getElementById("custosImportFileCount").textContent=n?`${n} arquivo(s) selecionado(s).`:"Nenhum arquivo selecionado.";custosImportAnalise=null;document.getElementById("custosImportConfirmar").disabled=true;document.getElementById("custosImportSummary").style.display="none";custosImportMsg("","");}); document.getElementById("custosImportCompetencia")?.addEventListener("change",()=>{custosImportAnalise=null;document.getElementById("custosImportConfirmar").disabled=true;document.getElementById("custosImportSummary").style.display="none";custosImportMsg("Competência alterada. Clique em Analisar arquivos novamente.","warn");}); document.getElementById("custosImportModal")?.addEventListener("click",e=>{if(e.target.id==="custosImportModal")custosFecharImportacao();});
+  document.getElementById("custosImportFiles")?.addEventListener("change",custosImportSelecionouArquivos); document.getElementById("custosImportCompetencia")?.addEventListener("change",()=>{custosImportAnalise=null;document.getElementById("custosImportConfirmar").disabled=true;document.getElementById("custosImportSummary").style.display="none";custosImportMsg("Competência alterada. Clique em Analisar arquivos novamente.","warn");}); document.getElementById("custosImportModal")?.addEventListener("click",e=>{if(e.target.id==="custosImportModal")custosFecharImportacao();});
   ["custosAno","custosMes","custosArea","custosCategoria"].forEach(id=>document.getElementById(id)?.addEventListener("change",custosRender));
   ["custosNovoLancamento","custosNovoLancamento2"].forEach(id=>document.getElementById(id)?.addEventListener("click",()=>solicitarSenha(()=>custosAbrirLancamento()))); ["custosNovoPermanente","custosNovoPermanente2"].forEach(id=>document.getElementById(id)?.addEventListener("click",()=>solicitarSenha(()=>custosAbrirPermanente())));
   document.getElementById("custosLancamentoFechar")?.addEventListener("click",custosFecharLancamento); document.getElementById("custosLancamentoCancelar")?.addEventListener("click",custosFecharLancamento); document.getElementById("custosLancamentoForm")?.addEventListener("submit",custosSubmitLancamento);
