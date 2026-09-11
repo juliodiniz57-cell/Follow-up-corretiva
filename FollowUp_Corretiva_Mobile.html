@@ -172,6 +172,96 @@ tr.row-semdata { background: #fafbfc; }
   .card-value { font-size: 19px; }
 }
 </style>
+<style id="custos-module-style">
+
+/* ===================== MÓDULO CUSTOS (adição isolada) ===================== */
+.btn-custos { background:#12805c; color:#fff; border-color:#12805c; }
+.btn-custos:hover { background:#0d6b4c; border-color:#0d6b4c; transform:translateY(-1px); }
+.costos-overlay { position:fixed; inset:0; z-index:240; display:none; flex-direction:column; background:#f3f7f5; color:#17312a; overflow:auto; }
+.costos-shell { min-height:100%; display:flex; flex-direction:column; }
+.costos-top { position:sticky; top:0; z-index:5; background:linear-gradient(135deg,#0f5139,#0b6f4d); color:#fff; box-shadow:0 5px 18px rgba(15,81,57,.18); }
+.costos-top-inner { max-width:1540px; margin:0 auto; padding:14px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; }
+.costos-brand { display:flex; align-items:center; gap:14px; min-width:0; }
+.costos-brand img { height:36px; max-width:190px; object-fit:contain; background:#fff; border-radius:8px; padding:4px 8px; }
+.costos-brand-text h2 { margin:0; font-size:20px; font-weight:800; letter-spacing:.01em; }
+.costos-brand-text p { margin:3px 0 0; font-size:12.5px; color:#d8eee5; }
+.costos-top-actions { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+.costos-top-actions .btn { border:1px solid rgba(255,255,255,.35); }
+.costos-main { width:100%; max-width:1540px; margin:0 auto; padding:20px 22px 42px; }
+.costos-sync { display:flex; align-items:center; gap:8px; padding:9px 12px; margin-bottom:12px; border-radius:9px; font-size:12.5px; border:1px solid #d9e6df; background:#fff; color:#597067; }
+.costos-sync.ok { border-color:#b9e4d2; background:#edf9f3; color:#176240; }
+.costos-sync.warn { border-color:#f4d6a2; background:#fff8eb; color:#8b5b0c; }
+.costos-filters { display:grid; grid-template-columns:130px 170px minmax(180px,1fr) minmax(180px,1fr) auto; gap:10px; align-items:end; background:#fff; border:1px solid #dde8e2; border-radius:12px; padding:13px; box-shadow:0 1px 5px rgba(18,80,58,.06); margin-bottom:14px; }
+.costos-field { display:flex; flex-direction:column; gap:5px; }
+.costos-field label { font-size:11.5px; font-weight:800; color:#5c7169; text-transform:uppercase; letter-spacing:.025em; }
+.costos-field input,.costos-field select,.costos-field textarea { width:100%; padding:9px 10px; border:1px solid #d7e1dc; border-radius:8px; background:#fff; color:#20362e; font:inherit; }
+.costos-field input:focus,.costos-field select:focus,.costos-field textarea:focus { outline:none; border-color:#149269; box-shadow:0 0 0 3px rgba(20,146,105,.12); }
+.costos-filter-actions { display:flex; gap:8px; align-items:center; }
+.costos-kpis { display:grid; grid-template-columns:repeat(8,minmax(145px,1fr)); gap:10px; margin-bottom:14px; }
+.costos-kpi { min-height:100px; background:#fff; border:1px solid #dde8e2; border-radius:12px; padding:13px 14px; box-shadow:0 1px 5px rgba(18,80,58,.06); position:relative; overflow:hidden; }
+.costos-kpi::before { content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:#2f966e; }
+.costos-kpi.orange::before { background:#ed7d31; } .costos-kpi.yellow::before { background:#d8a400; } .costos-kpi.blue::before { background:#2c78c4; } .costos-kpi.red::before { background:#c83e4d; }
+.costos-kpi .label { font-size:11.5px; color:#60756c; font-weight:700; line-height:1.25; min-height:29px; }
+.costos-kpi .value { font-size:20px; color:#14362a; font-weight:800; margin-top:5px; white-space:nowrap; }
+.costos-kpi .hint { font-size:10.5px; color:#8a9a94; margin-top:4px; }
+.costos-kpi.negative .value { color:#b42332; }
+.costos-grid-2 { display:grid; grid-template-columns:minmax(0,1.65fr) minmax(330px,.8fr); gap:12px; margin-bottom:12px; }
+.costos-panel { background:#fff; border:1px solid #dde8e2; border-radius:12px; box-shadow:0 1px 5px rgba(18,80,58,.06); overflow:hidden; }
+.costos-panel-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px; border-bottom:1px solid #e4ece8; }
+.costos-panel-head h3 { margin:0; font-size:14px; color:#1a3a2f; }
+.costos-panel-head small { color:#80928a; }
+.costos-panel-body { padding:14px; }
+.costos-year-chart { height:285px; display:flex; align-items:flex-end; gap:8px; padding:18px 4px 5px; border-bottom:1px solid #dfe8e3; background:linear-gradient(to top,rgba(15,111,77,.025),transparent); }
+.costos-month-group { flex:1; min-width:40px; height:100%; display:flex; flex-direction:column; justify-content:flex-end; align-items:stretch; gap:5px; }
+.costos-bars { flex:1; display:flex; align-items:flex-end; justify-content:center; gap:2px; min-height:0; }
+.costos-bar { width:20%; min-width:3px; border-radius:4px 4px 0 0; min-height:1px; transition:opacity .15s; }
+.costos-bar:hover { opacity:.7; }
+.costos-bar.budget { background:#3caf74; } .costos-bar.realizado { background:#0f6c4a; } .costos-bar.empenho { background:#ed7d31; } .costos-bar.permanente { background:#2c78c4; }
+.costos-month { text-align:center; font-size:10.5px; color:#687c74; font-weight:700; }
+.costos-legend { display:flex; flex-wrap:wrap; gap:12px; padding-top:10px; font-size:11px; color:#667a72; }
+.costos-legend span { display:inline-flex; align-items:center; gap:5px; } .costos-legend i { width:9px; height:9px; border-radius:2px; display:inline-block; }
+.costos-donut-wrap { display:flex; flex-direction:column; align-items:center; gap:14px; }
+.costos-donut { width:175px; height:175px; border-radius:50%; position:relative; display:grid; place-items:center; background:#e8eeeb; }
+.costos-donut::after { content:""; width:104px; height:104px; border-radius:50%; background:#fff; position:absolute; }
+.costos-donut-center { position:relative; z-index:1; text-align:center; max-width:88px; }
+.costos-donut-center strong { display:block; font-size:15px; color:#18372d; } .costos-donut-center span { display:block; margin-top:3px; font-size:10px; color:#7d8e87; }
+.costos-comp-list { width:100%; display:grid; gap:8px; }
+.costos-comp-row { display:grid; grid-template-columns:10px 1fr auto; gap:8px; align-items:center; font-size:11.5px; color:#536a61; }
+.costos-comp-dot { width:9px; height:9px; border-radius:50%; }
+.costos-ranking-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
+.costos-rank-list { display:grid; gap:8px; }
+.costos-rank-row { display:grid; grid-template-columns:minmax(120px,1.1fr) minmax(100px,1.8fr) auto; gap:9px; align-items:center; font-size:11.5px; }
+.costos-rank-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#354d44; }
+.costos-rank-track { height:8px; background:#e9efec; border-radius:999px; overflow:hidden; }
+.costos-rank-track i { display:block; height:100%; background:linear-gradient(90deg,#35a36f,#0f704d); border-radius:999px; }
+.costos-rank-value { font-weight:800; color:#385047; white-space:nowrap; }
+.costos-table-wrap { overflow:auto; }
+.costos-table { width:100%; border-collapse:collapse; min-width:1080px; }
+.costos-table th { position:sticky; top:0; z-index:1; background:#edf4f0; color:#314a40; padding:9px 10px; text-align:left; font-size:11px; border-bottom:1px solid #d8e3de; white-space:nowrap; }
+.costos-table td { padding:9px 10px; border-bottom:1px solid #e5ece8; font-size:11.5px; color:#40564e; vertical-align:middle; }
+.costos-table tbody tr:hover { background:#f7faf8; }
+.costos-money { text-align:right; white-space:nowrap; font-weight:700; }
+.costos-status { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:4px 8px; border-radius:999px; background:#eaf8f1; color:#15734d; }
+.costos-status.off { background:#f1f2f2; color:#6f7b77; }
+.costos-actions { display:flex; gap:4px; justify-content:flex-end; }
+.costos-actions button { border:1px solid #d8e1dd; background:#fff; border-radius:6px; padding:4px 7px; cursor:pointer; }
+.costos-actions button:hover { background:#edf5f1; }
+.costos-actions button.danger:hover { color:#b42332; background:#fff0f1; border-color:#f0c8cc; }
+.costos-empty { padding:28px 10px; text-align:center; color:#819189; font-size:12px; }
+.costos-modal-overlay { position:fixed; inset:0; z-index:270; display:none; align-items:center; justify-content:center; padding:18px; background:rgba(10,32,24,.58); }
+.costos-modal { width:100%; max-width:780px; max-height:92vh; overflow:auto; background:#fff; border-radius:14px; box-shadow:0 20px 60px rgba(0,0,0,.24); }
+.costos-modal-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:15px 18px; border-bottom:1px solid #e3ebe7; }
+.costos-modal-head h3 { margin:0; font-size:16px; color:#19382d; }
+.costos-modal-body { padding:16px 18px; }
+.costos-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 14px; }
+.costos-form-grid .wide { grid-column:1/-1; }
+.costos-modal-foot { display:flex; justify-content:flex-end; gap:8px; padding:13px 18px; border-top:1px solid #e3ebe7; }
+.costos-note { font-size:11px; color:#7a8d85; line-height:1.45; margin-top:8px; }
+@media(max-width:1200px){ .costos-kpis{grid-template-columns:repeat(4,1fr);} .costos-grid-2{grid-template-columns:1fr;} }
+@media(max-width:850px){ .costos-top-inner{align-items:flex-start;flex-direction:column;} .costos-top-actions{width:100%;justify-content:flex-start;} .costos-filters{grid-template-columns:1fr 1fr;} .costos-filter-actions{grid-column:1/-1;} .costos-ranking-grid{grid-template-columns:1fr;} .costos-year-chart{height:230px;gap:3px;} .costos-month-group{min-width:26px;} }
+@media(max-width:560px){ .costos-main{padding:12px 10px 30px;} .costos-top-inner{padding:12px 10px;} .costos-brand img{height:31px;max-width:145px;} .costos-brand-text h2{font-size:17px;} .costos-kpis{grid-template-columns:repeat(2,1fr);} .costos-filters{grid-template-columns:1fr;} .costos-filter-actions{grid-column:auto;} .costos-form-grid{grid-template-columns:1fr;} .costos-form-grid .wide{grid-column:auto;} .costos-year-chart{overflow-x:auto;justify-content:flex-start;} .costos-month-group{min-width:48px;} }
+
+</style>
 </head>
 <body>
 
@@ -188,6 +278,7 @@ tr.row-semdata { background: #fafbfc; }
     <button id="btnExport" class="btn btn-secondary">Exportar Excel</button>
     <button id="btnPainelGerencial" class="btn btn-secondary">📊 Painel Gerencial</button>
     <button id="btnDashboard" class="btn btn-dashboard">▦ Dashboard</button>
+    <button id="btnCustos" class="btn btn-custos">💰 Custos</button>
     <button id="btnAdd" class="btn btn-primary">+ Novo Registro</button>
   </div>
 </header>
@@ -374,6 +465,132 @@ tr.row-semdata { background: #fafbfc; }
     <div class="modal-footer">
       <button type="button" id="btnSyncClose2" class="btn btn-ghost">Fechar</button>
     </div>
+  </div>
+</div>
+
+
+<!-- ===================== MÓDULO CUSTOS (adição isolada) ===================== -->
+<div id="custosOverlay" class="costos-overlay" aria-hidden="true">
+  <div class="costos-shell">
+    <header class="costos-top">
+      <div class="costos-top-inner">
+        <div class="costos-brand">
+          <img id="custosLogo" alt="Mineração Taboca">
+          <div class="costos-brand-text">
+            <h2>CUSTOS — Follow-up de Manutenção Corretiva</h2>
+            <p>Budget · Realizado · Empenhos · Custos permanentes · Projeção mensal</p>
+          </div>
+        </div>
+        <div class="costos-top-actions">
+          <button type="button" class="btn btn-secondary" id="custosExportar">⇩ Exportar Excel</button>
+          <button type="button" class="btn btn-secondary" id="custosFechar">← Voltar ao Follow-up</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="costos-main">
+      <div id="custosSyncStatus" class="costos-sync">Carregando dados de custos…</div>
+
+      <section class="costos-filters">
+        <div class="costos-field"><label>Ano</label><select id="custosAno"></select></div>
+        <div class="costos-field"><label>Mês</label><select id="custosMes"></select></div>
+        <div class="costos-field"><label>Área / Centro de Custo</label><select id="custosArea"><option value="">Todos</option></select></div>
+        <div class="costos-field"><label>Categoria</label><select id="custosCategoria"><option value="">Todas</option></select></div>
+        <div class="costos-filter-actions">
+          <button type="button" class="btn btn-primary" id="custosNovoLancamento">+ Lançamento</button>
+          <button type="button" class="btn btn-dashboard" id="custosNovoPermanente">+ Custo Permanente</button>
+        </div>
+      </section>
+
+      <section class="costos-kpis">
+        <article class="costos-kpi"><div class="label">Budget do mês</div><div class="value" id="custosKpiBudget">R$ 0</div><div class="hint">Orçamento cadastrado</div></article>
+        <article class="costos-kpi"><div class="label">Realizado</div><div class="value" id="custosKpiRealizado">R$ 0</div><div class="hint">Custo efetivamente realizado</div></article>
+        <article class="costos-kpi orange"><div class="label">Empenhado c/ pedido</div><div class="value" id="custosKpiPedido">R$ 0</div><div class="hint">Compromissos com pedido</div></article>
+        <article class="costos-kpi yellow"><div class="label">Empenhado s/ pedido</div><div class="value" id="custosKpiSemPedido">R$ 0</div><div class="hint">Requisições / compromissos</div></article>
+        <article class="costos-kpi blue"><div class="label">Custos permanentes</div><div class="value" id="custosKpiPermanentes">R$ 0</div><div class="hint">Recorrentes ativos no mês</div></article>
+        <article class="costos-kpi orange"><div class="label">Exposição total</div><div class="value" id="custosKpiExposicao">R$ 0</div><div class="hint">Realizado + compromissos + permanentes</div></article>
+        <article class="costos-kpi"><div class="label">Saldo projetado</div><div class="value" id="custosKpiSaldo">R$ 0</div><div class="hint">Budget − exposição</div></article>
+        <article class="costos-kpi red"><div class="label">Budget comprometido</div><div class="value" id="custosKpiPct">0%</div><div class="hint">Exposição ÷ Budget</div></article>
+      </section>
+
+      <section class="costos-grid-2">
+        <article class="costos-panel">
+          <div class="costos-panel-head"><div><h3>Budget x Realizado x Compromissos</h3><small id="custosGraficoAnoLabel">Visão anual</small></div></div>
+          <div class="costos-panel-body">
+            <div id="custosYearChart" class="costos-year-chart"></div>
+            <div class="costos-legend">
+              <span><i style="background:#3caf74"></i>Budget</span><span><i style="background:#0f6c4a"></i>Realizado</span><span><i style="background:#ed7d31"></i>Empenhos</span><span><i style="background:#2c78c4"></i>Permanentes</span>
+            </div>
+          </div>
+        </article>
+        <article class="costos-panel">
+          <div class="costos-panel-head"><div><h3>Composição da exposição</h3><small>Mês selecionado</small></div></div>
+          <div class="costos-panel-body"><div class="costos-donut-wrap"><div class="costos-donut" id="custosDonut"><div class="costos-donut-center"><strong id="custosDonutTotal">R$ 0</strong><span>Total exposto</span></div></div><div id="custosComposicao" class="costos-comp-list"></div></div></div>
+        </article>
+      </section>
+
+      <section class="costos-ranking-grid">
+        <article class="costos-panel"><div class="costos-panel-head"><h3>Top 10 Fornecedores por Custo</h3></div><div class="costos-panel-body"><div id="custosTopFornecedores" class="costos-rank-list"></div></div></article>
+        <article class="costos-panel"><div class="costos-panel-head"><h3>Top 10 Equipamentos por Custo</h3></div><div class="costos-panel-body"><div id="custosTopEquipamentos" class="costos-rank-list"></div></div></article>
+      </section>
+
+      <section class="costos-panel" style="margin-bottom:12px;">
+        <div class="costos-panel-head"><div><h3>Custos Permanentes Mensais</h3><small>Entram automaticamente nos meses em que estiverem ativos</small></div><button type="button" class="btn btn-dashboard" id="custosNovoPermanente2">+ Adicionar Custo Permanente</button></div>
+        <div class="costos-table-wrap"><table class="costos-table"><thead><tr><th>Descrição</th><th>Fornecedor</th><th>Categoria</th><th>Centro de Custo</th><th style="text-align:right">Valor Mensal</th><th>Início</th><th>Término</th><th>Status</th><th style="text-align:right">Ações</th></tr></thead><tbody id="custosPermanentesBody"></tbody></table></div>
+      </section>
+
+      <section class="costos-panel">
+        <div class="costos-panel-head"><div><h3>Detalhamento do Mês</h3><small id="custosDetalheLabel"></small></div><button type="button" class="btn btn-primary" id="custosNovoLancamento2">+ Novo Lançamento</button></div>
+        <div class="costos-table-wrap"><table class="costos-table"><thead><tr><th>Tipo</th><th>Documento</th><th>OM</th><th>Equipamento</th><th>Fornecedor</th><th>Categoria</th><th>Centro de Custo</th><th>Descrição</th><th style="text-align:right">Valor</th><th style="text-align:right">Ações</th></tr></thead><tbody id="custosLancamentosBody"></tbody></table></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div id="custosLancamentoModal" class="costos-modal-overlay" aria-hidden="true">
+  <div class="costos-modal">
+    <div class="costos-modal-head"><h3 id="custosLancamentoTitulo">Novo Lançamento</h3><button type="button" class="btn-close" id="custosLancamentoFechar">×</button></div>
+    <form id="custosLancamentoForm">
+      <div class="costos-modal-body">
+        <div class="costos-form-grid">
+          <div class="costos-field"><label>Tipo *</label><select id="custoTipo" required><option value="budget">Budget</option><option value="realizado">Realizado</option><option value="empenhado_pedido">Empenhado com pedido</option><option value="empenhado_sem_pedido">Empenhado sem pedido</option></select></div>
+          <div class="costos-field"><label>Competência *</label><input id="custoCompetencia" type="month" required></div>
+          <div class="costos-field wide"><label>Descrição *</label><input id="custoDescricao" required placeholder="Ex.: Serviços de manutenção / material / contrato"></div>
+          <div class="costos-field"><label>Valor (R$) *</label><input id="custoValor" type="number" min="0" step="0.01" required></div>
+          <div class="costos-field"><label>Fornecedor</label><input id="custoFornecedor" list="custosFornecedoresList"></div>
+          <div class="costos-field"><label>Categoria</label><input id="custoCategoria" placeholder="Ex.: Manutenção, Material, Locação"></div>
+          <div class="costos-field"><label>Área / Centro de Custo</label><input id="custoCentroCusto" placeholder="Ex.: Metalurgia"></div>
+          <div class="costos-field"><label>Documento / Pedido / Requisição</label><input id="custoDocumento"></div>
+          <div class="costos-field"><label>Ordem de Manutenção</label><input id="custoOrdem"></div>
+          <div class="costos-field"><label>Equipamento</label><input id="custoEquipamento"></div>
+          <div class="costos-field wide"><label>Observação</label><textarea id="custoObservacao" rows="3"></textarea></div>
+        </div>
+        <datalist id="custosFornecedoresList"></datalist>
+      </div>
+      <div class="costos-modal-foot"><button type="button" class="btn btn-ghost" id="custosLancamentoCancelar">Cancelar</button><button type="submit" class="btn btn-primary">Salvar Lançamento</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="custosPermanenteModal" class="costos-modal-overlay" aria-hidden="true">
+  <div class="costos-modal">
+    <div class="costos-modal-head"><h3 id="custosPermanenteTitulo">Novo Custo Permanente</h3><button type="button" class="btn-close" id="custosPermanenteFechar">×</button></div>
+    <form id="custosPermanenteForm">
+      <div class="costos-modal-body">
+        <div class="costos-form-grid">
+          <div class="costos-field wide"><label>Descrição *</label><input id="custoPermDescricao" required placeholder="Ex.: Contrato mensal de manutenção elétrica"></div>
+          <div class="costos-field"><label>Valor Mensal (R$) *</label><input id="custoPermValor" type="number" min="0" step="0.01" required></div>
+          <div class="costos-field"><label>Fornecedor</label><input id="custoPermFornecedor" list="custosFornecedoresList"></div>
+          <div class="costos-field"><label>Categoria</label><input id="custoPermCategoria" placeholder="Ex.: Contrato, Locação, Serviço"></div>
+          <div class="costos-field"><label>Área / Centro de Custo</label><input id="custoPermCentroCusto"></div>
+          <div class="costos-field"><label>Data de início *</label><input id="custoPermInicio" type="date" required></div>
+          <div class="costos-field"><label>Data de término</label><input id="custoPermFim" type="date"><div class="costos-note">Deixe em branco para custo permanente sem término definido.</div></div>
+          <div class="costos-field"><label>Status</label><select id="custoPermAtivo"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+          <div class="costos-field wide"><label>Observação</label><textarea id="custoPermObservacao" rows="3"></textarea></div>
+        </div>
+      </div>
+      <div class="costos-modal-foot"><button type="button" class="btn btn-ghost" id="custosPermanenteCancelar">Cancelar</button><button type="submit" class="btn btn-dashboard">Salvar Custo Permanente</button></div>
+    </form>
   </div>
 </div>
 
@@ -2164,6 +2381,155 @@ function gerarPainelGerencial() {
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank");
 }
+
+
+// ===================== MÓDULO CUSTOS (adição isolada) =====================
+const CUSTOS_TABLE = "followup_custos_mensais";
+const CUSTOS_PERM_TABLE = "followup_custos_permanentes";
+const CUSTOS_LOCAL_KEY = "followup_custos_mensais_v1";
+const CUSTOS_PERM_LOCAL_KEY = "followup_custos_permanentes_v1";
+let custosMensais = [];
+let custosPermanentes = [];
+let custosOnline = false;
+let custosCarregados = false;
+let custoEditandoId = null;
+let custoPermEditandoId = null;
+
+function custosMoney(v){ return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+function custosEscape(v){ return escapeHtml(String(v==null?"":v)); }
+function custosMonthISO(valor){ return valor ? (valor.length===7 ? valor+"-01" : valor.slice(0,7)+"-01") : ""; }
+function custosMonthInput(valor){ return valor ? String(valor).slice(0,7) : ""; }
+function custosDateBR(v){ return v ? formatDateBR(String(v).slice(0,10)) : "—"; }
+function custosTipoLabel(t){ return ({budget:"Budget",realizado:"Realizado",empenhado_pedido:"Empenhado c/ pedido",empenhado_sem_pedido:"Empenhado s/ pedido"})[t] || t || "—"; }
+function custosLerLocal(chave){ const raw=safeGetItem(chave); if(!raw) return []; try{ const x=JSON.parse(raw); return Array.isArray(x)?x:[]; }catch(_){ return []; } }
+function custosSalvarLocal(){ safeSetItem(CUSTOS_LOCAL_KEY,JSON.stringify(custosMensais)); safeSetItem(CUSTOS_PERM_LOCAL_KEY,JSON.stringify(custosPermanentes)); }
+function custosSetStatus(texto,tipo){ const el=document.getElementById("custosSyncStatus"); if(!el)return; el.textContent=texto; el.className="costos-sync"+(tipo?" "+tipo:""); }
+function custosRowToLancamento(r){ return { id:String(r.id||uid()), tipo:String(r.tipo||"realizado"), competencia:String(r.competencia||"").slice(0,10), descricao:String(r.descricao||""), fornecedor:String(r.fornecedor||""), categoria:String(r.categoria||""), centroCusto:String(r.centro_custo||r.centroCusto||""), ordem:String(r.ordem||""), documento:String(r.documento||""), equipamento:String(r.equipamento||""), valor:Number(r.valor)||0, observacao:String(r.observacao||"") }; }
+function custosLancamentoToRow(r){ return {id:r.id,tipo:r.tipo,competencia:custosMonthISO(r.competencia),descricao:r.descricao||null,fornecedor:r.fornecedor||null,categoria:r.categoria||null,centro_custo:r.centroCusto||null,ordem:r.ordem||null,documento:r.documento||null,equipamento:r.equipamento||null,valor:Number(r.valor)||0,observacao:r.observacao||null}; }
+function custosRowToPermanente(r){ return { id:String(r.id||uid()), descricao:String(r.descricao||""), fornecedor:String(r.fornecedor||""), categoria:String(r.categoria||""), centroCusto:String(r.centro_custo||r.centroCusto||""), valorMensal:Number(r.valor_mensal??r.valorMensal)||0, dataInicio:String(r.data_inicio||r.dataInicio||"").slice(0,10), dataFim:r.data_fim||r.dataFim?String(r.data_fim||r.dataFim).slice(0,10):"", ativo:r.ativo!==false, observacao:String(r.observacao||"") }; }
+function custosPermanenteToRow(r){ return {id:r.id,descricao:r.descricao||null,fornecedor:r.fornecedor||null,categoria:r.categoria||null,centro_custo:r.centroCusto||null,valor_mensal:Number(r.valorMensal)||0,data_inicio:r.dataInicio||null,data_fim:r.dataFim||null,ativo:!!r.ativo,observacao:r.observacao||null}; }
+
+async function custosCarregarDados(){
+  custosMensais = custosLerLocal(CUSTOS_LOCAL_KEY).map(custosRowToLancamento);
+  custosPermanentes = custosLerLocal(CUSTOS_PERM_LOCAL_KEY).map(custosRowToPermanente);
+  custosSetStatus("Verificando sincronização dos custos com Supabase…","");
+  try{
+    const [a,b]=await Promise.all([
+      supabaseRequest(CUSTOS_TABLE+"?select=*&order=competencia.desc"),
+      supabaseRequest(CUSTOS_PERM_TABLE+"?select=*&order=descricao.asc")
+    ]);
+    if(!Array.isArray(a)||!Array.isArray(b)) throw new Error("resposta inválida");
+    custosMensais=a.map(custosRowToLancamento); custosPermanentes=b.map(custosRowToPermanente); custosOnline=true; custosSalvarLocal();
+    custosSetStatus("🟢 Custos conectados ao Supabase — dados disponíveis para todos os dispositivos.","ok");
+  }catch(e){
+    custosOnline=false;
+    custosSetStatus("🟠 Custos em modo local. Para sincronizar entre dispositivos, crie as duas tabelas de custos no Supabase usando o SQL fornecido.","warn");
+  }
+  custosCarregados=true; custosAtualizarFiltros(); custosRender();
+}
+
+async function custosSalvarLancamentoOnline(r){
+  if(!custosOnline) return;
+  try{ await supabaseRequest(CUSTOS_TABLE+"?on_conflict=id",{method:"POST",headers:supabaseHeaders({"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([custosLancamentoToRow(r)])}); }
+  catch(e){ custosSetStatus("🟠 Lançamento salvo localmente, mas não foi possível gravar no Supabase ("+e.message+").","warn"); }
+}
+async function custosSalvarPermanenteOnline(r){
+  if(!custosOnline) return;
+  try{ await supabaseRequest(CUSTOS_PERM_TABLE+"?on_conflict=id",{method:"POST",headers:supabaseHeaders({"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([custosPermanenteToRow(r)])}); }
+  catch(e){ custosSetStatus("🟠 Custo permanente salvo localmente, mas não foi possível gravar no Supabase ("+e.message+").","warn"); }
+}
+async function custosExcluirOnline(tabela,id){ if(!custosOnline)return; try{ await supabaseRequest(tabela+"?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:supabaseHeaders({"Prefer":"return=minimal"})}); }catch(e){ custosSetStatus("🟠 Exclusão feita localmente, mas houve falha no Supabase ("+e.message+").","warn"); } }
+
+function custosAtivoNoMes(r,ano,mes){
+  if(!r.ativo || !r.dataInicio) return false;
+  const iniMes=new Date(ano,mes-1,1), fimMes=new Date(ano,mes,0,23,59,59);
+  const ini=parseISO(r.dataInicio); const fim=r.dataFim?parseISO(r.dataFim):null;
+  return !!ini && ini<=fimMes && (!fim || fim>=iniMes);
+}
+function custosPassaDimensoes(r,area,categoria){ return (!area || (r.centroCusto||"")===area) && (!categoria || (r.categoria||"")===categoria); }
+function custosSelecionados(){
+  const ano=Number(document.getElementById("custosAno")?.value)||new Date().getFullYear();
+  const mes=Number(document.getElementById("custosMes")?.value)||new Date().getMonth()+1;
+  const area=document.getElementById("custosArea")?.value||""; const categoria=document.getElementById("custosCategoria")?.value||"";
+  const prefix=ano+"-"+String(mes).padStart(2,"0");
+  const lanc=custosMensais.filter(r=>String(r.competencia).slice(0,7)===prefix && custosPassaDimensoes(r,area,categoria));
+  const perm=custosPermanentes.filter(r=>custosAtivoNoMes(r,ano,mes) && custosPassaDimensoes(r,area,categoria));
+  return {ano,mes,area,categoria,lanc,perm};
+}
+function custosSomaTipo(lista,tipo){ return lista.filter(x=>x.tipo===tipo).reduce((s,x)=>s+(Number(x.valor)||0),0); }
+function custosCalcular(ano,mes,area,categoria){
+  const prefix=ano+"-"+String(mes).padStart(2,"0");
+  const lanc=custosMensais.filter(r=>String(r.competencia).slice(0,7)===prefix && custosPassaDimensoes(r,area,categoria));
+  const perm=custosPermanentes.filter(r=>custosAtivoNoMes(r,ano,mes)&&custosPassaDimensoes(r,area,categoria));
+  const budget=custosSomaTipo(lanc,"budget"), realizado=custosSomaTipo(lanc,"realizado"), pedido=custosSomaTipo(lanc,"empenhado_pedido"), semPedido=custosSomaTipo(lanc,"empenhado_sem_pedido"), permanentes=perm.reduce((s,x)=>s+(Number(x.valorMensal)||0),0);
+  const exposicao=realizado+pedido+semPedido+permanentes, saldo=budget-exposicao, pct=budget?exposicao/budget*100:0;
+  return {lanc,perm,budget,realizado,pedido,semPedido,permanentes,exposicao,saldo,pct};
+}
+
+function custosAtualizarFiltros(){
+  const aSel=document.getElementById("custosAno"), mSel=document.getElementById("custosMes"), areaSel=document.getElementById("custosArea"), catSel=document.getElementById("custosCategoria"); if(!aSel)return;
+  const oldA=aSel.value, oldM=mSel.value, oldArea=areaSel.value, oldCat=catSel.value;
+  const now=new Date(); const anos=new Set([now.getFullYear()-1,now.getFullYear(),now.getFullYear()+1]);
+  custosMensais.forEach(x=>{const y=Number(String(x.competencia).slice(0,4));if(y)anos.add(y)}); custosPermanentes.forEach(x=>{const y=Number(String(x.dataInicio).slice(0,4));if(y)anos.add(y)});
+  aSel.innerHTML=[...anos].sort((a,b)=>a-b).map(y=>`<option value="${y}">${y}</option>`).join(""); aSel.value=oldA&&anos.has(Number(oldA))?oldA:String(now.getFullYear());
+  const nomes=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]; mSel.innerHTML=nomes.map((n,i)=>`<option value="${i+1}">${n}</option>`).join(""); mSel.value=oldM||String(now.getMonth()+1);
+  const areas=[...new Set([...custosMensais.map(x=>x.centroCusto),...custosPermanentes.map(x=>x.centroCusto)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  areaSel.innerHTML='<option value="">Todos</option>'+areas.map(v=>`<option value="${custosEscape(v)}">${custosEscape(v)}</option>`).join(''); if(areas.includes(oldArea))areaSel.value=oldArea;
+  const cats=[...new Set([...custosMensais.map(x=>x.categoria),...custosPermanentes.map(x=>x.categoria)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  catSel.innerHTML='<option value="">Todas</option>'+cats.map(v=>`<option value="${custosEscape(v)}">${custosEscape(v)}</option>`).join(''); if(cats.includes(oldCat))catSel.value=oldCat;
+  const forn=[...new Set([...LISTAS.fornecedor,...custosMensais.map(x=>x.fornecedor),...custosPermanentes.map(x=>x.fornecedor)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR"));
+  const dl=document.getElementById("custosFornecedoresList"); if(dl)dl.innerHTML=forn.map(v=>`<option value="${custosEscape(v)}"></option>`).join('');
+}
+
+function custosRender(){
+  if(!document.getElementById("custosOverlay"))return;
+  const s=custosSelecionados(), c=custosCalcular(s.ano,s.mes,s.area,s.categoria);
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set("custosKpiBudget",custosMoney(c.budget)); set("custosKpiRealizado",custosMoney(c.realizado)); set("custosKpiPedido",custosMoney(c.pedido)); set("custosKpiSemPedido",custosMoney(c.semPedido)); set("custosKpiPermanentes",custosMoney(c.permanentes)); set("custosKpiExposicao",custosMoney(c.exposicao)); set("custosKpiSaldo",custosMoney(c.saldo)); set("custosKpiPct",(c.pct||0).toLocaleString("pt-BR",{maximumFractionDigits:1})+"%");
+  const saldoCard=document.getElementById("custosKpiSaldo")?.closest(".costos-kpi"); if(saldoCard)saldoCard.classList.toggle("negative",c.saldo<0);
+  set("custosGraficoAnoLabel","Visão anual de "+s.ano+(s.area?" · "+s.area:"")+(s.categoria?" · "+s.categoria:""));
+  const nomes=["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"]; const meses=[];
+  for(let m=1;m<=12;m++)meses.push(custosCalcular(s.ano,m,s.area,s.categoria));
+  const max=Math.max(1,...meses.flatMap(x=>[x.budget,x.realizado,x.pedido+x.semPedido,x.permanentes]));
+  document.getElementById("custosYearChart").innerHTML=meses.map((x,i)=>{const h=v=>Math.max(v>0?2:0,Math.round((v/max)*100));return `<div class="costos-month-group"><div class="costos-bars"><i class="costos-bar budget" style="height:${h(x.budget)}%" title="${nomes[i]} · Budget: ${custosMoney(x.budget)}"></i><i class="costos-bar realizado" style="height:${h(x.realizado)}%" title="${nomes[i]} · Realizado: ${custosMoney(x.realizado)}"></i><i class="costos-bar empenho" style="height:${h(x.pedido+x.semPedido)}%" title="${nomes[i]} · Empenhos: ${custosMoney(x.pedido+x.semPedido)}"></i><i class="costos-bar permanente" style="height:${h(x.permanentes)}%" title="${nomes[i]} · Permanentes: ${custosMoney(x.permanentes)}"></i></div><div class="costos-month">${nomes[i]}</div></div>`;}).join('');
+  const partes=[{n:"Realizado",v:c.realizado,cor:"#0f6c4a"},{n:"Pedido de Compra",v:c.pedido,cor:"#ed7d31"},{n:"Sem pedido",v:c.semPedido,cor:"#d8a400"},{n:"Custos permanentes",v:c.permanentes,cor:"#2c78c4"}]; const total=c.exposicao||1; let acc=0; const stops=[];
+  partes.forEach(p=>{const ini=acc, fim=acc+(p.v/total*100); stops.push(`${p.cor} ${ini}% ${fim}%`); acc=fim;}); const donut=document.getElementById("custosDonut"); donut.style.background=c.exposicao?`conic-gradient(${stops.join(',')})`:"#e8eeeb"; set("custosDonutTotal",custosMoney(c.exposicao));
+  document.getElementById("custosComposicao").innerHTML=partes.map(p=>`<div class="costos-comp-row"><i class="costos-comp-dot" style="background:${p.cor}"></i><span>${p.n}</span><strong>${custosMoney(p.v)} (${c.exposicao?Math.round(p.v/c.exposicao*100):0}%)</strong></div>`).join('');
+  custosRenderRanking("custosTopFornecedores",custosRankingFornecedores(c,s),"Sem fornecedor"); custosRenderRanking("custosTopEquipamentos",custosRankingEquipamentos(c),"Sem equipamento");
+  custosRenderPermanentes(s); custosRenderLancamentos(s);
+  const mesNome=new Intl.DateTimeFormat("pt-BR",{month:"long"}).format(new Date(s.ano,s.mes-1,1)); set("custosDetalheLabel",mesNome.charAt(0).toUpperCase()+mesNome.slice(1)+" / "+s.ano);
+}
+function custosRankingFornecedores(c,s){ const mapa=new Map(); c.lanc.filter(x=>x.tipo!=="budget").forEach(x=>{const k=x.fornecedor||"Sem fornecedor";mapa.set(k,(mapa.get(k)||0)+(Number(x.valor)||0));}); c.perm.forEach(x=>{const k=x.fornecedor||"Sem fornecedor";mapa.set(k,(mapa.get(k)||0)+(Number(x.valorMensal)||0));}); return [...mapa.entries()].map(([n,v])=>({n,v})).sort((a,b)=>b.v-a.v).slice(0,10); }
+function custosRankingEquipamentos(c){ const mapa=new Map(); c.lanc.filter(x=>x.tipo!=="budget").forEach(x=>{const k=x.equipamento||"Sem equipamento";mapa.set(k,(mapa.get(k)||0)+(Number(x.valor)||0));}); return [...mapa.entries()].map(([n,v])=>({n,v})).sort((a,b)=>b.v-a.v).slice(0,10); }
+function custosRenderRanking(id,arr){ const el=document.getElementById(id); if(!arr.length){el.innerHTML='<div class="costos-empty">Sem dados para o período selecionado.</div>';return;} const max=Math.max(1,...arr.map(x=>x.v)); el.innerHTML=arr.map((x,i)=>`<div class="costos-rank-row"><span class="costos-rank-label" title="${custosEscape(x.n)}">${i+1}. ${custosEscape(x.n)}</span><div class="costos-rank-track"><i style="width:${Math.max(3,x.v/max*100)}%"></i></div><strong class="costos-rank-value">${custosMoney(x.v)}</strong></div>`).join(''); }
+function custosRenderPermanentes(s){ const body=document.getElementById("custosPermanentesBody"); const arr=custosPermanentes.filter(x=>custosPassaDimensoes(x,s.area,s.categoria)).sort((a,b)=>(a.descricao||"").localeCompare(b.descricao||"","pt-BR")); if(!arr.length){body.innerHTML='<tr><td colspan="9" class="costos-empty">Nenhum custo permanente cadastrado.</td></tr>';return;} body.innerHTML=arr.map(r=>`<tr><td>${custosEscape(r.descricao)}</td><td>${custosEscape(r.fornecedor||"—")}</td><td>${custosEscape(r.categoria||"—")}</td><td>${custosEscape(r.centroCusto||"—")}</td><td class="costos-money">${custosMoney(r.valorMensal)}</td><td>${custosDateBR(r.dataInicio)}</td><td>${custosDateBR(r.dataFim)}</td><td><span class="costos-status ${r.ativo?'':'off'}">${r.ativo?'● Ativo':'○ Inativo'}</span></td><td><div class="costos-actions"><button type="button" data-custo-perm-edit="${r.id}" title="Editar">✎</button><button type="button" class="danger" data-custo-perm-del="${r.id}" title="Excluir">🗑</button></div></td></tr>`).join(''); }
+function custosRenderLancamentos(s){ const body=document.getElementById("custosLancamentosBody"); const arr=[...s.lanc].sort((a,b)=>(a.tipo||"").localeCompare(b.tipo||"")||(b.valor||0)-(a.valor||0)); if(!arr.length){body.innerHTML='<tr><td colspan="10" class="costos-empty">Nenhum lançamento para o mês selecionado.</td></tr>';return;} body.innerHTML=arr.map(r=>`<tr><td>${custosEscape(custosTipoLabel(r.tipo))}</td><td>${custosEscape(r.documento||"—")}</td><td>${custosEscape(r.ordem||"—")}</td><td>${custosEscape(r.equipamento||"—")}</td><td>${custosEscape(r.fornecedor||"—")}</td><td>${custosEscape(r.categoria||"—")}</td><td>${custosEscape(r.centroCusto||"—")}</td><td>${custosEscape(r.descricao)}</td><td class="costos-money">${custosMoney(r.valor)}</td><td><div class="costos-actions"><button type="button" data-custo-edit="${r.id}" title="Editar">✎</button><button type="button" class="danger" data-custo-del="${r.id}" title="Excluir">🗑</button></div></td></tr>`).join(''); }
+
+function custosAbrir(){ const ov=document.getElementById("custosOverlay"); if(!ov)return; const src=document.querySelector(".topbar-title img"); if(src)document.getElementById("custosLogo").src=src.src; ov.style.display="flex";ov.setAttribute("aria-hidden","false");document.body.style.overflow="hidden"; if(!custosCarregados)custosCarregarDados();else{custosAtualizarFiltros();custosRender();} }
+function custosFechar(){ document.getElementById("custosOverlay").style.display="none";document.getElementById("custosOverlay").setAttribute("aria-hidden","true");document.body.style.overflow=""; }
+function custosAbrirLancamento(id){ custoEditandoId=id||null; const r=id?custosMensais.find(x=>x.id===id):null; const s=custosSelecionados(); document.getElementById("custosLancamentoTitulo").textContent=r?"Editar Lançamento":"Novo Lançamento"; document.getElementById("custoTipo").value=r?.tipo||"realizado"; document.getElementById("custoCompetencia").value=custosMonthInput(r?.competencia)||`${s.ano}-${String(s.mes).padStart(2,"0")}`; document.getElementById("custoDescricao").value=r?.descricao||""; document.getElementById("custoValor").value=r?.valor??""; document.getElementById("custoFornecedor").value=r?.fornecedor||""; document.getElementById("custoCategoria").value=r?.categoria||""; document.getElementById("custoCentroCusto").value=r?.centroCusto||s.area||""; document.getElementById("custoDocumento").value=r?.documento||""; document.getElementById("custoOrdem").value=r?.ordem||""; document.getElementById("custoEquipamento").value=r?.equipamento||""; document.getElementById("custoObservacao").value=r?.observacao||""; document.getElementById("custosLancamentoModal").style.display="flex"; }
+function custosFecharLancamento(){document.getElementById("custosLancamentoModal").style.display="none";custoEditandoId=null;}
+async function custosSubmitLancamento(e){ e.preventDefault(); const r={id:custoEditandoId||uid(),tipo:document.getElementById("custoTipo").value,competencia:custosMonthISO(document.getElementById("custoCompetencia").value),descricao:document.getElementById("custoDescricao").value.trim(),valor:Number(document.getElementById("custoValor").value)||0,fornecedor:document.getElementById("custoFornecedor").value.trim(),categoria:document.getElementById("custoCategoria").value.trim(),centroCusto:document.getElementById("custoCentroCusto").value.trim(),documento:document.getElementById("custoDocumento").value.trim(),ordem:document.getElementById("custoOrdem").value.trim(),equipamento:document.getElementById("custoEquipamento").value.trim(),observacao:document.getElementById("custoObservacao").value.trim()}; const idx=custosMensais.findIndex(x=>x.id===r.id); if(idx>=0)custosMensais[idx]=r;else custosMensais.push(r); custosSalvarLocal(); custosFecharLancamento(); custosAtualizarFiltros(); custosRender(); await custosSalvarLancamentoOnline(r); }
+function custosAbrirPermanente(id){ custoPermEditandoId=id||null; const r=id?custosPermanentes.find(x=>x.id===id):null; const hoje=new Date(); const hojeStr=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-01`; document.getElementById("custosPermanenteTitulo").textContent=r?"Editar Custo Permanente":"Novo Custo Permanente"; document.getElementById("custoPermDescricao").value=r?.descricao||""; document.getElementById("custoPermValor").value=r?.valorMensal??""; document.getElementById("custoPermFornecedor").value=r?.fornecedor||""; document.getElementById("custoPermCategoria").value=r?.categoria||""; document.getElementById("custoPermCentroCusto").value=r?.centroCusto||document.getElementById("custosArea")?.value||""; document.getElementById("custoPermInicio").value=r?.dataInicio||hojeStr; document.getElementById("custoPermFim").value=r?.dataFim||""; document.getElementById("custoPermAtivo").value=String(r?.ativo!==false); document.getElementById("custoPermObservacao").value=r?.observacao||""; document.getElementById("custosPermanenteModal").style.display="flex"; }
+function custosFecharPermanente(){document.getElementById("custosPermanenteModal").style.display="none";custoPermEditandoId=null;}
+async function custosSubmitPermanente(e){ e.preventDefault(); const r={id:custoPermEditandoId||uid(),descricao:document.getElementById("custoPermDescricao").value.trim(),valorMensal:Number(document.getElementById("custoPermValor").value)||0,fornecedor:document.getElementById("custoPermFornecedor").value.trim(),categoria:document.getElementById("custoPermCategoria").value.trim(),centroCusto:document.getElementById("custoPermCentroCusto").value.trim(),dataInicio:document.getElementById("custoPermInicio").value,dataFim:document.getElementById("custoPermFim").value,ativo:document.getElementById("custoPermAtivo").value==="true",observacao:document.getElementById("custoPermObservacao").value.trim()}; const idx=custosPermanentes.findIndex(x=>x.id===r.id); if(idx>=0)custosPermanentes[idx]=r;else custosPermanentes.push(r); custosSalvarLocal(); custosFecharPermanente(); custosAtualizarFiltros(); custosRender(); await custosSalvarPermanenteOnline(r); }
+async function custosExcluirLancamento(id){ const r=custosMensais.find(x=>x.id===id); if(!r||!confirm(`Excluir o lançamento "${r.descricao}"?`))return; custosMensais=custosMensais.filter(x=>x.id!==id); custosSalvarLocal(); custosRender(); await custosExcluirOnline(CUSTOS_TABLE,id); }
+async function custosExcluirPermanente(id){ const r=custosPermanentes.find(x=>x.id===id); if(!r||!confirm(`Excluir o custo permanente "${r.descricao}"?`))return; custosPermanentes=custosPermanentes.filter(x=>x.id!==id); custosSalvarLocal(); custosAtualizarFiltros(); custosRender(); await custosExcluirOnline(CUSTOS_PERM_TABLE,id); }
+function custosExportarExcel(){ if(typeof XLSX==="undefined"){alert("Biblioteca de exportação não carregada.");return;} const s=custosSelecionados(),c=custosCalcular(s.ano,s.mes,s.area,s.categoria); const wb=XLSX.utils.book_new(); const resumo=[{"Indicador":"Budget","Valor":c.budget},{"Indicador":"Realizado","Valor":c.realizado},{"Indicador":"Empenhado com pedido","Valor":c.pedido},{"Indicador":"Empenhado sem pedido","Valor":c.semPedido},{"Indicador":"Custos permanentes","Valor":c.permanentes},{"Indicador":"Exposição total","Valor":c.exposicao},{"Indicador":"Saldo projetado","Valor":c.saldo},{"Indicador":"% Budget comprometido","Valor":c.pct/100}]; const wsR=XLSX.utils.json_to_sheet(resumo); XLSX.utils.book_append_sheet(wb,wsR,"Resumo"); const det=s.lanc.map(r=>({"Tipo":custosTipoLabel(r.tipo),"Competência":String(r.competencia).slice(0,7),"Documento":r.documento,"OM":r.ordem,"Equipamento":r.equipamento,"Fornecedor":r.fornecedor,"Categoria":r.categoria,"Centro de Custo":r.centroCusto,"Descrição":r.descricao,"Valor":r.valor,"Observação":r.observacao})); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(det),"Lançamentos"); const per=custosPermanentes.map(r=>({"Descrição":r.descricao,"Fornecedor":r.fornecedor,"Categoria":r.categoria,"Centro de Custo":r.centroCusto,"Valor Mensal":r.valorMensal,"Início":r.dataInicio,"Término":r.dataFim,"Ativo":r.ativo?"Sim":"Não","Observação":r.observacao})); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(per),"Custos Permanentes"); XLSX.writeFile(wb,`CUSTOS_FOLLOWUP_${s.ano}_${String(s.mes).padStart(2,"0")}.xlsx`); }
+
+function custosInit(){
+  document.getElementById("btnCustos")?.addEventListener("click",custosAbrir); document.getElementById("custosFechar")?.addEventListener("click",custosFechar); document.getElementById("custosExportar")?.addEventListener("click",custosExportarExcel);
+  ["custosAno","custosMes","custosArea","custosCategoria"].forEach(id=>document.getElementById(id)?.addEventListener("change",custosRender));
+  ["custosNovoLancamento","custosNovoLancamento2"].forEach(id=>document.getElementById(id)?.addEventListener("click",()=>solicitarSenha(()=>custosAbrirLancamento()))); ["custosNovoPermanente","custosNovoPermanente2"].forEach(id=>document.getElementById(id)?.addEventListener("click",()=>solicitarSenha(()=>custosAbrirPermanente())));
+  document.getElementById("custosLancamentoFechar")?.addEventListener("click",custosFecharLancamento); document.getElementById("custosLancamentoCancelar")?.addEventListener("click",custosFecharLancamento); document.getElementById("custosLancamentoForm")?.addEventListener("submit",custosSubmitLancamento);
+  document.getElementById("custosPermanenteFechar")?.addEventListener("click",custosFecharPermanente); document.getElementById("custosPermanenteCancelar")?.addEventListener("click",custosFecharPermanente); document.getElementById("custosPermanenteForm")?.addEventListener("submit",custosSubmitPermanente);
+  document.getElementById("custosLancamentosBody")?.addEventListener("click",e=>{const eb=e.target.closest("[data-custo-edit]");const db=e.target.closest("[data-custo-del]");if(eb)solicitarSenha(()=>custosAbrirLancamento(eb.dataset.custoEdit));if(db)solicitarSenha(()=>custosExcluirLancamento(db.dataset.custoDel));});
+  document.getElementById("custosPermanentesBody")?.addEventListener("click",e=>{const eb=e.target.closest("[data-custo-perm-edit]");const db=e.target.closest("[data-custo-perm-del]");if(eb)solicitarSenha(()=>custosAbrirPermanente(eb.dataset.custoPermEdit));if(db)solicitarSenha(()=>custosExcluirPermanente(db.dataset.custoPermDel));});
+  document.getElementById("custosLancamentoModal")?.addEventListener("click",e=>{if(e.target.id==="custosLancamentoModal")custosFecharLancamento();}); document.getElementById("custosPermanenteModal")?.addEventListener("click",e=>{if(e.target.id==="custosPermanenteModal")custosFecharPermanente();});
+  document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(document.getElementById("custosLancamentoModal")?.style.display==="flex")custosFecharLancamento();else if(document.getElementById("custosPermanenteModal")?.style.display==="flex")custosFecharPermanente();else if(document.getElementById("custosOverlay")?.style.display==="flex")custosFechar();});
+}
+document.addEventListener("DOMContentLoaded",custosInit);
+
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadRegistros(); inicializarDropdowns();
