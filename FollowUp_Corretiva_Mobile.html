@@ -353,6 +353,33 @@ tr.row-semdata { background: #fafbfc; }
   .om-item-grid .wide { grid-column:1 / -1; }
 }
 
+/* ===================== CARTEIRA DE EQUIPAMENTOS / IW38 ===================== */
+.iw38-overlay{position:fixed;inset:0;z-index:345;display:none;background:#eef3f0;color:#173b2b;overflow:auto;}
+.iw38-shell{width:100%;min-height:100%;}
+.iw38-top{position:sticky;top:0;z-index:8;display:flex;align-items:center;gap:14px;padding:14px 22px;background:#075a34;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.12);}
+.iw38-back{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;border-radius:7px;padding:9px 12px;font-weight:700;cursor:pointer;}
+.iw38-title{min-width:0;}.iw38-title h2{margin:0;font-size:20px}.iw38-title p{margin:3px 0 0;font-size:11px;color:rgba(255,255,255,.76)}
+.iw38-top-spacer{flex:1}.iw38-last{font-size:11px;color:rgba(255,255,255,.82);text-align:right;max-width:300px;}
+.iw38-import-btn{border:0;background:#fff;color:#075a34;border-radius:7px;padding:10px 14px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.iw38-content{max-width:1580px;margin:0 auto;padding:18px 22px 34px;}
+.iw38-statusbar{display:flex;align-items:center;gap:9px;margin-bottom:14px;padding:10px 12px;border:1px solid #d4dfd9;background:#fff;border-radius:8px;font-size:12px;color:#5f7468;}
+.iw38-status-dot{width:8px;height:8px;border-radius:50%;background:#0b7a46;flex:0 0 auto}.iw38-status-dot.warn{background:#d97706}.iw38-status-dot.err{background:#c62828}
+.iw38-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.iw38-kpi{background:#fff;border:1px solid #d6e1db;border-top:3px solid #0c7143;border-radius:8px;padding:13px 14px;min-width:0;}
+.iw38-kpi strong{display:block;font-size:21px;line-height:1.1;color:#173e2d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.iw38-kpi span{display:block;margin-top:5px;font-size:11px;color:#6c8075}.iw38-kpi.move{border-top-color:#d97706}.iw38-kpi.good{border-top-color:#169c58}.iw38-kpi.muted{border-top-color:#70857a}
+.iw38-delta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:15px;}.iw38-delta-card{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f7faf8;border:1px solid #dce5e0;border-radius:7px;padding:10px 12px}.iw38-delta-card b{font-size:18px;color:#16452f}.iw38-delta-card small{color:#71857a;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+.iw38-tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}.iw38-tab{border:1px solid #cfdcd5;background:#fff;color:#365c49;border-radius:6px;padding:8px 12px;font-weight:700;font-size:12px;cursor:pointer}.iw38-tab.active{background:#0b6d3e;color:#fff;border-color:#0b6d3e}
+.iw38-panel{display:none}.iw38-panel.active{display:block}
+.iw38-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.iw38-card{background:#fff;border:1px solid #d8e2dd;border-radius:8px;padding:14px;min-width:0}.iw38-card h3{margin:0 0 12px;font-size:13px;color:#244d39;text-transform:uppercase;letter-spacing:.04em}
+.iw38-bars{display:flex;flex-direction:column;gap:8px}.iw38-bar-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr 54px;gap:8px;align-items:center;font-size:11px}.iw38-bar-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#405f50}.iw38-bar-track{height:9px;background:#edf2ef;border-radius:6px;overflow:hidden}.iw38-bar-fill{height:100%;background:#0b7442;border-radius:6px}.iw38-bar-val{text-align:right;font-weight:800;color:#244b38}
+.iw38-recent{width:100%;border-collapse:collapse}.iw38-recent th,.iw38-recent td{padding:7px 6px;border-bottom:1px solid #e4ebe7;font-size:11px;text-align:left;vertical-align:top}.iw38-recent th{color:#6e8177;font-weight:700}.iw38-move-badge{display:inline-flex;padding:3px 6px;border-radius:4px;font-size:9px;font-weight:800;background:#eef4f1;color:#426957}.iw38-move-badge.NOVA,.iw38-move-badge.RETORNOU{background:#e0f5e8;color:#087443}.iw38-move-badge.STATUS_USUARIO,.iw38-move-badge.STATUS_SISTEMA{background:#fff3d8;color:#9a5b00}.iw38-move-badge.FINALIZADA{background:#e2f3ff;color:#145b83}.iw38-move-badge.SAIU_CARTEIRA{background:#fce8e8;color:#a52929}
+.iw38-filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;background:#fff;border:1px solid #d8e2dd;border-radius:8px;padding:10px;margin-bottom:10px}.iw38-filters input,.iw38-filters select{min-width:0;padding:9px 10px;border:1px solid #d4ded9;border-radius:6px;background:#fff;color:#243f32;font-size:12px}.iw38-clear{border:1px solid #ccd9d2;background:#f7faf8;color:#365c49;border-radius:6px;padding:8px 11px;font-weight:700;cursor:pointer}
+.iw38-table-wrap{background:#fff;border:1px solid #d8e2dd;border-radius:8px;overflow:auto}.iw38-table{width:100%;min-width:1450px;border-collapse:collapse}.iw38-table th{position:sticky;top:0;background:#edf3f0;color:#173e2d;padding:9px 8px;font-size:10px;text-align:left;white-space:nowrap;border-bottom:1px solid #d1ddd7}.iw38-table td{padding:8px;border-bottom:1px solid #e4ebe7;font-size:11px;vertical-align:top;max-width:300px}.iw38-table td.desc{white-space:normal;min-width:220px}.iw38-table td.money{text-align:right;white-space:nowrap}.iw38-table tr:hover td{background:#fbfdfc}.iw38-pagination{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 2px;font-size:11px;color:#667a6f}.iw38-pagination button{border:1px solid #ccd8d2;background:#fff;border-radius:5px;padding:6px 9px;cursor:pointer;color:#315844}.iw38-pagination button:disabled{opacity:.4;cursor:default}
+.iw38-import-preview{display:none;background:#fff;border:1px solid #cfdcd5;border-left:4px solid #0b7442;border-radius:8px;padding:13px 14px;margin-bottom:14px}.iw38-preview-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.iw38-preview-head h3{margin:0;font-size:14px;color:#214d37}.iw38-preview-head p{margin:4px 0 0;color:#708178;font-size:11px}.iw38-preview-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}.iw38-preview-item{background:#f5f9f7;border:1px solid #e0e9e4;border-radius:6px;padding:9px}.iw38-preview-item b{display:block;font-size:14px;color:#1b4933}.iw38-preview-item span{font-size:9px;color:#71857a;text-transform:uppercase}.iw38-preview-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:11px}.iw38-preview-actions button{border:1px solid #cbd8d1;background:#fff;border-radius:6px;padding:8px 11px;font-weight:700;cursor:pointer}.iw38-preview-actions .confirm{background:#0b6d3e;color:#fff;border-color:#0b6d3e}.iw38-progress{height:5px;background:#e6ede9;border-radius:8px;overflow:hidden;margin-top:10px;display:none}.iw38-progress i{display:block;height:100%;width:0;background:#0b7442;transition:width .2s}
+.iw38-empty{padding:34px 20px;text-align:center;color:#708278;font-size:12px}.iw38-history-table{width:100%;min-width:1050px;border-collapse:collapse}.iw38-history-table th,.iw38-history-table td{padding:8px 7px;border-bottom:1px solid #e2e9e5;font-size:11px;text-align:left}.iw38-history-table th{background:#edf3f0;color:#244d39;white-space:nowrap}.iw38-history-table td.num{text-align:right}
+@media(max-width:1100px){.iw38-kpis{grid-template-columns:repeat(3,1fr)}.iw38-grid{grid-template-columns:1fr}.iw38-filters{grid-template-columns:1fr 1fr}.iw38-preview-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:650px){.iw38-top{padding:10px;flex-wrap:wrap}.iw38-title h2{font-size:16px}.iw38-last{display:none}.iw38-content{padding:10px}.iw38-kpis{grid-template-columns:repeat(2,1fr)}.iw38-delta{grid-template-columns:repeat(2,1fr)}.iw38-filters{grid-template-columns:1fr}.iw38-preview-grid{grid-template-columns:repeat(2,1fr)}.iw38-import-btn{margin-left:auto}.iw38-kpi strong{font-size:18px}}
+
 </style>
 <style id="custos-module-style">
 
@@ -603,6 +630,89 @@ body.portal-mode #portalHome { display:block; }
   </div>
 </div>
 <div id="portalToast" class="portal-toast" role="status" aria-live="polite"></div>
+
+
+<!-- ===================== CARTEIRA DE EQUIPAMENTOS / IW38 ===================== -->
+<div id="iw38Overlay" class="iw38-overlay" aria-label="Carteira de equipamentos IW38">
+  <div class="iw38-shell">
+    <div class="iw38-top">
+      <button type="button" class="iw38-back" id="iw38Back">← Portal PCM</button>
+      <div class="iw38-title"><h2>Carteira de Equipamentos — IW38</h2><p>Movimentação de ordens de manutenção e acompanhamento da frota</p></div>
+      <div class="iw38-top-spacer"></div>
+      <div class="iw38-last" id="iw38LastImport">Nenhuma carga realizada</div>
+      <input type="file" id="iw38File" accept=".xlsx,.xls" hidden>
+      <button type="button" class="iw38-import-btn" id="iw38ImportBtn">↥ Atualizar IW38</button>
+    </div>
+
+    <div class="iw38-content">
+      <div class="iw38-statusbar"><span class="iw38-status-dot" id="iw38StatusDot"></span><span id="iw38StatusText">Carregando carteira IW38…</span></div>
+
+      <div class="iw38-import-preview" id="iw38ImportPreview">
+        <div class="iw38-preview-head"><div><h3 id="iw38PreviewTitle">Arquivo IW38 selecionado</h3><p id="iw38PreviewSub">Confira os dados antes de atualizar a carteira.</p></div></div>
+        <div class="iw38-preview-grid">
+          <div class="iw38-preview-item"><b id="iw38PreviewRegistros">0</b><span>Registros</span></div>
+          <div class="iw38-preview-item"><b id="iw38PreviewEquip">0</b><span>Equipamentos</span></div>
+          <div class="iw38-preview-item"><b id="iw38PreviewRef">—</b><span>Data referência</span></div>
+          <div class="iw38-preview-item"><b id="iw38PreviewPlan">R$ 0,00</b><span>Custo planejado</span></div>
+          <div class="iw38-preview-item"><b id="iw38PreviewReal">R$ 0,00</b><span>Custo real</span></div>
+        </div>
+        <div class="iw38-progress" id="iw38Progress"><i id="iw38ProgressBar"></i></div>
+        <div class="iw38-preview-actions"><button type="button" id="iw38CancelImport">Cancelar</button><button type="button" class="confirm" id="iw38ConfirmImport">Confirmar atualização</button></div>
+      </div>
+
+      <div class="iw38-kpis">
+        <div class="iw38-kpi"><strong id="iw38KpiTotal">0</strong><span>OMs na carteira atual</span></div>
+        <div class="iw38-kpi"><strong id="iw38KpiEquip">0</strong><span>Equipamentos com OM</span></div>
+        <div class="iw38-kpi"><strong id="iw38KpiPlan">R$ 0,00</strong><span>Custos totais planejados</span></div>
+        <div class="iw38-kpi"><strong id="iw38KpiReal">R$ 0,00</strong><span>Custos totais reais</span></div>
+        <div class="iw38-kpi good"><strong id="iw38KpiFinal">0</strong><span>OMs com fim real</span></div>
+        <div class="iw38-kpi muted"><strong id="iw38KpiStatus">—</strong><span>Status usuário predominante</span></div>
+      </div>
+
+      <div class="iw38-delta">
+        <div class="iw38-delta-card"><div><small>Novas desde última carga</small><b id="iw38DeltaNovas">0</b></div></div>
+        <div class="iw38-delta-card"><div><small>Mudanças de status</small><b id="iw38DeltaStatus">0</b></div></div>
+        <div class="iw38-delta-card"><div><small>Finalizadas</small><b id="iw38DeltaFinal">0</b></div></div>
+        <div class="iw38-delta-card"><div><small>Saíram da carteira</small><b id="iw38DeltaSaiu">0</b></div></div>
+      </div>
+
+      <div class="iw38-tabs">
+        <button type="button" class="iw38-tab active" data-iw38-tab="resumo">Visão geral</button>
+        <button type="button" class="iw38-tab" data-iw38-tab="carteira">Carteira atual</button>
+        <button type="button" class="iw38-tab" data-iw38-tab="movimentos">Movimentações</button>
+        <button type="button" class="iw38-tab" data-iw38-tab="historico">Histórico de cargas</button>
+      </div>
+
+      <section id="iw38PanelResumo" class="iw38-panel active">
+        <div class="iw38-grid">
+          <div class="iw38-card"><h3>Status usuário — carteira atual</h3><div class="iw38-bars" id="iw38StatusBars"></div></div>
+          <div class="iw38-card"><h3>Top 10 equipamentos por quantidade de OMs</h3><div class="iw38-bars" id="iw38EquipBars"></div></div>
+          <div class="iw38-card" style="grid-column:1/-1"><h3>Movimentações mais recentes</h3><div id="iw38RecentMov"></div></div>
+        </div>
+      </section>
+
+      <section id="iw38PanelCarteira" class="iw38-panel">
+        <div class="iw38-filters">
+          <input id="iw38Search" placeholder="Buscar Ordem, Equipamento ou Texto breve">
+          <select id="iw38FilterStatus"><option value="">Status usuário (todos)</option></select>
+          <select id="iw38FilterEquip"><option value="">Equipamento (todos)</option></select>
+          <select id="iw38FilterCentro"><option value="">Centro trabalho (todos)</option></select>
+          <button type="button" class="iw38-clear" id="iw38ClearFilters">Limpar</button>
+        </div>
+        <div class="iw38-table-wrap"><table class="iw38-table"><thead><tr><th>Ordem</th><th>Equipamento</th><th>Texto breve</th><th>Data entrada</th><th>Status usuário</th><th>Status sistema</th><th>Centro trabalho</th><th>Centro custo</th><th>Custo plan.</th><th>Custo real</th><th>Fim real</th><th>Último modificador</th></tr></thead><tbody id="iw38CurrentBody"></tbody></table></div>
+        <div class="iw38-pagination"><span id="iw38PageInfo">0 registros</span><button type="button" id="iw38Prev">Anterior</button><button type="button" id="iw38Next">Próxima</button></div>
+      </section>
+
+      <section id="iw38PanelMovimentos" class="iw38-panel">
+        <div class="iw38-table-wrap"><table class="iw38-table"><thead><tr><th>Data</th><th>Tipo</th><th>Ordem</th><th>Equipamento</th><th>Texto breve</th><th>Campo</th><th>Anterior</th><th>Novo</th></tr></thead><tbody id="iw38MovesBody"></tbody></table></div>
+      </section>
+
+      <section id="iw38PanelHistorico" class="iw38-panel">
+        <div class="iw38-table-wrap"><table class="iw38-history-table"><thead><tr><th>Data da carga</th><th>Arquivo</th><th>Tipo</th><th>Referência</th><th>Registros</th><th>Equipamentos</th><th>Novas</th><th>Status</th><th>Finalizadas</th><th>Saíram</th><th>Custo planejado</th><th>Custo real</th></tr></thead><tbody id="iw38HistoryBody"></tbody></table></div>
+      </section>
+    </div>
+  </div>
+</div>
 
 <header class="topbar" id="appTopbar">
   <div class="topbar-title" style="display:flex; align-items:center; gap:16px;">
@@ -3309,6 +3419,208 @@ function empenhadoFatInit(){
 }
 
 
+// ===================== CARTEIRA DE EQUIPAMENTOS / IW38 =====================
+const IW38_CURRENT_TABLE = "followup_iw38_atual";
+const IW38_IMPORT_TABLE = "followup_iw38_importacoes";
+const IW38_MOVE_TABLE = "followup_iw38_movimentos";
+let iw38AllRows = [];
+let iw38Rows = [];
+let iw38Imports = [];
+let iw38Moves = [];
+let iw38Pending = null;
+let iw38Page = 1;
+const IW38_PAGE_SIZE = 100;
+
+function iw38SetStatus(msg,type){
+  const t=document.getElementById('iw38StatusText'),d=document.getElementById('iw38StatusDot');
+  if(t)t.textContent=msg||''; if(d){d.className='iw38-status-dot'+(type==='warn'?' warn':type==='err'?' err':'');}
+}
+function iw38Money(v){ return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function iw38DateBR(v){
+  if(!v)return '—'; const s=String(v); const d=s.slice(0,10).split('-');
+  return d.length===3?`${d[2]}/${d[1]}/${d[0]}`:s;
+}
+function iw38DateTimeBR(v){ if(!v)return '—'; const d=new Date(v); return isNaN(d)?String(v):d.toLocaleString('pt-BR'); }
+function iw38Num(v){
+  if(v==null||v==='')return 0; if(typeof v==='number')return Number.isFinite(v)?v:0;
+  let s=String(v).trim().replace(/\s/g,'').replace(/R\$/gi,'');
+  if(s.includes(',')&&s.includes('.')) s=s.replace(/\./g,'').replace(',','.'); else if(s.includes(',')) s=s.replace(',','.');
+  const n=Number(s); return Number.isFinite(n)?n:0;
+}
+function iw38DateISO(v){
+  if(v==null||v==='')return null;
+  if(v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+  if(typeof v==='number' && v>20000 && typeof XLSX!=='undefined' && XLSX.SSF){ const d=XLSX.SSF.parse_date_code(v); if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`; }
+  const s=String(v).trim(); if(!s)return null;
+  if(/^\d{4}-\d{1,2}-\d{1,2}/.test(s)){ const [y,m,d]=s.slice(0,10).split('-'); return `${y}-${String(Number(m)).padStart(2,'0')}-${String(Number(d)).padStart(2,'0')}`; }
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s)){ const [d,m,y]=s.split('/'); return `${y}-${String(Number(m)).padStart(2,'0')}-${String(Number(d)).padStart(2,'0')}`; }
+  const n=Number(s); if(Number.isFinite(n)&&n>20000&&typeof XLSX!=='undefined'&&XLSX.SSF){const d=XLSX.SSF.parse_date_code(n);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}
+  return null;
+}
+function iw38Header(s){ return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim(); }
+function iw38MapRow(row){
+  const idx={}; Object.keys(row||{}).forEach(k=>idx[iw38Header(k)]=row[k]);
+  const g=(...names)=>{for(const n of names){const k=iw38Header(n); if(Object.prototype.hasOwnProperty.call(idx,k))return idx[k];}return '';};
+  const ordem=String(g('Ordem')??'').trim(); if(!ordem)return null;
+  return {
+    ordem,
+    nota:String(g('Nota')??'').trim(),
+    tipo_ordem:String(g('Tipo de ordem')??'').trim(),
+    equipamento:String(g('Equipamento')??'').trim(),
+    criado_por:String(g('Criado por')??'').trim(),
+    texto_breve:String(g('Texto breve')??'').trim(),
+    data_entrada:iw38DateISO(g('Data de entrada')),
+    centro_trabalho:String(g('CenTrabalho princ.','Centro trabalho princ.')??'').trim(),
+    revisao:String(g('Revisão','Revisao')??'').trim(),
+    tipo_atividade:String(g('Tp.atvd.manut.','Tp atvd manut')??'').trim(),
+    status_sistema:String(g('Status do sistema')??'').trim(),
+    status_usuario:String(g('Status usuário','Status usuario')??'').trim(),
+    data_base_inicio:iw38DateISO(g('Data-base do início','Data base do inicio')),
+    hora_fim_real:String(g('Hora para o fim real')??'').trim(),
+    data_fim_real:iw38DateISO(g('Data fim real da ordem')),
+    fim_programado:iw38DateISO(g('Fim programado')),
+    inicio_programado:iw38DateISO(g('Início programado','Inicio programado')),
+    centro_planejamento:String(g('Centro planejamento')??'').trim(),
+    grupo_planej:String(g('Grupo planej.')??'').trim(),
+    centro_custo:String(g('Centro custo')??'').trim(),
+    custo_planejado:iw38Num(g('Custos totais plan.','Custos totais plan')),
+    custo_real:iw38Num(g('Custos tot.reais','Custos tot reais')),
+    denominacao_conjunto:String(g('Denominação do conjunto','Denominacao do conjunto')??'').trim(),
+    ultimo_modificador:String(g('Último modificador','Ultimo modificador')??'').trim(),
+    local_instalacao:String(g('Local de instalação','Local de instalacao')??'').trim(),
+    ativo:true
+  };
+}
+function iw38ValidarCabecalho(rawRows){
+  if(!rawRows.length)throw new Error('A planilha está vazia.');
+  const hs=Object.keys(rawRows[0]).map(iw38Header);
+  const obrig=['ordem','status do sistema','status usuario'];
+  const faltam=obrig.filter(x=>!hs.includes(x));
+  if(faltam.length)throw new Error('Arquivo não reconhecido como IW38. Campos ausentes: '+faltam.join(', '));
+}
+function iw38LerArquivo(file){
+  return new Promise((resolve,reject)=>{
+    if(typeof XLSX==='undefined'){reject(new Error('Biblioteca de leitura Excel não carregada. Atualize a página com internet.'));return;}
+    const rd=new FileReader();
+    rd.onload=()=>{try{
+      const wb=XLSX.read(rd.result,{type:'array',cellDates:false}); const sn=wb.SheetNames[0]; const ws=wb.Sheets[sn];
+      const raw=XLSX.utils.sheet_to_json(ws,{defval:'',raw:true}); iw38ValidarCabecalho(raw);
+      const map=new Map(); raw.forEach(x=>{const r=iw38MapRow(x);if(r)map.set(r.ordem,r);}); const rows=[...map.values()];
+      if(!rows.length)throw new Error('Nenhuma ordem válida foi encontrada.');
+      resolve({file,rows,duplicates:Math.max(0,raw.length-rows.length)});
+    }catch(e){reject(e);} }; rd.onerror=()=>reject(new Error('Falha ao ler '+file.name)); rd.readAsArrayBuffer(file);
+  });
+}
+async function iw38FetchPaged(pathBase){
+  const out=[]; const limit=1000; let offset=0;
+  while(true){ const sep=pathBase.includes('?')?'&':'?'; const part=await supabaseRequest(`${pathBase}${sep}limit=${limit}&offset=${offset}`); const arr=Array.isArray(part)?part:[]; out.push(...arr); if(arr.length<limit)break; offset+=limit; }
+  return out;
+}
+async function iw38LoadData(silent){
+  try{
+    if(!silent)iw38SetStatus('Carregando carteira IW38…');
+    const [all,imports,moves]=await Promise.all([
+      iw38FetchPaged(IW38_CURRENT_TABLE+'?select=*&order=ordem.asc'),
+      supabaseRequest(IW38_IMPORT_TABLE+'?select=*&order=criado_em.desc&limit=30'),
+      supabaseRequest(IW38_MOVE_TABLE+'?select=*&order=criado_em.desc&limit=500')
+    ]);
+    iw38AllRows=Array.isArray(all)?all:[]; iw38Rows=iw38AllRows.filter(r=>r.ativo!==false); iw38Imports=Array.isArray(imports)?imports:[]; iw38Moves=Array.isArray(moves)?moves:[];
+    iw38RenderAll();
+    iw38SetStatus(iw38Imports.length?'Carteira atualizada e sincronizada com o Supabase.':'Estrutura pronta. Faça a primeira carga da IW38 para criar a base inicial.');
+  }catch(e){
+    iw38AllRows=[];iw38Rows=[];iw38Imports=[];iw38Moves=[];iw38RenderAll();
+    iw38SetStatus('Não foi possível carregar a Carteira IW38. Execute o SQL do módulo no Supabase antes da primeira carga. ('+e.message+')','err');
+  }
+}
+function iw38Counts(list,key){ const m=new Map(); (list||[]).forEach(r=>{const k=String(r[key]||'').trim();if(k)m.set(k,(m.get(k)||0)+1);}); return [...m.entries()].sort((a,b)=>b[1]-a[1]); }
+function iw38RenderBars(id,data,maxItems){
+  const el=document.getElementById(id);if(!el)return; const arr=(data||[]).slice(0,maxItems||10); if(!arr.length){el.innerHTML='<div class="iw38-empty">Sem dados para exibir.</div>';return;} const max=Math.max(...arr.map(x=>x[1]),1);
+  el.innerHTML=arr.map(([label,n])=>`<div class="iw38-bar-row"><span class="iw38-bar-label" title="${escapeHtml(label)}">${escapeHtml(label)}</span><div class="iw38-bar-track"><i class="iw38-bar-fill" style="width:${Math.max(2,n/max*100)}%"></i></div><span class="iw38-bar-val">${n}</span></div>`).join('');
+}
+function iw38MoveLabel(t){ return ({NOVA:'Nova OM',RETORNOU:'Retornou',STATUS_USUARIO:'Status usuário',STATUS_SISTEMA:'Status sistema',EQUIPAMENTO:'Equipamento',CUSTO_PLANEJADO:'Custo planejado',CUSTO_REAL:'Custo real',FINALIZADA:'Finalizada',SAIU_CARTEIRA:'Saiu da carteira'})[t]||t||'Alteração'; }
+function iw38RenderRecent(){
+  const el=document.getElementById('iw38RecentMov'); if(!el)return; const arr=iw38Moves.slice(0,12); if(!arr.length){el.innerHTML='<div class="iw38-empty">A primeira importação será usada como base inicial. As movimentações aparecerão a partir da próxima carga.</div>';return;}
+  el.innerHTML='<table class="iw38-recent"><thead><tr><th>Data</th><th>Tipo</th><th>Ordem</th><th>Equipamento</th><th>Movimentação</th></tr></thead><tbody>'+arr.map(m=>`<tr><td>${escapeHtml(iw38DateTimeBR(m.criado_em))}</td><td><span class="iw38-move-badge ${escapeHtml(m.tipo)}">${escapeHtml(iw38MoveLabel(m.tipo))}</span></td><td>${escapeHtml(m.ordem||'')}</td><td>${escapeHtml(m.equipamento||'')}</td><td>${escapeHtml((m.campo?m.campo+': ':'')+(m.valor_anterior||'—')+' → '+(m.valor_novo||'—'))}</td></tr>`).join('')+'</tbody></table>';
+}
+function iw38LatestImport(){ return iw38Imports[0]||null; }
+function iw38RenderKpis(){
+  const total=iw38Rows.length, eq=new Set(iw38Rows.map(r=>r.equipamento).filter(Boolean)).size, plan=iw38Rows.reduce((a,r)=>a+Number(r.custo_planejado||0),0), real=iw38Rows.reduce((a,r)=>a+Number(r.custo_real||0),0), fin=iw38Rows.filter(r=>r.data_fim_real).length;
+  const status=iw38Counts(iw38Rows,'status_usuario')[0];
+  document.getElementById('iw38KpiTotal').textContent=total.toLocaleString('pt-BR'); document.getElementById('iw38KpiEquip').textContent=eq.toLocaleString('pt-BR'); document.getElementById('iw38KpiPlan').textContent=iw38Money(plan); document.getElementById('iw38KpiReal').textContent=iw38Money(real); document.getElementById('iw38KpiFinal').textContent=fin.toLocaleString('pt-BR'); document.getElementById('iw38KpiStatus').textContent=status?status[0]:'—';
+  const imp=iw38LatestImport(); document.getElementById('iw38DeltaNovas').textContent=imp?Number(imp.novas||0).toLocaleString('pt-BR'):'0'; document.getElementById('iw38DeltaStatus').textContent=imp?Number(imp.status_alterado||0).toLocaleString('pt-BR'):'0'; document.getElementById('iw38DeltaFinal').textContent=imp?Number(imp.finalizadas||0).toLocaleString('pt-BR'):'0'; document.getElementById('iw38DeltaSaiu').textContent=imp?Number(imp.removidas||0).toLocaleString('pt-BR'):'0';
+  document.getElementById('iw38LastImport').textContent=imp?`Última carga: ${iw38DateTimeBR(imp.criado_em)} • ${imp.arquivo}`:'Nenhuma carga realizada';
+}
+function iw38PopulateFilters(){
+  const defs=[['iw38FilterStatus','status_usuario','Status usuário (todos)'],['iw38FilterEquip','equipamento','Equipamento (todos)'],['iw38FilterCentro','centro_trabalho','Centro trabalho (todos)']];
+  defs.forEach(([id,key,first])=>{const sel=document.getElementById(id);if(!sel)return;const cur=sel.value;const vals=[...new Set(iw38Rows.map(r=>String(r[key]||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-BR'));sel.innerHTML=`<option value="">${first}</option>`+vals.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join(''); if(vals.includes(cur))sel.value=cur;});
+}
+function iw38Filtered(){
+  const q=(document.getElementById('iw38Search')?.value||'').trim().toLowerCase(),st=document.getElementById('iw38FilterStatus')?.value||'',eq=document.getElementById('iw38FilterEquip')?.value||'',ct=document.getElementById('iw38FilterCentro')?.value||'';
+  return iw38Rows.filter(r=>(!st||r.status_usuario===st)&&(!eq||r.equipamento===eq)&&(!ct||r.centro_trabalho===ct)&&(!q||[r.ordem,r.equipamento,r.texto_breve,r.nota,r.status_sistema,r.status_usuario].some(v=>String(v||'').toLowerCase().includes(q))));
+}
+function iw38RenderCurrent(){
+  const body=document.getElementById('iw38CurrentBody');if(!body)return;const list=iw38Filtered();const pages=Math.max(1,Math.ceil(list.length/IW38_PAGE_SIZE));iw38Page=Math.min(Math.max(1,iw38Page),pages);const start=(iw38Page-1)*IW38_PAGE_SIZE;const part=list.slice(start,start+IW38_PAGE_SIZE);
+  body.innerHTML=part.length?part.map(r=>`<tr><td>${escapeHtml(r.ordem||'')}</td><td>${escapeHtml(r.equipamento||'')}</td><td class="desc">${escapeHtml(r.texto_breve||'')}</td><td>${escapeHtml(iw38DateBR(r.data_entrada))}</td><td><b>${escapeHtml(r.status_usuario||'')}</b></td><td>${escapeHtml(r.status_sistema||'')}</td><td>${escapeHtml(r.centro_trabalho||'')}</td><td>${escapeHtml(r.centro_custo||'')}</td><td class="money">${iw38Money(r.custo_planejado)}</td><td class="money">${iw38Money(r.custo_real)}</td><td>${escapeHtml(iw38DateBR(r.data_fim_real))}</td><td>${escapeHtml(r.ultimo_modificador||'')}</td></tr>`).join(''):'<tr><td colspan="12" class="iw38-empty">Nenhum registro encontrado.</td></tr>';
+  document.getElementById('iw38PageInfo').textContent=`${list.length.toLocaleString('pt-BR')} registros • Página ${iw38Page} de ${pages}`; document.getElementById('iw38Prev').disabled=iw38Page<=1;document.getElementById('iw38Next').disabled=iw38Page>=pages;
+}
+function iw38RenderMoves(){
+  const body=document.getElementById('iw38MovesBody');if(!body)return;body.innerHTML=iw38Moves.length?iw38Moves.map(m=>`<tr><td>${escapeHtml(iw38DateTimeBR(m.criado_em))}</td><td><span class="iw38-move-badge ${escapeHtml(m.tipo||'')}">${escapeHtml(iw38MoveLabel(m.tipo))}</span></td><td>${escapeHtml(m.ordem||'')}</td><td>${escapeHtml(m.equipamento||'')}</td><td class="desc">${escapeHtml(m.texto_breve||'')}</td><td>${escapeHtml(m.campo||'')}</td><td>${escapeHtml(m.valor_anterior||'—')}</td><td>${escapeHtml(m.valor_novo||'—')}</td></tr>`).join(''):'<tr><td colspan="8" class="iw38-empty">Sem movimentações registradas. A primeira carga funciona como base inicial.</td></tr>';
+}
+function iw38RenderHistory(){
+  const body=document.getElementById('iw38HistoryBody');if(!body)return;body.innerHTML=iw38Imports.length?iw38Imports.map(i=>`<tr><td>${escapeHtml(iw38DateTimeBR(i.criado_em))}</td><td>${escapeHtml(i.arquivo||'')}</td><td>${escapeHtml(i.tipo_carga||'')}</td><td>${escapeHtml(iw38DateBR(i.data_referencia))}</td><td class="num">${Number(i.total_registros||0).toLocaleString('pt-BR')}</td><td class="num">${Number(i.total_equipamentos||0).toLocaleString('pt-BR')}</td><td class="num">${Number(i.novas||0).toLocaleString('pt-BR')}</td><td class="num">${Number(i.status_alterado||0).toLocaleString('pt-BR')}</td><td class="num">${Number(i.finalizadas||0).toLocaleString('pt-BR')}</td><td class="num">${Number(i.removidas||0).toLocaleString('pt-BR')}</td><td class="num">${iw38Money(i.custo_planejado)}</td><td class="num">${iw38Money(i.custo_real)}</td></tr>`).join(''):'<tr><td colspan="12" class="iw38-empty">Nenhuma carga registrada.</td></tr>';
+}
+function iw38RenderAll(){ iw38RenderKpis();iw38PopulateFilters();iw38RenderBars('iw38StatusBars',iw38Counts(iw38Rows,'status_usuario'),10);iw38RenderBars('iw38EquipBars',iw38Counts(iw38Rows,'equipamento'),10);iw38RenderRecent();iw38RenderCurrent();iw38RenderMoves();iw38RenderHistory(); }
+function iw38SetTab(tab){
+  document.querySelectorAll('.iw38-tab').forEach(b=>b.classList.toggle('active',b.dataset.iw38Tab===tab));
+  ['resumo','carteira','movimentos','historico'].forEach(x=>document.getElementById('iw38Panel'+x.charAt(0).toUpperCase()+x.slice(1))?.classList.toggle('active',x===tab));
+}
+function iw38Open(){ const el=document.getElementById('iw38Overlay');if(!el)return; el.style.display='block';document.body.style.overflow='hidden';if(typeof portalPararCarousel==='function')portalPararCarousel();iw38LoadData(false); }
+function iw38Close(){ const el=document.getElementById('iw38Overlay');if(el)el.style.display='none';document.body.style.overflow='';iw38CancelPreview();if(document.body.classList.contains('portal-mode')&&typeof portalIniciarCarousel==='function')portalIniciarCarousel(); }
+function iw38CancelPreview(){iw38Pending=null;const p=document.getElementById('iw38ImportPreview');if(p)p.style.display='none';const f=document.getElementById('iw38File');if(f)f.value='';const pr=document.getElementById('iw38Progress');if(pr)pr.style.display='none';}
+function iw38Progress(p){const wrap=document.getElementById('iw38Progress'),bar=document.getElementById('iw38ProgressBar');if(wrap)wrap.style.display='block';if(bar)bar.style.width=Math.max(0,Math.min(100,p))+'%';}
+function iw38Preview(data){
+  iw38Pending=data;const rows=data.rows,eq=new Set(rows.map(r=>r.equipamento).filter(Boolean)).size,dates=rows.map(r=>r.data_entrada).filter(Boolean).sort(),ref=dates.length?dates[dates.length-1]:null,plan=rows.reduce((a,r)=>a+r.custo_planejado,0),real=rows.reduce((a,r)=>a+r.custo_real,0);
+  data.stats={total:rows.length,equip:eq,ref,plan,real}; document.getElementById('iw38PreviewTitle').textContent=data.file.name;document.getElementById('iw38PreviewSub').textContent=(data.duplicates?`${data.duplicates} linha(s) duplicada(s) por Ordem foram consolidadas. `:'')+'A primeira carga será tratada como base inicial; as próximas mostrarão as movimentações.';document.getElementById('iw38PreviewRegistros').textContent=rows.length.toLocaleString('pt-BR');document.getElementById('iw38PreviewEquip').textContent=eq.toLocaleString('pt-BR');document.getElementById('iw38PreviewRef').textContent=iw38DateBR(ref);document.getElementById('iw38PreviewPlan').textContent=iw38Money(plan);document.getElementById('iw38PreviewReal').textContent=iw38Money(real);document.getElementById('iw38ImportPreview').style.display='block';iw38Progress(0);document.getElementById('iw38Progress').style.display='none';
+}
+function iw38Move(ordem,r,tipo,campo,oldv,newv){return {ordem,equipamento:r?.equipamento||'',texto_breve:r?.texto_breve||'',tipo,campo:campo||'',valor_anterior:oldv==null?'':String(oldv),valor_novo:newv==null?'':String(newv)};}
+function iw38Compare(newRows,isBase){
+  const prev=new Map(iw38AllRows.map(r=>[String(r.ordem),r])),curr=new Map(newRows.map(r=>[String(r.ordem),r]));const moves=[];const novas=new Set(),stat=new Set(),finals=new Set(),removed=new Set();
+  if(!isBase){
+    newRows.forEach(r=>{const p=prev.get(r.ordem);if(!p){moves.push(iw38Move(r.ordem,r,'NOVA','Ordem','',r.ordem));novas.add(r.ordem);return;}if(p.ativo===false){moves.push(iw38Move(r.ordem,r,'RETORNOU','Carteira','Fora','Ativa'));novas.add(r.ordem);}if(String(p.status_usuario||'')!==String(r.status_usuario||'')){moves.push(iw38Move(r.ordem,r,'STATUS_USUARIO','Status usuário',p.status_usuario,r.status_usuario));stat.add(r.ordem);}if(String(p.status_sistema||'')!==String(r.status_sistema||'')){moves.push(iw38Move(r.ordem,r,'STATUS_SISTEMA','Status sistema',p.status_sistema,r.status_sistema));stat.add(r.ordem);}if(String(p.equipamento||'')!==String(r.equipamento||'')){moves.push(iw38Move(r.ordem,r,'EQUIPAMENTO','Equipamento',p.equipamento,r.equipamento));}if(Math.abs(Number(p.custo_planejado||0)-Number(r.custo_planejado||0))>.009){moves.push(iw38Move(r.ordem,r,'CUSTO_PLANEJADO','Custo planejado',iw38Money(p.custo_planejado),iw38Money(r.custo_planejado)));}if(Math.abs(Number(p.custo_real||0)-Number(r.custo_real||0))>.009){moves.push(iw38Move(r.ordem,r,'CUSTO_REAL','Custo real',iw38Money(p.custo_real),iw38Money(r.custo_real)));}if(!p.data_fim_real&&r.data_fim_real){moves.push(iw38Move(r.ordem,r,'FINALIZADA','Data fim real','',iw38DateBR(r.data_fim_real)));finals.add(r.ordem);}});
+    iw38AllRows.filter(r=>r.ativo!==false&&!curr.has(String(r.ordem))).forEach(r=>{moves.push(iw38Move(r.ordem,r,'SAIU_CARTEIRA','Carteira','Ativa','Fora da exportação'));removed.add(String(r.ordem));});
+  }
+  return {moves,novas:novas.size,status_alterado:stat.size,finalizadas:finals.size,removidas:removed.size,removedRows:[...removed].map(o=>prev.get(o)).filter(Boolean)};
+}
+function iw38DbClean(r,importId,ativo){return {ordem:String(r.ordem),nota:r.nota||'',tipo_ordem:r.tipo_ordem||'',equipamento:r.equipamento||'',criado_por:r.criado_por||'',texto_breve:r.texto_breve||'',data_entrada:r.data_entrada||null,centro_trabalho:r.centro_trabalho||'',revisao:r.revisao||'',tipo_atividade:r.tipo_atividade||'',status_sistema:r.status_sistema||'',status_usuario:r.status_usuario||'',data_base_inicio:r.data_base_inicio||null,hora_fim_real:r.hora_fim_real||'',data_fim_real:r.data_fim_real||null,fim_programado:r.fim_programado||null,inicio_programado:r.inicio_programado||null,centro_planejamento:r.centro_planejamento||'',grupo_planej:r.grupo_planej||'',centro_custo:r.centro_custo||'',custo_planejado:Number(r.custo_planejado||0),custo_real:Number(r.custo_real||0),denominacao_conjunto:r.denominacao_conjunto||'',ultimo_modificador:r.ultimo_modificador||'',local_instalacao:r.local_instalacao||'',ativo:ativo!==false,import_id:importId};}
+async function iw38BatchPost(table,rows,onProgress){const batch=250;for(let i=0;i<rows.length;i+=batch){const part=rows.slice(i,i+batch);await supabaseRequest(table,{method:'POST',headers:supabaseHeaders({'Prefer':'return=minimal'}),body:JSON.stringify(part)});if(onProgress)onProgress(Math.min(rows.length,i+part.length),rows.length);}}
+async function iw38BatchUpsert(rows,onProgress){const batch=250;for(let i=0;i<rows.length;i+=batch){const part=rows.slice(i,i+batch);await supabaseRequest(IW38_CURRENT_TABLE+'?on_conflict=ordem',{method:'POST',headers:supabaseHeaders({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(part)});if(onProgress)onProgress(Math.min(rows.length,i+part.length),rows.length);}}
+async function iw38ConfirmImport(){
+  if(!iw38Pending)return;const btn=document.getElementById('iw38ConfirmImport'),cancel=document.getElementById('iw38CancelImport');btn.disabled=true;cancel.disabled=true;
+  try{
+    iw38SetStatus('Comparando a nova IW38 com a carteira anterior…','warn');iw38Progress(5);
+    await iw38LoadData(true);const isBase=iw38AllRows.length===0&&iw38Imports.length===0;const cmp=iw38Compare(iw38Pending.rows,isBase),s=iw38Pending.stats;
+    iw38Progress(12);
+    const impPayload={arquivo:iw38Pending.file.name,tipo_carga:isBase?'BASE INICIAL':'ATUALIZACAO',data_referencia:s.ref,total_registros:s.total,total_equipamentos:s.equip,novas:cmp.novas,status_alterado:cmp.status_alterado,finalizadas:cmp.finalizadas,removidas:cmp.removidas,alteracoes:cmp.moves.length,custo_planejado:s.plan,custo_real:s.real};
+    const impRes=await supabaseRequest(IW38_IMPORT_TABLE+'?select=*',{method:'POST',headers:supabaseHeaders({'Prefer':'return=representation'}),body:JSON.stringify(impPayload)});const imp=(Array.isArray(impRes)?impRes[0]:impRes);if(!imp||!imp.id)throw new Error('O Supabase não retornou o identificador da carga.');
+    iw38SetStatus('Gravando carteira atual no Supabase…','warn');
+    const up=iw38Pending.rows.map(r=>iw38DbClean(r,imp.id,true));const gone=cmp.removedRows.map(r=>iw38DbClean(r,imp.id,false));const allUp=[...up,...gone];
+    await iw38BatchUpsert(allUp,(n,total)=>iw38Progress(15+(n/Math.max(total,1))*60));
+    if(cmp.moves.length){iw38SetStatus('Registrando movimentações detectadas…','warn');const mrows=cmp.moves.map(m=>Object.assign({import_id:imp.id},m));await iw38BatchPost(IW38_MOVE_TABLE,mrows,(n,total)=>iw38Progress(76+(n/Math.max(total,1))*18));}
+    iw38Progress(98);await iw38LoadData(true);iw38Progress(100);iw38SetStatus(isBase?`Base inicial criada com ${s.total.toLocaleString('pt-BR')} OMs.`:`IW38 atualizada: ${cmp.novas} novas, ${cmp.status_alterado} mudanças de status, ${cmp.finalizadas} finalizadas e ${cmp.removidas} saíram da carteira.`);setTimeout(iw38CancelPreview,450);
+  }catch(e){iw38SetStatus('Falha ao atualizar a IW38: '+e.message,'err');iw38Progress(0);}finally{btn.disabled=false;cancel.disabled=false;}
+}
+function iw38Init(){
+  document.getElementById('iw38Back')?.addEventListener('click',iw38Close);document.getElementById('iw38ImportBtn')?.addEventListener('click',()=>{const f=document.getElementById('iw38File');if(f){f.value='';f.click();}});
+  document.getElementById('iw38File')?.addEventListener('change',async e=>{const file=e.target.files?.[0];if(!file)return;iw38SetStatus('Lendo '+file.name+'…','warn');try{const data=await iw38LerArquivo(file);iw38Preview(data);iw38SetStatus('Arquivo reconhecido. Confira a prévia e confirme a atualização.');}catch(err){iw38SetStatus('Não foi possível ler a planilha: '+err.message,'err');}});
+  document.getElementById('iw38CancelImport')?.addEventListener('click',iw38CancelPreview);document.getElementById('iw38ConfirmImport')?.addEventListener('click',()=>solicitarSenha(iw38ConfirmImport));
+  document.querySelectorAll('.iw38-tab').forEach(b=>b.addEventListener('click',()=>iw38SetTab(b.dataset.iw38Tab)));
+  ['iw38Search','iw38FilterStatus','iw38FilterEquip','iw38FilterCentro'].forEach(id=>document.getElementById(id)?.addEventListener(id==='iw38Search'?'input':'change',()=>{iw38Page=1;iw38RenderCurrent();}));
+  document.getElementById('iw38ClearFilters')?.addEventListener('click',()=>{['iw38Search','iw38FilterStatus','iw38FilterEquip','iw38FilterCentro'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});iw38Page=1;iw38RenderCurrent();});
+  document.getElementById('iw38Prev')?.addEventListener('click',()=>{iw38Page--;iw38RenderCurrent();});document.getElementById('iw38Next')?.addEventListener('click',()=>{iw38Page++;iw38RenderCurrent();});
+}
+document.addEventListener('DOMContentLoaded',iw38Init);
+
+
 // ===================== PORTAL INICIAL PCM =====================
 const portalState = { index:0, timer:null, intervalMs:5500 };
 function portalSlides(){ return Array.from(document.querySelectorAll('#portalHero .portal-slide')); }
@@ -3337,7 +3649,7 @@ function portalExecutar(acao){
     case 'custos': if(typeof custosAbrir==='function') custosAbrir(); else document.getElementById('btnCustos')?.click(); break;
     case 'gerencial': document.getElementById('btnPainelGerencial')?.click(); break;
     case 'pedidos': if(typeof empenhadoFatAbrir==='function') empenhadoFatAbrir(); else portalToast('Controle de pedidos ainda não está disponível.'); break;
-    case 'equipamentos': portalToast('Carteira de equipamentos (IW38): em desenvolvimento.'); break;
+    case 'equipamentos': iw38Open(); break;
     case 'outros': portalToast('Outros módulos: em desenvolvimento.'); break;
     case 'config': portalToast('Configurações do portal: em desenvolvimento.'); break;
   }
